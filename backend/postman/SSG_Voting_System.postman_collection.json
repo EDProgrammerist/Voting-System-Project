@@ -708,7 +708,48 @@
     },
     {
       "name": "02 - Admin Read APIs",
+      "description": "Read-only administrator checks. The folder starts with its own login so it can be run independently.",
       "item": [
+        {
+          "name": "Admin Login - Read APIs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ssg.local\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/login",
+            "description": "Refreshes admin_token so this folder can run independently. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Admin token returned', function () { pm.expect(json.token).to.be.a('string').and.not.empty; });",
+                  "if (json.token) { pm.collectionVariables.set('admin_token', json.token); }"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Dashboard",
           "request": {
@@ -885,7 +926,48 @@
     },
     {
       "name": "03 - Admin Student Management",
+      "description": "Administrator student creation and update checks. The folder logs in and generates a fresh Student ID each time it runs.",
       "item": [
+        {
+          "name": "Admin Login - Student Management",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ssg.local\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/login",
+            "description": "Refreshes admin_token so this folder can run independently. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Admin token returned', function () { pm.expect(json.token).to.be.a('string').and.not.empty; });",
+                  "if (json.token) { pm.collectionVariables.set('admin_token', json.token); }"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Create Student",
           "request": {
@@ -923,6 +1005,14 @@
             "description": "Creates an enrolled student. Expected: 201 on a fresh database; 422 if rerun without resetting."
           },
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('new_student_id', 'PM-' + Date.now());"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
