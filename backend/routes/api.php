@@ -15,7 +15,7 @@ Route::prefix('voter')->group(function (): void {
     Route::post(
         '/login',
         [VoterAuthController::class, 'login'],
-    )->middleware('throttle:10,1');
+    )->middleware('throttle:20,1');
 
     Route::middleware([
         'auth:sanctum',
@@ -42,7 +42,7 @@ Route::prefix('admin')->group(function (): void {
     Route::post(
         '/login',
         [AdminAuthController::class, 'login'],
-    )->middleware('throttle:10,1');
+    )->middleware('throttle:20,1');
 
     Route::middleware([
         'auth:sanctum',

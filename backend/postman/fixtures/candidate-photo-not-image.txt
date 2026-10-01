@@ -1,0 +1,2 @@
+This is intentionally a plain-text file.
+It is used to verify that the candidate photo endpoint rejects non-image uploads.

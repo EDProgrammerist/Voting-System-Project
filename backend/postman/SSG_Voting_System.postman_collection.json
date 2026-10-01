@@ -11,11 +11,19 @@
       "value": "http://127.0.0.1:8000/api"
     },
     {
+      "key": "concurrent_base_url",
+      "value": "http://127.0.0.1:8001/api"
+    },
+    {
       "key": "admin_token",
       "value": ""
     },
     {
       "key": "voter_token",
+      "value": ""
+    },
+    {
+      "key": "concurrent_voter_token",
       "value": ""
     },
     {
@@ -620,6 +628,153 @@
           ]
         },
         {
+          "name": "Candidate from Wrong Position - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{voter_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0003\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/voter/vote",
+            "description": "Attempts to select Vice President candidate 2024-0003 for the President position. The backend must reject the mismatched candidacy. Expected: 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Wrong-position validation returned', function () { pm.expect(json.errors.selections[0]).to.include('invalid for President'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Too Many Candidates for One Position - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{voter_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0002\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/voter/vote",
+            "description": "Submits two different President candidates even though the President position allows only one selection. Expected: 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Maximum-selection validation returned', function () { pm.expect(json.errors.selections[0]).to.eql('Too many candidates selected for President.'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Same Candidate Submitted Twice - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{voter_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/voter/vote",
+            "description": "Submits candidate 2024-0001 twice in one ballot. Application validation must reject the duplicate before any participation, ballot, or vote record is written. Expected: 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Duplicate-candidate validation returned', function () { pm.expect(json.errors.selections[0]).to.eql('The same candidate cannot be selected more than once.'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Submit Valid Vote",
           "request": {
             "method": "POST",
@@ -699,6 +854,122 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 409', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01B - Concurrent Submission Security",
+      "description": "Logs in a separate eligible voter and sends two vote submissions concurrently. The database-level participation constraint must allow exactly one request to succeed.",
+      "item": [
+        {
+          "name": "Concurrent-Test Voter Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"full_name\": \"Test Voter One\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/voter/login",
+            "description": "Obtains a dedicated token for the concurrency test. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Concurrency voter token returned', function () { pm.expect(json.token).to.be.a('string').and.not.empty; });",
+                  "if (json.token) { pm.collectionVariables.set('concurrent_voter_token', json.token); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Two Simultaneous Vote Submissions - Only One Succeeds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{concurrent_voter_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{base_url}}/voter/ballot",
+            "description": "The visible request confirms the token and ballot first. Its test script then starts two identical POST /voter/vote requests without waiting for either one to finish. Expected concurrent statuses: one 201 and one 409."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ballot is available before concurrent submission', function () { pm.response.to.have.status(200); });",
+                  "const baseUrl = pm.variables.replaceIn('{{base_url}}');",
+                  "const concurrentBaseUrl = pm.variables.replaceIn('{{concurrent_base_url}}');",
+                  "const token = pm.collectionVariables.get('concurrent_voter_token');",
+                  "const requestOptions = {",
+                  "    url: baseUrl + '/voter/vote',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Accept': 'application/json',",
+                  "        'Content-Type': 'application/json',",
+                  "        'Authorization': 'Bearer ' + token",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({",
+                  "            election_id: Number(pm.collectionVariables.get('election_id')),",
+                  "            selections: [",
+                  "                { position_id: Number(pm.collectionVariables.get('president_position_id')), candidate_student_id: '2024-0002' },",
+                  "                { position_id: Number(pm.collectionVariables.get('vice_president_position_id')), candidate_student_id: '2024-0004' }",
+                  "            ]",
+                  "        })",
+                  "    }",
+                  "};",
+                  "const statuses = [];",
+                  "const errors = [];",
+                  "function recordResult(error, response) {",
+                  "    if (error) { errors.push(String(error)); }",
+                  "    if (response) { statuses.push(response.code); }",
+                  "    if (statuses.length + errors.length === 2) {",
+                  "        pm.test('Both concurrent requests completed without transport errors', function () { pm.expect(errors).to.be.empty; });",
+                  "        pm.test('Exactly one submission succeeds and one is rejected', function () { pm.expect(statuses.sort()).to.eql([201, 409]); });",
+                  "        pm.collectionVariables.unset('concurrent_voter_token');",
+                  "    }",
+                  "}",
+                  "const secondRequestOptions = Object.assign({}, requestOptions, { url: concurrentBaseUrl + '/voter/vote' });",
+                  "pm.sendRequest(requestOptions, recordResult);",
+                  "pm.sendRequest(secondRequestOptions, recordResult);"
                 ]
               }
             }
@@ -1456,6 +1727,148 @@
           ]
         },
         {
+          "name": "Candidate Photo over 2 MB - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "student_id",
+                  "value": "{{draft_candidate_student_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "election_id",
+                  "value": "{{draft_election_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "position_id",
+                  "value": "{{draft_position_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "team",
+                  "value": "TEAM_A",
+                  "type": "text"
+                },
+                {
+                  "key": "motto",
+                  "value": "Service with accountability",
+                  "type": "text"
+                },
+                {
+                  "key": "profile_photo",
+                  "type": "file",
+                  "src": "C:/Users/ED/Desktop/Voting System/backend/postman/fixtures/candidate-photo-over-2mb.png"
+                }
+              ]
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Uploads a valid PNG of about 3 MB. Laravel's 2048 KB maximum must reject it. Expected: 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Photo-size validation returned', function () { pm.expect(json.errors.profile_photo[0]).to.include('2048 kilobytes'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Non-image Candidate Photo - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "student_id",
+                  "value": "{{draft_candidate_student_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "election_id",
+                  "value": "{{draft_election_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "position_id",
+                  "value": "{{draft_position_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "team",
+                  "value": "TEAM_A",
+                  "type": "text"
+                },
+                {
+                  "key": "motto",
+                  "value": "Service with accountability",
+                  "type": "text"
+                },
+                {
+                  "key": "profile_photo",
+                  "type": "file",
+                  "src": "C:/Users/ED/Desktop/Voting System/backend/postman/fixtures/candidate-photo-not-image.txt"
+                }
+              ]
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Uploads a plain-text file as profile_photo. Laravel's image validation must reject it. Expected: 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Non-image validation returned', function () { pm.expect(json.errors.profile_photo[0].toLowerCase()).to.include('image'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Upload Candidate Photo - Select File First",
           "request": {
             "method": "POST",
@@ -1587,6 +2000,45 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Voter Login with No Active Election - Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"full_name\": \"Test Voter One\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/voter/login",
+            "description": "Confirms that an eligible student cannot authenticate when no election is active. Expected: 409."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 409', function () { pm.response.to.have.status(409); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No-active-election message returned', function () { pm.expect(json.message).to.eql('There is currently no active SSG election.'); });"
                 ]
               }
             }
