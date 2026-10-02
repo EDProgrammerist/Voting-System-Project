@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Election;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ElectionController extends Controller
 {
@@ -113,12 +112,10 @@ class ElectionController extends Controller
             ], 409);
         }
 
-        DB::transaction(function () use ($election): void {
-            $election->update([
-                'status' => 'active',
-                'starts_at' => $election->starts_at ?? now(),
-            ]);
-        });
+        $election->update([
+            'status' => 'active',
+            'starts_at' => $election->starts_at ?? now(),
+        ]);
 
         return response()->json([
             'message' => 'Election activated successfully.',

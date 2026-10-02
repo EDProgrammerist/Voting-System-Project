@@ -41,6 +41,13 @@ class PositionController extends Controller
                 'required',
                 'string',
                 'max:255',
+                Rule::unique('positions', 'name')
+                    ->where(
+                        fn ($query) => $query->where(
+                            'election_id',
+                            $request->integer('election_id'),
+                        ),
+                    ),
             ],
             'max_selections' => [
                 'required',
@@ -64,21 +71,6 @@ class PositionController extends Controller
                 'message' => 'Positions can only be changed while the election is in draft status.',
             ], 409);
         }
-
-        $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('positions', 'name')
-                    ->where(
-                        fn ($query) => $query->where(
-                            'election_id',
-                            $election->id,
-                        ),
-                    ),
-            ],
-        ]);
 
         $position = Position::create($validated);
 
