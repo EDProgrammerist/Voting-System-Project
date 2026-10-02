@@ -11,6 +11,24 @@ Laravel REST API for administering SSG elections and securely accepting student 
 
 Docker support will be added after the local backend workflow is complete.
 
+## Docker development setup
+
+Run the complete backend stack from this `backend` directory:
+
+```powershell
+docker compose up --detach --build
+docker compose exec app php artisan migrate:fresh --seed --force
+docker compose exec app php artisan storage:link
+```
+
+The API is available at `http://localhost:8000/api`. Docker MySQL is exposed to the host on port `3308` and is reached by Laravel containers through `db:3306`.
+
+Stop the containers without deleting database data:
+
+```powershell
+docker compose down
+```
+
 ## Local setup
 
 ```powershell
@@ -23,6 +41,13 @@ php artisan serve
 ```
 
 Update the `DB_*` values in `.env` for your local MySQL installation before running migrations.
+
+Windows does not support multiple workers in PHP's built-in server. For the concurrent-vote Postman test, start two single-worker servers in separate terminals:
+
+```powershell
+php artisan serve --host=127.0.0.1 --port=8000
+php artisan serve --host=127.0.0.1 --port=8001
+```
 
 In `local` and `testing` environments, the default seeder calls `DevelopmentSeeder`, which creates the development administrator, students, active election, positions, and candidates required by the Postman suite. It does not seed these known credentials in production.
 
