@@ -14,6 +14,10 @@ const AdminVotesPage = lazy(() => import("@/pages/admin/votes"));
 const HomePage = lazy(() => import("@/pages/guest/home"));
 const GuestLayout = lazy(() => import("@/pages/guest/layout"));
 const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
+const VoterLoginPage = lazy(() => import("@/pages/voter/login"));
+const VoterBallotPage = lazy(() => import("@/pages/voter/ballot"));
+const VoterReviewPage = lazy(() => import("@/pages/voter/review"));
+const VoterThankYouPage = lazy(() => import("@/pages/voter/thank-you"));
 
 export default function AppRouter() {
   const hasAdminToken = Boolean(getAdminToken());
@@ -23,13 +27,13 @@ export default function AppRouter() {
       <Routes>
       <Route
         path="/"
-        element={
-          <Navigate
-            to={hasAdminToken ? "/admin/dashboard" : "/admin/login"}
-            replace
-          />
-        }
+        element={<Navigate to={hasAdminToken ? "/admin/dashboard" : "/voter/login"} replace />}
       />
+      <Route path="/login" element={<Navigate to="/voter/login" replace />} />
+      <Route path="/voter/login" element={<VoterLoginPage />} />
+      <Route path="/voter/ballot" element={<VoterBallotPage />} />
+      <Route path="/voter/review" element={<VoterReviewPage />} />
+      <Route path="/voter/thank-you" element={<VoterThankYouPage />} />
       <Route
         path="/admin/login"
         element={

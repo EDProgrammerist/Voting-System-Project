@@ -1,0 +1,240 @@
+.voter-review {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #0a3977;
+  color: #080d25;
+}
+
+.voter-review--loading {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.voter-review__background,
+.voter-review__overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.voter-review__background {
+  object-fit: cover;
+  object-position: center;
+}
+
+.voter-review__overlay {
+  background: rgb(0 45 112 / 72%);
+}
+
+.voter-review__stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 84rem);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 8vh, 6rem) clamp(1.5rem, 5vw, 4.5rem) 2rem;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.voter-review__panel {
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 96%);
+  padding: clamp(2rem, 4vw, 3.25rem) clamp(2rem, 4.5vw, 4.2rem) clamp(1.65rem, 3vw, 2.7rem);
+  box-shadow: 0 1.4rem 3.5rem rgb(0 16 52 / 24%);
+}
+
+.voter-review__header h1 {
+  margin: 0;
+  font-size: clamp(2.45rem, 4vw, 3.55rem);
+  font-weight: 820;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.voter-review__header p {
+  margin: 1.35rem 0 2.5rem;
+  color: #737789;
+  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  font-weight: 430;
+  letter-spacing: -0.025em;
+}
+
+.voter-review__positions {
+  display: grid;
+}
+
+.review-position {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.42fr) minmax(0, 1fr);
+  align-items: center;
+  min-height: 6.6rem;
+  border-bottom: 0.12rem solid #8c91a0;
+  gap: 2rem;
+}
+
+.review-position:last-child {
+  border-bottom: 0;
+}
+
+.review-position h2,
+.review-position p {
+  margin: 0;
+}
+
+.review-position h2 {
+  font-size: clamp(1.65rem, 2.5vw, 2.25rem);
+  font-weight: 820;
+  letter-spacing: -0.04em;
+}
+
+.review-position p {
+  color: #40475b;
+  font-size: clamp(1rem, 1.55vw, 1.3rem);
+  font-weight: 610;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.voter-review__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: clamp(2.5rem, 8vw, 7.5rem);
+}
+
+.voter-review__actions button {
+  min-width: clamp(14rem, 22vw, 20rem);
+  min-height: 5rem;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #fff;
+  font: inherit;
+  font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+  font-weight: 820;
+  letter-spacing: -0.025em;
+  cursor: pointer;
+  box-shadow: 0 0.75rem 2rem rgb(0 24 72 / 22%);
+  transition: filter 160ms ease, transform 160ms ease, opacity 160ms ease;
+}
+
+.voter-review__back {
+  background: #a9aab0;
+}
+
+.voter-review__confirm {
+  background: #06449b;
+}
+
+.voter-review__actions button:hover:not(:disabled),
+.voter-review__actions button:focus-visible:not(:disabled) {
+  filter: brightness(1.12);
+  outline: 0.2rem solid rgb(132 208 255 / 62%);
+  outline-offset: 0.2rem;
+  transform: translateY(-0.1rem);
+}
+
+.voter-review__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.voter-review__status {
+  min-height: 1.4rem;
+  margin: 0.8rem auto 0;
+  color: #ffe4e4;
+  font-size: 0.9rem;
+  font-weight: 680;
+  text-align: center;
+}
+
+.voter-review__status[data-state="success"] {
+  color: #d8ffe5;
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .voter-review__stage {
+    padding-top: 1.25rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .voter-review__panel {
+    padding-top: 1.75rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .voter-review__header p {
+    margin: 0.75rem 0 1.25rem;
+  }
+
+  .review-position {
+    min-height: 4.75rem;
+  }
+
+  .voter-review__actions {
+    margin-top: 1rem;
+  }
+
+  .voter-review__actions button {
+    min-height: 4rem;
+  }
+
+  .voter-review__status {
+    margin-top: 0.35rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .voter-review {
+    overflow: visible;
+  }
+
+  .voter-review__stage {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .voter-review__panel {
+    padding: 1.75rem 1.25rem 1rem;
+  }
+
+  .voter-review__header p {
+    margin: 0.8rem 0 1.35rem;
+    line-height: 1.35;
+  }
+
+  .review-position {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 1.15rem 0;
+    gap: 0.4rem;
+  }
+
+  .review-position p {
+    text-align: left;
+  }
+
+  .voter-review__actions {
+    margin-top: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .voter-review__actions button {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.8rem;
+    font-size: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voter-review__actions button {
+    transition: none;
+  }
+}

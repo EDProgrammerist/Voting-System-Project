@@ -1,4 +1,5 @@
 import { clearAdminSession } from "@/lib/admin-session";
+import { clearVoterSession } from "@/lib/voter-session";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -32,9 +33,16 @@ export async function apiRequest<T>(
   if (!response.ok) {
     const requestHeaders = new Headers(init?.headers);
     if (response.status === 401 && requestHeaders.has("Authorization")) {
-      clearAdminSession();
-      if (window.location.pathname !== "/admin/login") {
-        window.location.replace("/admin/login");
+      if (endpoint.startsWith("/admin/")) {
+        clearAdminSession();
+        if (window.location.pathname !== "/admin/login") {
+          window.location.replace("/admin/login");
+        }
+      } else if (endpoint.startsWith("/voter/")) {
+        clearVoterSession();
+        if (window.location.pathname !== "/voter/login") {
+          window.location.replace("/voter/login");
+        }
       }
     }
 
