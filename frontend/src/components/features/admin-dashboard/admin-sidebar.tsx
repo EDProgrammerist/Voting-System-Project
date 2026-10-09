@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { clearAdminSession, getAdminToken, getAdminUser } from "@/lib/admin-session";
 import { logoutAdmin } from "@/services/admin-dashboard-service";
 
-type AdminSection = "dashboard" | "votes";
+type AdminSection = "dashboard" | "votes" | "voters" | "position" | "candidates" | "ballot";
 
 interface AdminSidebarProps {
   active: AdminSection;
@@ -23,10 +23,10 @@ const navigationGroups = [
   {
     label: "Manage",
     items: [
-      { id: "voters", label: "Voters", icon: Users },
-      { id: "position", label: "Position", icon: Medal },
-      { id: "candidates", label: "Candidates", icon: UserList },
-      { id: "ballot", label: "Ballot Position", icon: ListChecks },
+      { id: "voters", label: "Voters", icon: Users, path: "/admin/voters" },
+      { id: "position", label: "Position", icon: Medal, path: "/admin/positions" },
+      { id: "candidates", label: "Candidates", icon: UserList, path: "/admin/candidates" },
+      { id: "ballot", label: "Ballot Position", icon: ListChecks, path: "/admin/ballot-position" },
     ],
   },
 ];

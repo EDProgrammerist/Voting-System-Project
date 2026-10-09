@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Printer, User } from "@phosphor-icons/react";
 
 import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
+import { AdminDataState } from "@/components/features/admin-dashboard/admin-data-state";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import type { CandidateResult } from "@/types/dashboard";
@@ -46,6 +47,17 @@ export function AdminVotesScreen() {
 
   function handleUnavailable(label: string) {
     setNotice(`${label} management will be connected in the next screen.`);
+  }
+
+  if (dataState !== "live") {
+    return (
+      <main className="admin-dashboard admin-votes">
+        <AdminSidebar active="votes" onUnavailable={handleUnavailable} />
+        <section className="admin-dashboard__content admin-votes__content">
+          <AdminDataState message={dataNotice} state={dataState} />
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -97,7 +109,7 @@ export function AdminVotesScreen() {
         </div>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">
-          {notice || dataNotice || (dataState === "loading" ? "Loading live election results…" : "")}
+          {notice || dataNotice}
         </p>
       </section>
     </main>

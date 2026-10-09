@@ -15,4 +15,14 @@ class ApiBoundaryTest extends TestCase
     {
         $this->getJson('/api/voter/ballot')->assertUnauthorized();
     }
+
+    public function test_api_authentication_failure_is_json_without_accept_header(): void
+    {
+        $this->get('/api/admin/students')
+            ->assertUnauthorized()
+            ->assertHeader('content-type', 'application/json')
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
 }

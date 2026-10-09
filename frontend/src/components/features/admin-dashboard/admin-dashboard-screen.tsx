@@ -10,6 +10,7 @@ import {
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import campusBackground from "@/assets/campus-admin-bg.png";
+import { AdminDataState } from "@/components/features/admin-dashboard/admin-data-state";
 import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -104,6 +105,17 @@ export function AdminDashboardScreen() {
 
   function handleUnavailable(label: string) {
     setNotice(`${label} management will be connected in the next screen.`);
+  }
+
+  if (dataState !== "live") {
+    return (
+      <main className="admin-dashboard">
+        <AdminSidebar active="dashboard" onUnavailable={handleUnavailable} />
+        <section className="admin-dashboard__content">
+          <AdminDataState message={dataNotice} state={dataState} />
+        </section>
+      </main>
+    );
   }
 
   return (

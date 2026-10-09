@@ -141,6 +141,146 @@ final result: passed
 
 ---
 
+# Admin Candidates Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/candidates-design-ref.png`
+- Source board pixels: 1791 × 878
+- Implementation: `http://127.0.0.1:4173/admin/candidates`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose local filesystem paths
+- Main implementation viewport: 1440 × 900 CSS px
+- Mobile implementation viewport: 390 × 844 CSS px
+- Device pixel ratio: 1
+- States compared: default candidate grid and Add Candidate dialog open
+- Density normalization: the source is a presentation board containing the page and a detached dialog specimen. A single browser comparison canvas placed that source above the rendered page and rendered dialog state so both regions could be judged together.
+
+## Full-View Comparison Evidence
+
+The implementation preserves the reference's fixed cobalt sidebar, large Candidates heading and description, top-right Add Candidate action, four yellow-capped summary cards, wide search and position controls, and two-column white candidate cards with blue headers. The source's dark presentation frame is intentionally omitted so the application fills the viewport, consistent with the established admin screens.
+
+## Focused Region Comparison Evidence
+
+- Candidate cards: the blue header band, centered circular portrait, two outlined actions, card proportions, and two-column rhythm align with the source. Real names, partylist, position, and platform content make the previously blank specimen usable.
+- Filters: the wide search field, dark search action, compact All Position select, elevation, and spacing retain the source hierarchy.
+- Dialog: Full Name, Position, Partylist, Platform, Upload, Cancel, and Save are present in the same order and with matching field rhythm, compact dimensions, and blue primary action.
+- Mobile: the header stacks, summaries and candidate cards become single-column, the modal fits inside 390 × 844, and the page has no horizontal overflow.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Satoshi maintains the established admin family, with title, subtitle, summary labels, card content, controls, and dialog labels matching the source's weight hierarchy.
+- Spacing and layout rhythm: page header, four-card summary, filters, two-column candidate grid, portrait overlap, actions, dialog fields, radii, and elevation align with the reference regions.
+- Colors and visual tokens: cobalt navigation and candidate headers, yellow active state and summary accents, pale blue-gray canvas, white cards, gray search action, and red delete treatment match the source palette.
+- Image quality and assets: real profile photos render when returned by the API. Empty profiles use the installed Phosphor User icon inside the source-style neutral portrait circle rather than custom SVG or CSS illustration.
+- Copy and content: Candidates, election management description, summary labels, search and position filter, candidate actions, dialog labels, and action copy match the reference. Dynamic candidate details are coherent and grounded in the preview/API records.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial page pass
+   - No actionable P0/P1/P2 finding. The source board and rendered page were placed in one comparison canvas, and the major proportions, palette, typography, filters, and card structure aligned.
+2. Dialog pass
+   - The rendered Add Candidate dialog was opened in the same comparison canvas and matched the reference's field order, dimensions, hierarchy, and actions without a corrective visual iteration.
+3. Interaction pass
+   - Added a candidate in preview mode and verified the total and President count updated.
+   - Search for `Maria` returned exactly one candidate; Edit opened with the candidate identity locked and existing values ready to update.
+4. Responsive and console pass
+   - Verified 390 × 844 layout, modal dimensions, navigation behavior, no horizontal overflow, and a clean browser console.
+
+## Functional Verification
+
+- [x] Search filters by name, student ID, partylist, and platform.
+- [x] Position selection filters the candidate grid.
+- [x] Add Candidate creates a preview record and updates summary totals.
+- [x] Edit Candidate reuses the backend's candidate upsert behavior.
+- [x] Authenticated mode lists candidates, positions, and enrolled students through the existing protected endpoints.
+- [x] Multipart profile-photo upload is supported without forcing a JSON content type.
+- [x] Candidates navigation is active and connected to `/admin/candidates`.
+- [x] Lint, typecheck, production build, desktop comparison, mobile verification, and console checks pass.
+
+## Open Questions
+
+- The backend currently exposes no candidate-delete endpoint. Delete works in isolated preview mode; authenticated mode reports that the action is unavailable instead of simulating success.
+
+## Follow-up Polish
+
+- P3: the implementation shows useful candidate identity and platform content where the static reference intentionally leaves card bodies blank.
+
+final result: passed
+
+---
+
+# Admin Voters Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/voters-design-ref.png`
+- Source pixels: 1672 × 941
+- Implementation: `http://127.0.0.1:4173/admin/voters`
+- Implementation screenshot evidence: Codex in-app Browser capture retained in this task; the capture API did not expose a local filesystem path
+- Browser viewport: 1672 × 941 CSS px
+- Device pixel ratio: 1
+- State: unfiltered preview voter records, viewport positioned at the top
+- Density normalization: none required; source and implementation were compared at 1:1 dimensions
+
+## Full-View Comparison Evidence
+
+The implementation was captured at the exact source dimensions. It preserves the reference's full-height blue navigation, large Voters heading and description, three-part filter panel, and wide white table surface with the dark-blue four-column header. The surrounding dark presentation frame from the source is intentionally omitted to follow the established full-viewport requirement.
+
+## Focused Region Comparison Evidence
+
+- Search controls: input/button split, dark search action, muted field fill, select proportions, caret alignment, and horizontal spacing match the source hierarchy.
+- Table: Student ID, Name, Course, and Status columns retain equal visual weighting and the rounded navy header treatment.
+- Sidebar: Voters uses the yellow active state, while Dashboard and Votes remain functional routes.
+- Mobile at 390 × 844 CSS px: controls stack cleanly, the table scrolls inside its card, the navigation opens as an overlay, and the page itself has no horizontal overflow.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Satoshi matches the existing admin visual language, with heading, subtitle, controls, and table labels calibrated to the source hierarchy.
+- Spacing and layout rhythm: header baseline, filter panel, table spacing, radii, and elevation align with the reference; row content uses the source's empty table space productively.
+- Colors and visual tokens: cobalt navigation, yellow selected state, pale blue-gray canvas, white panels, dark-blue table header, and gray input fields match the source palette.
+- Image quality and assets: the Voters reference contains no raster imagery. Search, caret, and navigation symbols use the installed Phosphor icon set rather than custom SVG or CSS drawings.
+- Copy and content: Voters title, management description, search placeholder, filter labels, and column headings match the reference.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial pass
+   - No actionable P0/P1/P2 findings.
+   - Desktop proportions aligned at 1672 × 941 without a corrective visual iteration.
+2. Interaction pass
+   - Search for `Maria` returned exactly one matching voter.
+   - Combined `BSIT` and `Not Voted` filters returned exactly one matching voter.
+3. Responsive pass
+   - Verified 390 × 844 layout, menu expansion, internal table scrolling, no page-level horizontal overflow, and a clean browser console.
+
+## Functional Verification
+
+- [x] Search by student name or ID works.
+- [x] Course and status filters work independently and together.
+- [x] Empty-result feedback is implemented.
+- [x] Authenticated sessions request `/api/admin/students`.
+- [x] Voters navigation is active and connected to `/admin/voters`.
+- [x] Lint, typecheck, production build, desktop comparison, and mobile verification pass.
+
+## Open Questions
+
+- The current backend student response has no course field or per-student voting-participation flag. Authenticated rows therefore show the real academic status and an em dash for course; the isolated preview demonstrates the complete course/voting-status design until those fields are exposed.
+
+## Follow-up Polish
+
+- P3: the reference leaves the table body empty, while the implementation includes realistic rows and status pills so the primary management flow can be tested.
+
+final result: passed
+
+---
+
 # Admin Votes Design QA
 
 ## Comparison Target
@@ -202,5 +342,137 @@ No actionable P0, P1, or P2 mismatch remains.
 ## Follow-up Polish
 
 - P3: the source hides candidate names and vote totals inside otherwise empty bars; the implementation displays both so the live results remain understandable and useful.
+
+final result: passed
+
+---
+
+# Admin Position Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/position-design-ref.png`
+- Source board pixels: 2946 × 1146
+- Implementation: `http://127.0.0.1:4173/admin/positions`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose local filesystem paths
+- Main implementation viewport: 1536 × 900 CSS px
+- Mobile implementation viewport: 390 × 844 CSS px
+- Device pixel ratio: 1
+- States compared: default position list and Add Position dialog open
+- Density normalization: the source is a presentation board containing the page and a separate modal specimen side by side, so the page and dialog were compared as normalized content regions rather than as one literal 2946 px application viewport
+
+## Full-View Comparison Evidence
+
+The full-viewport implementation preserves the reference's blue sidebar, Position heading, top-right Add Position action, three yellow-capped summary cards, and compact four-column management table. The dark board background is intentionally omitted to follow the established full-viewport requirement.
+
+## Focused Region Comparison Evidence
+
+- Summary region: three equal white cards, yellow top rules, compact labels, and live totals match the source hierarchy and spacing.
+- Table: dark-blue rounded header, Position/Max Votes/Candidates/Actions columns, alternating row treatment, and dark/red action labels match the reference.
+- Dialog: the Add Position title, two labeled fields, white-gray surface, Cancel/Save actions, dimensions, and spacing were captured and compared in the open state.
+- Mobile: summary cards stack, the table scrolls within its surface, the dialog fits the viewport, and no page-level horizontal overflow occurs.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Satoshi preserves the established admin typography with matching title, label, table, and dialog weight hierarchy.
+- Spacing and layout rhythm: page header, summary grid, table, modal field spacing, radii, and shadows align with their respective source regions.
+- Colors and visual tokens: cobalt navigation, yellow active state and card accents, blue action/header surfaces, pale canvas, white cards, and red delete actions match the reference palette.
+- Image quality and assets: the Position reference contains no raster imagery. Plus, close, and navigation symbols use the installed Phosphor icon library.
+- Copy and content: Position, Add Position, Total Position, Total Candidates, Total Seats, table headings, field labels, and action copy match the source.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial page pass
+   - No actionable P0/P1/P2 finding; page proportions aligned without a corrective visual iteration.
+2. Dialog pass
+   - The add dialog matched the source specimen at desktop and remained usable at 390 × 844.
+3. Interaction pass
+   - Added a Treasurer position in preview mode, verified summary totals updated, then edited its max-per-vote value successfully.
+   - Delete was intentionally not exercised during browser QA because it is a destructive action; the implementation requires explicit confirmation.
+4. Final pass
+   - Verified desktop and mobile rendering, modal open/close behavior, no horizontal page overflow, and a clean browser console.
+
+## Functional Verification
+
+- [x] Add Position opens the referenced dialog.
+- [x] Preview-mode create and edit update the table and summary totals.
+- [x] Authenticated mode lists, creates, updates, and deletes through the existing protected position endpoints.
+- [x] Backend validation and draft-election restrictions surface as visible messages.
+- [x] Position navigation is active and connected to `/admin/positions`.
+- [x] Lint, typecheck, production build, desktop comparison, and mobile verification pass.
+
+## Follow-up Polish
+
+- P3: unlike the static summary cards in the source, the implementation displays live totals so the page communicates useful state.
+
+final result: passed
+
+---
+
+# Admin Ballot Position Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/ballot-position-design-ref.png`
+- Source board pixels: 1711 × 919
+- Implementation: `http://127.0.0.1:4173/admin/ballot-position`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose local filesystem paths
+- Desktop implementation viewport: 1711 × 919 CSS px
+- Mobile implementation viewport: 390 × 844 CSS px
+- Device pixel ratio: 1
+- State: President, Vice President, and Senators in their default ballot order
+- Density normalization: the source and implementation were placed together on one 1711 px-wide comparison canvas. The source's dark presentation frame was excluded from application-level fidelity judgments.
+
+## Full-View Comparison Evidence
+
+The rendered screen preserves the reference's fixed cobalt sidebar, pale full-height workspace, single wide white panel, ballot-order instruction, rounded navy table header, three divided position rows, and paired reorder arrows. The implementation uses the complete viewport instead of retaining the source board's dark outer frame, matching the established admin-screen requirement.
+
+## Focused Region Comparison Evidence
+
+- Panel: its top position, generous white surface, corner radius, and content inset align with the source composition.
+- Table header: Order and Position keep the same wide two-label treatment, with a reserved action column for alignment.
+- Rows: order numerals, centered position names, divider weight, vertical rhythm, and arrow placement closely track the source.
+- Mobile: the instruction wraps naturally, all three columns remain readable at 390 px, arrow controls retain practical tap targets, and no page-level horizontal overflow occurs.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Satoshi matches the existing admin language, with the instruction, header labels, position names, and order numbers calibrated to the source's weight and hierarchy.
+- Spacing and layout rhythm: panel placement, title gap, header height, row height, dividers, column proportions, radii, and surrounding whitespace reproduce the reference structure.
+- Colors and visual tokens: cobalt navigation and table header, yellow active navigation, pale blue-gray workspace, white panel, gray dividers, and dark row content match the source palette.
+- Image quality and assets: the reference contains no raster imagery. Navigation and reorder symbols use the installed Phosphor icon set rather than custom SVG or CSS drawings.
+- Copy and content: the ballot-order instruction, Order and Position labels, and President, Vice President, and Senators rows match the source.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial comparison pass
+   - The source and browser-rendered implementation were placed in one comparison canvas.
+   - No actionable P0/P1/P2 differences were found in layout, type, color, spacing, icons, or content.
+2. Interaction pass
+   - Moved Vice President above President and verified the displayed order and ordinal values updated together.
+   - Restored the reference order and confirmed the success notice.
+3. Responsive and console pass
+   - Verified 390 × 844 rendering, open/close mobile navigation, disabled boundary arrows, no horizontal overflow, and a clean browser console.
+
+## Functional Verification
+
+- [x] Up and down controls reorder positions and order numbers together.
+- [x] First-up and last-down controls are disabled at their boundaries.
+- [x] Preview mode applies ordering locally with visible success feedback.
+- [x] Authenticated draft elections persist normalized `display_order` values through the existing position update endpoint.
+- [x] Backend rejection restores the previous order and exposes the API message.
+- [x] Ballot Position navigation is active and connected to `/admin/ballot-position`.
+- [x] Lint, typecheck, production build, desktop comparison, mobile verification, and console checks pass.
+
+## Follow-up Polish
+
+- P3: boundary arrows are visibly muted when unavailable; the static source keeps every arrow black, but the disabled treatment improves affordance without changing the composition.
 
 final result: passed

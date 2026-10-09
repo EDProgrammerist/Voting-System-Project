@@ -250,6 +250,30 @@
           ]
         },
         {
+          "name": "Admin API without Accept Header - JSON Unauthorized",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{base_url}}/admin/students",
+            "description": "Protected API requests must return JSON 401 even when Accept is omitted."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Response is JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "pm.test('Unauthenticated message returned', function () { pm.expect(pm.response.json().message).to.eql('Unauthenticated.'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Unknown Student - Unauthorized",
           "request": {
             "method": "POST",
@@ -1077,15 +1101,16 @@
                 }
               ]
             },
-            "url": "{{base_url}}/admin/students?status=enrolled&search=2024",
-            "description": "Paginated student list with optional status and search filters. Expected: 200."
+            "url": "{{base_url}}/admin/students?election_id={{election_id}}&status=enrolled&search=2024",
+            "description": "Paginated student list with course and election-specific participation. Expected: 200."
           },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Student participation fields exist', function () { const student = pm.response.json().data[0]; pm.expect(student).to.have.property('course'); pm.expect(student).to.have.property('has_voted'); pm.expect(student).to.have.property('voting_status'); });"
                 ]
               }
             }
@@ -1265,7 +1290,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"{{new_student_id}}\",\n  \"full_name\": \"Postman Test Student\",\n  \"academic_status\": \"enrolled\"\n}",
+              "raw": "{\n  \"student_id\": \"{{new_student_id}}\",\n  \"full_name\": \"Postman Test Student\",\n  \"course\": \"BSIT\",\n  \"academic_status\": \"enrolled\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1320,7 +1345,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"full_name\": \"Postman Test Student Updated\",\n  \"academic_status\": \"inactive\"\n}",
+              "raw": "{\n  \"full_name\": \"Postman Test Student Updated\",\n  \"course\": \"BSCS\",\n  \"academic_status\": \"inactive\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1623,6 +1648,54 @@
                   "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
                   "const json = pm.response.json();",
                   "if (json.data && json.data.id) { pm.collectionVariables.set('temporary_position_id', String(json.data.id)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reorder Draft Ballot Positions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{draft_election_id}},\n  \"positions\": [\n    {\n      \"id\": {{temporary_position_id}},\n      \"display_order\": 1\n    },\n    {\n      \"id\": {{draft_position_id}},\n      \"display_order\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/positions/reorder",
+            "description": "Atomically saves the complete position order for a draft election. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Positions are returned in saved order', function () { const data = pm.response.json().data; pm.expect(String(data[0].id)).to.eql(pm.collectionVariables.get('temporary_position_id')); pm.expect(String(data[1].id)).to.eql(pm.collectionVariables.get('draft_position_id')); });"
                 ]
               }
             }
@@ -1959,6 +2032,100 @@
             },
             "url": "{{base_url}}/admin/candidates?election_id={{draft_election_id}}",
             "description": "Confirms the draft election candidate, team, position, motto, and optional photo URL. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Temporary Candidate for Deletion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"election_id\": {{draft_election_id}},\n  \"position_id\": {{draft_position_id}},\n  \"team\": \"TEAM_B\",\n  \"motto\": \"Temporary deletion test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Creates a second draft candidate used only to verify candidate deletion. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Draft Candidate",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{draft_election_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates/2024-0100",
+            "description": "Removes the election-specific candidacy while preserving the reusable candidate profile. Expected: 200."
           },
           "event": [
             {

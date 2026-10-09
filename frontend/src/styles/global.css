@@ -25,4 +25,11 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
-
+.route-loading {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  background: #edf3f8;
+  color: #0b2754;
+  font-weight: 700;
+}

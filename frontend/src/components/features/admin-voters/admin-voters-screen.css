@@ -1,0 +1,272 @@
+.admin-voters__content {
+  min-height: 100dvh;
+  padding-top: 3.8rem;
+  background: #edf3f8;
+}
+
+.admin-voters__header h1 {
+  margin: 0;
+  color: #071329;
+  font-size: clamp(2.8rem, 4.2vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.admin-voters__header p {
+  margin: 0.8rem 0 0;
+  color: #152038;
+  font-size: clamp(1rem, 1.7vw, 1.45rem);
+  font-weight: 500;
+}
+
+.voter-filters {
+  display: grid;
+  grid-template-columns: minmax(22rem, 1.35fr) minmax(12rem, 0.58fr) minmax(12rem, 0.62fr);
+  gap: 1.2rem;
+  margin-top: 1.35rem;
+  border-radius: 0.65rem;
+  padding: 1.3rem 1.5rem;
+  background: #fff;
+  box-shadow: 0 0.55rem 1.45rem rgb(21 51 91 / 9%);
+}
+
+.voter-filters__search {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.voter-filters__search label,
+.voter-filters__select > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.voter-filters input,
+.voter-filters select {
+  width: 100%;
+  min-height: 3.85rem;
+  border: 1px solid #cfd7e3;
+  border-radius: 0.5rem;
+  background: #f0f3f7;
+  color: #4b5568;
+  box-shadow: inset 0 0.15rem 0.4rem rgb(16 43 82 / 5%);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.voter-filters input {
+  border-radius: 0.5rem 0 0 0.5rem;
+  padding: 0.8rem 1.2rem;
+}
+
+.voter-filters input::placeholder {
+  color: #596274;
+  opacity: 1;
+}
+
+.voter-filters input:focus,
+.voter-filters select:focus {
+  border-color: #1768d4;
+  background: #fff;
+  box-shadow: 0 0 0 0.22rem rgb(23 104 212 / 14%);
+}
+
+.voter-filters__search button {
+  display: grid;
+  width: 5.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: #484b52;
+  color: #d9dde4;
+  box-shadow: 0 0.45rem 0.8rem rgb(18 29 48 / 18%);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.voter-filters__search button:hover,
+.voter-filters__search button:focus-visible {
+  background: #073f92;
+  color: #fff;
+  outline: none;
+}
+
+.voter-filters__search button svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.voter-filters__select {
+  position: relative;
+}
+
+.voter-filters select {
+  appearance: none;
+  padding: 0.8rem 3.2rem 0.8rem 1.2rem;
+  cursor: pointer;
+}
+
+.voter-filters__select > svg {
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #19243a;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.voters-table-card {
+  position: relative;
+  min-height: 30.5rem;
+  margin-top: 1.85rem;
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.65rem 1rem;
+  background: #fff;
+  box-shadow: 0 0.55rem 1.45rem rgb(21 51 91 / 10%);
+}
+
+.voters-table__scroll {
+  overflow-x: auto;
+}
+
+.voters-table {
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.voters-table thead {
+  background: #073f92;
+  color: #fff;
+}
+
+.voters-table th {
+  width: 25%;
+  padding: 1rem 1.3rem;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.voters-table th:first-child {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.voters-table th:last-child {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.voters-table td {
+  border-bottom: 1px solid #edf1f5;
+  padding: 0.9rem 1.3rem;
+  color: #536176;
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.voters-table tbody tr:hover {
+  background: #f7faff;
+}
+
+.voters-table td strong {
+  color: #18243a;
+  font-weight: 800;
+}
+
+.voter-status {
+  display: inline-flex;
+  min-width: 5.3rem;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: #e6edf5;
+  color: #526075;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.voter-status[data-status="voted"],
+.voter-status[data-status="enrolled"] {
+  background: #d9f7e9;
+  color: #08794c;
+}
+
+.voter-status[data-status="not-voted"] {
+  background: #fff1c8;
+  color: #9d6a00;
+}
+
+.voter-status[data-status="ineligible"],
+.voter-status[data-status="stopped"],
+.voter-status[data-status="inactive"] {
+  background: #ffe1df;
+  color: #b12d25;
+}
+
+.voters-table__empty {
+  position: absolute;
+  inset: 7.5rem 1rem 1rem;
+  display: grid;
+  place-content: center;
+  color: #7b8799;
+  text-align: center;
+}
+
+.voters-table__empty svg {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0 auto 0.7rem;
+}
+
+.voters-table__empty strong {
+  color: #243249;
+}
+
+.voters-table__empty p {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 1050px) {
+  .voter-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .voter-filters__search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-voters__content {
+    padding-top: 5.2rem;
+  }
+
+  .voter-filters {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .voter-filters__search {
+    grid-column: auto;
+  }
+
+  .voters-table-card {
+    min-height: 27rem;
+    margin-top: 1rem;
+  }
+}

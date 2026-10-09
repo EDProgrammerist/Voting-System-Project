@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Election;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,22 +13,54 @@ class StudentController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'election_id' => [
+                'nullable',
+                'integer',
+                'exists:elections,id',
+            ],
+            'status' => [
+                'nullable',
+                Rule::in([
+                    'enrolled',
+                    'graduated',
+                    'stopped',
+                    'inactive',
+                    'withdrawn',
+                ]),
+            ],
+            'search' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+        ]);
+
+        $electionId = $validated['election_id']
+            ?? Election::currentlyActive()->value('id');
+
         $students = Student::query()
             ->when(
-                $request->filled('status'),
-                function ($query) use ($request): void {
+                $electionId,
+                function ($query, int $electionId): void {
+                    $query->withExists([
+                        'participations as has_voted' => fn ($query) => $query->where('election_id', $electionId),
+                    ]);
+                },
+            )
+            ->when(
+                isset($validated['status']),
+                function ($query) use ($validated): void {
                     $query->where(
                         'academic_status',
-                        $request->string('status')->toString(),
+                        $validated['status'],
                     );
                 },
             )
             ->when(
-                $request->filled('search'),
-                function ($query) use ($request): void {
-                    $search = trim(
-                        $request->string('search')->toString(),
-                    );
+                isset($validated['search']),
+                function ($query) use ($validated): void {
+                    $search = trim($validated['search']);
 
                     $query->where(
                         function ($query) use ($search): void {
@@ -49,6 +82,22 @@ class StudentController extends Controller
             ->orderBy('full_name')
             ->paginate(25);
 
+        $students->through(function (Student $student) use ($electionId): array {
+            $hasVoted = (bool) ($student->has_voted ?? false);
+
+            return [
+                'student_id' => $student->student_id,
+                'full_name' => $student->full_name,
+                'course' => $student->course,
+                'academic_status' => $student->academic_status,
+                'election_id' => $electionId,
+                'has_voted' => $hasVoted,
+                'voting_status' => $student->academic_status !== 'enrolled'
+                    ? 'ineligible'
+                    : ($hasVoted ? 'voted' : 'not_voted'),
+            ];
+        });
+
         return response()->json($students);
     }
 
@@ -65,6 +114,11 @@ class StudentController extends Controller
                 'required',
                 'string',
                 'max:255',
+            ],
+            'course' => [
+                'nullable',
+                'string',
+                'max:100',
             ],
             'academic_status' => [
                 'required',
@@ -98,6 +152,12 @@ class StudentController extends Controller
                 'required',
                 'string',
                 'max:255',
+            ],
+            'course' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:100',
             ],
             'academic_status' => [
                 'sometimes',

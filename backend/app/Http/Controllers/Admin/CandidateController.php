@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CandidateProfile;
 use App\Models\Candidacy;
+use App\Models\CandidateProfile;
 use App\Models\Election;
 use App\Models\Position;
 use App\Models\Student;
@@ -175,5 +175,37 @@ class CandidateController extends Controller
         return response()->json([
             'message' => 'Candidate saved successfully.',
         ], 201);
+    }
+
+    public function destroy(
+        Request $request,
+        string $studentId,
+    ): JsonResponse {
+        $validated = $request->validate([
+            'election_id' => [
+                'required',
+                'integer',
+                'exists:elections,id',
+            ],
+        ]);
+
+        $election = Election::findOrFail($validated['election_id']);
+
+        if ($election->status !== 'draft') {
+            return response()->json([
+                'message' => 'Candidates can only be changed while the election is in draft status.',
+            ], 409);
+        }
+
+        $candidacy = Candidacy::query()
+            ->where('election_id', $election->id)
+            ->where('student_id', $studentId)
+            ->firstOrFail();
+
+        $candidacy->delete();
+
+        return response()->json([
+            'message' => 'Candidate removed successfully.',
+        ]);
     }
 }

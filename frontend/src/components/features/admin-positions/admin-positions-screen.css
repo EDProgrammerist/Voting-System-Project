@@ -1,0 +1,345 @@
+.admin-positions__content {
+  min-height: 100dvh;
+  padding-top: 4rem;
+  background: #edf3f8;
+}
+
+.admin-positions__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.admin-positions__header h1 {
+  margin: 0;
+  color: #071329;
+  font-size: clamp(2.6rem, 4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.admin-positions__header > button {
+  display: flex;
+  min-width: 13.9rem;
+  min-height: 3.2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: #073f92;
+  color: #fff;
+  box-shadow: 0 0.3rem 0 rgb(2 40 96 / 18%), 0 0.55rem 1.2rem rgb(10 54 118 / 14%);
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.admin-positions__header > button:hover,
+.admin-positions__header > button:focus-visible {
+  background: #0b55b7;
+  outline: 0.2rem solid rgb(11 85 183 / 18%);
+  outline-offset: 0.18rem;
+  transform: translateY(-0.08rem);
+}
+
+.admin-positions__header svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.position-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 5vw, 4.5rem);
+  max-width: 54rem;
+  margin-top: 2.9rem;
+}
+
+.position-summary article {
+  position: relative;
+  min-height: 8.65rem;
+  overflow: hidden;
+  border-radius: 0.45rem;
+  padding: 2rem 1.2rem 1rem;
+  background: #fff;
+  box-shadow: 0 0.42rem 0 rgb(48 59 75 / 22%), 0 0.65rem 1.4rem rgb(21 51 91 / 8%);
+}
+
+.position-summary article::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.42rem;
+  background: #ffbf13;
+  content: "";
+}
+
+.position-summary strong {
+  display: block;
+  color: #10203a;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+}
+
+.position-summary p {
+  margin: 2.2rem 0 0;
+  color: #354258;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.positions-table-card {
+  min-height: 22rem;
+  max-width: 57rem;
+  margin-top: 2.4rem;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1.05rem 1.2rem;
+  background: #fff;
+  box-shadow: 0 0.42rem 0 rgb(48 59 75 / 22%), 0 0.65rem 1.4rem rgb(21 51 91 / 8%);
+}
+
+.positions-table__scroll {
+  overflow-x: auto;
+}
+
+.positions-table {
+  width: 100%;
+  min-width: 43rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.positions-table thead {
+  background: #073f92;
+  color: #fff;
+}
+
+.positions-table th {
+  width: 25%;
+  padding: 0.95rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.positions-table th:first-child {
+  border-radius: 0.45rem 0 0 0.45rem;
+}
+
+.positions-table th:last-child {
+  border-radius: 0 0.45rem 0.45rem 0;
+}
+
+.positions-table td {
+  border-bottom: 1px solid #dfe5ed;
+  padding: 0.95rem 1rem;
+  color: #1f2b40;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.positions-table tbody tr:nth-child(even) {
+  background: #f3f6f9;
+}
+
+.positions-table td:first-child {
+  text-align: left;
+}
+
+.positions-table td strong {
+  font-size: 0.95rem;
+}
+
+.position-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.position-actions button {
+  border: 0;
+  padding: 0.25rem;
+  background: transparent;
+  color: #2c3648;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.position-actions button:hover,
+.position-actions button:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.position-actions .position-actions__delete {
+  color: #f2253b;
+}
+
+.position-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgb(15 23 42 / 62%);
+  backdrop-filter: blur(0.16rem);
+}
+
+.position-modal {
+  position: relative;
+  width: min(100%, 32.5rem);
+  border-radius: 0.65rem;
+  padding: 2.15rem 2.75rem 2.5rem;
+  background: #f7f9fc;
+  box-shadow: 0 0.5rem 0 rgb(11 20 34 / 30%), 0 1.5rem 4rem rgb(5 14 31 / 28%);
+}
+
+.position-modal h2 {
+  margin: 0;
+  color: #0f1c32;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.position-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+}
+
+.position-modal__close:hover,
+.position-modal__close:focus-visible {
+  background: #e5eaf1;
+  color: #17243a;
+  outline: none;
+}
+
+.position-modal form {
+  display: grid;
+  gap: 1.65rem;
+  margin-top: 1.55rem;
+}
+
+.position-modal label {
+  display: grid;
+  gap: 0.6rem;
+  color: #17243a;
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.position-modal input {
+  min-height: 3.2rem;
+  border: 2px solid #d4dce8;
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  background: #fff;
+  color: #142039;
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.position-modal input:focus {
+  border-color: #1768d4;
+  box-shadow: 0 0 0 0.22rem rgb(23 104 212 / 14%);
+}
+
+.position-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.position-modal__actions button {
+  min-width: 7.15rem;
+  min-height: 3rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: #e6eaf0;
+  color: #344054;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.position-modal__actions button[type="submit"] {
+  background: #073f92;
+  color: #fff;
+}
+
+.position-modal__actions button:hover:not(:disabled),
+.position-modal__actions button:focus-visible:not(:disabled) {
+  filter: brightness(0.96);
+  outline: 0.2rem solid rgb(7 63 146 / 14%);
+  outline-offset: 0.12rem;
+}
+
+.position-modal__actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+@media (max-width: 930px) {
+  .position-summary {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-positions__content {
+    padding-top: 5.2rem;
+  }
+
+  .admin-positions__header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .admin-positions__header > button {
+    align-self: flex-start;
+  }
+
+  .position-summary {
+    grid-template-columns: 1fr;
+    max-width: none;
+    margin-top: 1.8rem;
+  }
+
+  .position-summary article {
+    min-height: 7rem;
+  }
+
+  .position-summary p {
+    margin-top: 1.35rem;
+  }
+
+  .positions-table-card {
+    margin-top: 1rem;
+  }
+
+  .position-modal {
+    padding: 1.8rem 1.25rem 1.5rem;
+  }
+
+  .position-modal__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

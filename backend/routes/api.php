@@ -109,6 +109,11 @@ Route::prefix('admin')->group(function (): void {
         );
 
         Route::put(
+            '/positions/reorder',
+            [PositionController::class, 'reorder'],
+        );
+
+        Route::put(
             '/positions/{position}',
             [PositionController::class, 'update'],
         );
@@ -126,6 +131,11 @@ Route::prefix('admin')->group(function (): void {
         Route::post(
             '/candidates',
             [CandidateController::class, 'store'],
+        );
+
+        Route::delete(
+            '/candidates/{studentId}',
+            [CandidateController::class, 'destroy'],
         );
     });
 });

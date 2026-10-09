@@ -774,3 +774,43 @@
     transition-duration: 0.01ms !important;
   }
 }
+.admin-data-state {
+  display: grid;
+  place-items: center;
+  min-height: 18rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.admin-data-state strong {
+  color: #0b2754;
+  font-size: 1.2rem;
+}
+
+.admin-data-state p {
+  color: #5d6b82;
+  margin: 0.6rem 0 0;
+}
+
+.admin-election-picker {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(19rem, 100%);
+}
+
+.admin-election-picker span {
+  color: #5d6b82;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-election-picker select {
+  border: 1px solid #cdd8e8;
+  border-radius: 0.7rem;
+  background: #fff;
+  color: #12233f;
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+}

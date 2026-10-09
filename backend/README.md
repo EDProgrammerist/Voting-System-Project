@@ -9,8 +9,6 @@ Laravel REST API for administering SSG elections and securely accepting student 
 - MySQL 8 or a compatible MariaDB release
 - Postman or Newman for API verification
 
-Docker support will be added after the local backend workflow is complete.
-
 ## Docker development setup
 
 Run the complete backend stack from this `backend` directory:
@@ -22,6 +20,13 @@ docker compose exec app php artisan storage:link
 ```
 
 The API is available at `http://localhost:8000/api`. Docker MySQL is exposed to the host on port `3308` and is reached by Laravel containers through `db:3306`.
+
+Composer dependencies are stored in a native Docker volume so PHP does not repeatedly read the large `vendor` tree through the Windows bind mount. Rebuild the app image after changing `composer.json` or `composer.lock`:
+
+```powershell
+docker compose build app
+docker compose up --detach
+```
 
 Stop the containers without deleting database data:
 
@@ -61,6 +66,8 @@ vendor\bin\pint --test
 php artisan route:list --path=api
 ```
 
+The automated suite uses an in-memory SQLite database. It does not reset or modify the Docker development MySQL database.
+
 Run the complete Postman collection from a freshly seeded database:
 
 ```powershell
@@ -69,6 +76,13 @@ npx --yes newman run postman\SSG_Voting_System.postman_collection.json
 ```
 
 The collection is stateful and intentionally closes the seeded election. Reseed before every complete rerun.
+
+## Admin management additions
+
+- `GET /api/admin/students?election_id={id}` returns `course`, `has_voted`, and `voting_status` without exposing ballot selections.
+- `DELETE /api/admin/candidates/{studentId}` accepts `election_id` in the JSON body and removes only the draft-election candidacy.
+- `PUT /api/admin/positions/reorder` accepts the complete position order for one draft election and saves it in a database transaction.
+- Every unauthenticated `/api/*` request returns JSON `401`, even when the request omits the `Accept` header.
 
 ## Security model
 

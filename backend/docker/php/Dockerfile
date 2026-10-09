@@ -26,4 +26,15 @@ COPY docker/php/zz-www.conf /usr/local/etc/php-fpm.d/zz-www.conf
 
 WORKDIR /var/www
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+        --no-interaction \
+        --no-progress \
+        --no-scripts \
+        --prefer-dist \
+        --optimize-autoloader
+
 CMD ["php-fpm"]

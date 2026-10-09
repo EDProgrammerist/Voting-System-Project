@@ -1,3 +1,5 @@
+import { clearAdminSession } from "@/lib/admin-session";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 export class ApiError extends Error {
@@ -15,11 +17,12 @@ export async function apiRequest<T>(
   endpoint: string,
   init?: RequestInit,
 ): Promise<T> {
+  const sendsFormData = init?.body instanceof FormData;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...init,
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...(sendsFormData ? {} : { "Content-Type": "application/json" }),
       ...init?.headers,
     },
   });
@@ -27,6 +30,14 @@ export async function apiRequest<T>(
   const payload = (await response.json().catch(() => null)) as unknown;
 
   if (!response.ok) {
+    const requestHeaders = new Headers(init?.headers);
+    if (response.status === 401 && requestHeaders.has("Authorization")) {
+      clearAdminSession();
+      if (window.location.pathname !== "/admin/login") {
+        window.location.replace("/admin/login");
+      }
+    }
+
     const message =
       payload &&
       typeof payload === "object" &&
