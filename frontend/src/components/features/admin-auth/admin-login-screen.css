@@ -56,6 +56,39 @@
   text-shadow: 0 0.2rem 1rem rgb(0 30 105 / 18%);
 }
 
+.admin-login__switch {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.5rem;
+  display: inline-flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 54%);
+  border-radius: 999px;
+  background: rgb(2 45 135 / 42%);
+  color: #fff;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  backdrop-filter: blur(0.45rem);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.admin-login__switch:hover,
+.admin-login__switch:focus-visible {
+  background: rgb(15 77 178 / 78%);
+  outline: 0.18rem solid rgb(255 255 255 / 44%);
+  outline-offset: 0.18rem;
+  transform: translateY(-0.08rem);
+}
+
+.admin-login__switch svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .admin-login__brand-cpc {
   color: #ffe900;
   font-weight: 800;
@@ -257,6 +290,14 @@
 }
 
 @media (max-width: 440px) {
+  .admin-login__switch {
+    top: 0.85rem;
+    right: 0.85rem;
+    min-height: 2.35rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
   .admin-login__brand {
     flex-wrap: wrap;
     row-gap: 0.25rem;

@@ -141,6 +141,71 @@ final result: passed
 
 ---
 
+# Voter Login Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/user-login-design-ref.png`
+- Source pixels: 1605 × 979
+- Implementation: `http://127.0.0.1:4173/voter/login`
+- Implementation screenshot evidence: Codex in-app Browser capture retained in this task; the capture API did not expose a local filesystem path
+- Browser viewport: 1605 × 979 CSS px
+- Device pixel ratio: 1
+- State: initial Student ID step
+- Density normalization: none required; source and implementation were captured at matching dimensions
+- Product constraint: the reference's dark presentation margin is intentionally removed so the application fills the viewport
+
+## Full-View Comparison Evidence
+
+The source and browser-rendered implementation were placed together in one vertical comparison canvas. The implementation preserves the 50/50 campus-and-blue split, `CPCVote` lockup, two-line `Your Voice / Your Vote` statement, translucent cobalt form panel, centered student-ID field, and violet login action. The campus image uses the existing project asset and the application fills the viewport as previously requested.
+
+## Focused Region Comparison Evidence
+
+- Brand and statement: yellow heavyweight `CPC`, lightweight white `Vote`, cyan first line, and white second line retain the source hierarchy and alignment.
+- Form panel: width, height, rounded corners, blue translucency, input rhythm, button placement, and centered copy align with the reference.
+- Background: the existing campus photograph supplies the same gate, crest, masonry, foliage, and school-building composition without a placeholder.
+- Interaction: the reference-perfect Student ID state advances to a visually matched full-name verification step required by the backend.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: Inter/system sans reproduces the clean geometric source treatment; weights, line height, letter spacing, and centered form copy are calibrated to the target.
+- Spacing and layout rhythm: split boundary, brand top offset, statement gap, panel position, internal padding, field height, button size, and corner radii match the normalized source composition.
+- Colors and visual tokens: saturated yellow, white, cyan, deep translucent blue, pale input surface, and violet CTA reproduce the source hierarchy with accessible contrast.
+- Image quality and asset fidelity: the project-local campus image is sharp at the target viewport and contains the required visual subject; no placeholder, CSS drawing, or recreated logo asset is used.
+- Copy and content: `CPCVote`, `Your Voice`, `Your Vote`, `Enter Student ID`, and `Log In` match the source exactly.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial implementation and combined comparison
+   - The page matched the source composition without a corrective P0/P1/P2 iteration.
+   - The full-viewport treatment intentionally expands the campus and overlay beyond the source's dark presentation frame.
+2. Functional verification
+   - Student ID `2024-0001` advanced to the full-name verification step.
+   - `Juan Dela Cruz` completed `/api/voter/login`, produced the verified state, and the temporary test token was removed afterward.
+   - Browser console contained no warnings or errors.
+
+## Implementation Checklist
+
+- [x] Match the supplied desktop composition.
+- [x] Fill the viewport with no dark or gray outer background.
+- [x] Keep the reference's one-field initial state.
+- [x] Add the backend-required full-name verification step.
+- [x] Store the voter token, identity, and active election in session storage.
+- [x] Make `/` and `/login` route to `/voter/login` while preserving `/admin/login`.
+- [x] Pass lint, typecheck, production build, live authentication, combined visual comparison, and console checks.
+
+## Follow-up Polish
+
+- P3: the supplied reference photograph shows an older crest variation, while the existing project campus asset shows the current crest used by the admin experience. Reusing the project asset keeps both login flows visually consistent.
+
+final result: passed
+
+---
+
 # Admin Candidates Design QA
 
 ## Comparison Target
@@ -474,5 +539,210 @@ No actionable P0, P1, or P2 mismatch remains.
 ## Follow-up Polish
 
 - P3: boundary arrows are visibly muted when unavailable; the static source keeps every arrow black, but the disabled treatment improves affordance without changing the composition.
+
+final result: passed
+
+---
+
+# Voter Ballot Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/voting-design-ref.png`
+- Source pixels: 1571 × 996
+- Implementation: `http://127.0.0.1:4173/voter/ballot`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose local filesystem paths
+- Desktop viewport: 1571 × 996 CSS px
+- Responsive iframe viewport: 390 × 844 CSS px
+- State: preview ballot, no candidates selected
+- Density normalization: source and implementation were placed in one vertical comparison canvas at matching desktop dimensions
+- Product constraint: the source's dark presentation margin is intentionally omitted so the ballot fills the viewport
+
+## Full-View Comparison Evidence
+
+The source and implementation were captured together in one comparison canvas. The implementation preserves the campus background, translucent navy treatment, two-column President and Vice-President areas, centered Senators heading, paired seven-row senator grid, and centered Review Vote action. Real candidate content fills the intentionally blank source specimens without changing their hierarchy.
+
+## Focused Region Comparison Evidence
+
+- Executive positions: two headings and two selectable candidates per column retain the reference's spacing, width, alignment, and white surface treatment.
+- Senators: fourteen candidates are arranged in two seven-row columns with source-sized checkbox controls and matching row rhythm.
+- Review action: the large blue button remains centered below the ballot and provides validation feedback without shifting the composition materially.
+- Responsive state: at 390 × 844 the executive positions and senator candidates become a single readable column with no clipped controls.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: the existing sans-serif stack reproduces the bold white section headings, compact candidate labels, and prominent Review Vote hierarchy.
+- Spacing and layout rhythm: heading baselines, paired columns, row heights, gaps, stage padding, review-button dimensions, radii, and full-height composition align with the source.
+- Colors and visual tokens: translucent deep-blue overlay, white candidate surfaces, dark text, gray checkbox borders, cyan selection accents, and cobalt CTA preserve the reference palette.
+- Image quality and asset fidelity: the existing high-resolution campus photograph supplies the correct gate, crest, architecture, and foliage with no placeholders or recreated image assets.
+- Copy and content: President, Vice - President, Senators, and Review Vote match the source. Candidate names and partylists are deliberate functional content added to the source's blank rows.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial combined comparison
+   - Major layout, spacing, color, image, and control proportions aligned without a corrective P0/P1/P2 iteration.
+   - The full-viewport implementation intentionally removes the source board's dark outer frame.
+2. Interaction pass
+   - Selected President, Vice-President, and two Senators.
+   - Verified pressed states, checkbox feedback, selection-count persistence, and Review Vote validation.
+3. Responsive and console pass
+   - Verified a 390 × 844 iframe layout with single-column controls and readable tap targets.
+   - Browser console contained no warnings or errors.
+
+## Functional Verification
+
+- [x] Direct preview works without a voter account.
+- [x] A real voter session requests `/api/voter/ballot` automatically.
+- [x] Single-choice positions replace or clear their current selection.
+- [x] Multi-choice positions enforce `max_selections`.
+- [x] Review Vote requires at least one selection for every populated position.
+- [x] Draft selections are saved in session storage for the upcoming review screen.
+- [x] Successful voter login now continues to `/voter/ballot`.
+- [x] Invalid voter tokens clear only the voter session and return to `/voter/login`.
+- [x] Lint, typecheck, production build, combined visual comparison, responsive check, and console checks pass.
+
+## Follow-up Polish
+
+- P3: the reference leaves candidate rows blank, while the implementation adds names and partylist labels so selection can be understood and tested.
+
+final result: passed
+
+---
+
+# Voter Review Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/Review-design-ref.png`
+- Source pixels: 1604 × 980
+- Implementation: `http://127.0.0.1:4173/voter/review`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose a local filesystem path
+- Desktop viewport: 1604 × 980 CSS px
+- Responsive viewport: 390 × 844 CSS px
+- State: review preview with complete President, Vice President, and Senator selections
+- Density normalization: source and browser-rendered implementation were placed in one vertical comparison canvas at matching 1604 × 980 dimensions
+- Product constraint: the source board's dark presentation margin is intentionally omitted so the screen fills the viewport, following the user's established full-screen requirement
+
+## Full-View Comparison Evidence
+
+The source and rendered implementation were captured together in one comparison canvas. The implementation preserves the campus photograph, translucent deep-blue veil, large white review panel, warning hierarchy, three divided position rows, and centered gray/blue action pair. Panel width is normalized to the full-viewport crop rather than reproducing the source board's dark outer frame.
+
+## Focused Region Comparison Evidence
+
+- Header: the large bold title and muted irreversible-action warning retain the reference's type scale, weight, spacing, and left alignment.
+- Review rows: President, Vice President, and Senators use the same strong labels and horizontal divider rhythm; selected candidate names occupy the intentionally blank value area in the source.
+- Actions: Go Back and Confirm Vote retain the reference's relative sizing, placement, color contrast, and rounded geometry.
+- Responsive state: browser geometry at 390 × 844 measured a 358.4 px panel and action row inside a 390 px viewport, with stacked labels, readable values, and no horizontal clipping.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: the existing Inter/system sans stack reproduces the heavy title and position labels, muted warning text, and bold action hierarchy without awkward wrapping at the reference viewport.
+- Spacing and layout rhythm: normalized panel width, inset padding, row heights, dividers, button dimensions, center alignment, and full-height stage track the source composition.
+- Colors and visual tokens: deep navy overlay, near-white panel, ink headings, muted gray warning/dividers, neutral back action, and cobalt confirmation action preserve the source palette and contrast.
+- Image quality and asset fidelity: the existing high-resolution campus photograph provides the correct gate, crest, architecture, and foliage; no placeholder or recreated asset is used.
+- Copy and content: Review your vote, irreversible-action warning, position labels, Go Back, and Confirm Vote match the source. Candidate names are functional content required to make the review step meaningful.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial combined comparison
+   - Typography, panel geometry, row rhythm, color treatment, background crop, and action placement aligned without a corrective P0/P1/P2 iteration.
+   - The implementation intentionally fills the viewport and omits the source board's dark outer presentation margin.
+2. Interaction pass
+   - Selected a President, Vice President, and Senator on the ballot, opened review, verified the exact names, returned to the ballot, and confirmed the review route remained connected.
+   - Preview confirmation changed the CTA to Vote Confirmed and locked both actions to prevent repeat submission.
+3. Responsive and console pass
+   - Verified desktop at 1604 × 980, short-laptop rendering at 910 × 677, and responsive geometry at 390 × 844.
+   - The initial short-laptop capture placed the actions too close to the bottom edge; a height-specific spacing pass brought both controls and their status region fully into view without changing the reference viewport.
+   - Browser console contained no warnings or errors.
+
+## Functional Verification
+
+- [x] Direct preview works without a demo voter account and uses realistic selections.
+- [x] Review Vote saves the current ballot draft and navigates to `/voter/review`.
+- [x] Go Back returns to `/voter/ballot`, where saved choices are restored.
+- [x] A live voter session reloads the authoritative ballot before rendering selected names.
+- [x] Confirm Vote posts the election and selections to `/api/voter/vote` only for a signed-in voter.
+- [x] Preview confirmation performs no backend mutation and clearly identifies itself as a preview.
+- [x] Successful live submission clears the voter token and prevents repeat confirmation.
+- [x] Incomplete drafts keep confirmation disabled and direct the voter back to the ballot.
+- [x] Lint, typecheck, production build, combined visual comparison, responsive verification, interaction flow, and console checks pass.
+
+## Follow-up Polish
+
+- P3: the reference leaves every review row blank, while the implementation adds selected names so voters can actually verify the ballot before the irreversible action.
+
+final result: passed
+
+---
+
+# Voter Thank-You Design QA
+
+## Comparison Target
+
+- Source visual truth: `frontend/design/thankyou-design-ref.png`
+- Source pixels: 1575 × 998
+- Implementation: `http://127.0.0.1:4173/voter/thank-you`
+- Implementation screenshot evidence: Codex in-app Browser captures retained in this task; the capture API did not expose a local filesystem path
+- Desktop viewport: 1575 × 998 CSS px
+- Responsive iframe viewport: 390 × 844 CSS px
+- State: completed voter confirmation with Logout available
+- Density normalization: source and browser-rendered implementation were placed in one vertical comparison canvas at matching 1575 × 998 dimensions
+- Product constraint: the source board's dark presentation margin is intentionally omitted so the screen fills the viewport, following the user's established full-screen requirement
+
+## Full-View Comparison Evidence
+
+The source and rendered implementation were captured together in one comparison canvas. The implementation preserves the full campus backdrop, translucent navy veil, wide centered white completion panel, centered title/message hierarchy, and single cobalt Logout action. Normalizing away the source board's outer frame yields the same 1184 px panel width and approximately 400 px panel height at the target viewport.
+
+## Focused Region Comparison Evidence
+
+- Completion panel: the title, message, button, internal spacing, surface color, radius, and restrained shadow reproduce the source hierarchy and proportions.
+- Logout action: the rendered control measures 288 × 83 px at the desktop target, matching the source's prominent centered action and practical focus treatment.
+- Responsive state: a real 390 × 844 iframe measured 390 px content width and 844 px content height with no horizontal or vertical overflow; the panel remains centered and the message wraps cleanly.
+
+## Required Fidelity Surfaces
+
+- Fonts and typography: the existing Inter/system sans stack recreates the heavy Thank you! heading, lighter recorded-vote message, and bold button text with closely matched scale and tracking.
+- Spacing and layout rhythm: desktop panel position, normalized width, approximately 400 px height, centered content stack, message gap, and button proportions track the reference.
+- Colors and visual tokens: deep-blue photographic veil, near-white panel, navy heading/body color, and cobalt action preserve the source palette and readable contrast.
+- Image quality and asset fidelity: the implementation uses the project's shared high-resolution campus photograph rather than a placeholder or recreated asset. The source mockup contains a different historic crest baked into its background; the implementation intentionally preserves the current shared CPC campus asset used across the voter flow.
+- Copy and content: Thank you!, Your vote has been recorded., and Logout match the source exactly.
+
+## Findings
+
+No actionable P0, P1, or P2 mismatch remains.
+
+## Comparison History
+
+1. Initial combined comparison
+   - The source and implementation aligned in normalized panel geometry, typography, spacing, color treatment, background crop, and action placement without a corrective P0/P1/P2 visual iteration.
+   - The implementation intentionally omits the source board's dark outer frame and uses the project's current campus image asset.
+2. Flow and interaction pass
+   - Confirm Vote in preview mode navigated from review to the thank-you route without a backend mutation.
+   - Logout cleared voter session data and returned to `/voter/login`.
+3. Responsive and console pass
+   - Verified the 1575 × 998 desktop state and a 390 × 844 responsive iframe with no page overflow.
+   - Browser console contained no warnings or errors.
+
+## Functional Verification
+
+- [x] Direct preview works without a demo voter account.
+- [x] Preview confirmation reaches `/voter/thank-you` without submitting a backend vote.
+- [x] Authenticated confirmation reaches the thank-you route only after `/api/voter/vote` succeeds.
+- [x] Failed live submissions remain on review and expose the backend message.
+- [x] Logout clears voter session data and returns to `/voter/login`.
+- [x] Full-screen desktop and mobile layouts remain unclipped and keyboard accessible.
+- [x] Lint, typecheck, production build, combined visual comparison, responsive verification, flow testing, and console checks pass.
+
+## Follow-up Polish
+
+- P3: the mockup's background photo contains a different historic crest; the implementation keeps the current project-wide CPC campus asset for continuity across login, ballot, review, and completion screens.
 
 final result: passed

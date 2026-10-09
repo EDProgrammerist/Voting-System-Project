@@ -1,7 +1,8 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useGSAP } from "@gsap/react";
+import { ArrowsLeftRight } from "@phosphor-icons/react";
 import gsap from "gsap";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import campusBackground from "@/assets/campus-admin-bg.png";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -99,6 +100,10 @@ export function AdminLoginScreen() {
         />
 
         <div className="admin-login__curtain" data-login-curtain>
+          <Link className="admin-login__switch" to="/voter/login">
+            <ArrowsLeftRight aria-hidden="true" weight="bold" />
+            Voter Login
+          </Link>
           <h1 className="admin-login__brand" id="admin-login-title">
             <span className="admin-login__brand-cpc" data-brand-word>
               CPC
