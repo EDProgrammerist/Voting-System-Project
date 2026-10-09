@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Student Voting System</title>
+  <rect width="48" height="48" rx="12" fill="#2563eb" />
+  <path d="M13 21h22v18H13z" fill="#fff" />
+  <path d="m18 12 6 6 9-9 4 4-13 13-10-10z" fill="#bfdbfe" />
+  <path d="M18 29h12v3H18z" fill="#2563eb" />
+</svg>
+
