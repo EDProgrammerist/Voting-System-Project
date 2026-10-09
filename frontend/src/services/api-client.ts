@@ -4,6 +4,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    public readonly payload?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -23,10 +24,19 @@ export async function apiRequest<T>(
     },
   });
 
+  const payload = (await response.json().catch(() => null)) as unknown;
+
   if (!response.ok) {
-    throw new ApiError(`Request failed with status ${response.status}.`, response.status);
+    const message =
+      payload &&
+      typeof payload === "object" &&
+      "message" in payload &&
+      typeof payload.message === "string"
+        ? payload.message
+        : `Request failed with status ${response.status}.`;
+
+    throw new ApiError(message, response.status, payload);
   }
 
-  return (await response.json()) as T;
+  return payload as T;
 }
-

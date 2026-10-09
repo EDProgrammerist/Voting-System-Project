@@ -1,0 +1,288 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800&display=swap");
+
+.admin-login {
+  min-height: 100dvh;
+  width: 100%;
+  overflow-x: hidden;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: #fff;
+  font-family: "Satoshi", "Segoe UI", sans-serif;
+}
+
+.admin-login__stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.admin-login__background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-login__curtain {
+  position: absolute;
+  inset: 0 0 0 50.55%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(3rem, 6.2vw, 6.25rem) clamp(1.5rem, 3.75vw, 4rem) clamp(2rem, 4.5vw, 4rem);
+  background: rgb(0 61 173 / 68%);
+  box-shadow: -1.25rem 0 3.5rem rgb(0 35 119 / 16%);
+  backdrop-filter: saturate(112%) contrast(104%);
+}
+
+.admin-login__brand {
+  position: relative;
+  left: -0.85rem;
+  display: flex;
+  width: 100%;
+  max-width: 48rem;
+  align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: clamp(2.15rem, 4.4vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  text-shadow: 0 0.2rem 1rem rgb(0 30 105 / 18%);
+}
+
+.admin-login__brand-cpc {
+  color: #ffe900;
+  font-weight: 800;
+}
+
+.admin-login__brand-vote {
+  margin-left: 0.04em;
+  color: #fff;
+  font-weight: 300;
+}
+
+.admin-login__brand-admin {
+  margin-left: 0.2em;
+  color: #fff;
+  font-weight: 800;
+}
+
+.admin-login__panel {
+  position: relative;
+  left: -0.85rem;
+  width: min(100%, 33.35rem);
+  height: 24.9rem;
+  margin-top: clamp(2.5rem, 4.5vw, 4.5rem);
+  padding: 5.9rem clamp(1.75rem, 2.3vw, 2.35rem) 3rem;
+  border: 0.125rem solid rgb(64 182 255 / 82%);
+  border-radius: 1.25rem;
+  background: rgb(0 84 190 / 58%);
+  box-shadow:
+    inset 0 0 2.75rem rgb(0 113 230 / 28%),
+    0 1.5rem 3.75rem rgb(0 25 96 / 18%);
+  backdrop-filter: blur(0.35rem) saturate(120%);
+}
+
+.admin-login__form {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-login__field {
+  width: 100%;
+}
+
+.admin-login__field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.admin-login__field input {
+  width: 100%;
+  height: 3.75rem;
+  border: 0.125rem solid #1689ef;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  background: rgb(255 255 255 / 96%);
+  color: #202a38;
+  box-shadow:
+    inset 0 0.125rem 0.5rem rgb(0 45 122 / 8%),
+    0 0.25rem 1rem rgb(0 35 116 / 12%);
+  font-family: inherit;
+  font-size: clamp(1rem, 1.55vw, 1.55rem);
+  font-style: normal;
+  font-weight: 500;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.admin-login__field input::placeholder {
+  color: #727985;
+  font-family: "Segoe UI", sans-serif;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 1;
+}
+
+.admin-login__field input:hover {
+  border-color: #66c7ff;
+}
+
+.admin-login__field input:focus {
+  border-color: #8ad7ff;
+  box-shadow:
+    0 0 0 0.25rem rgb(91 197 255 / 25%),
+    0 0.75rem 1.75rem rgb(0 35 116 / 18%);
+  transform: translateY(-0.08rem);
+}
+
+.admin-login__submit {
+  min-width: min(68%, 16.85rem);
+  height: 4rem;
+  margin-top: 0.75rem;
+  border: 0.125rem solid #7548f4;
+  border-radius: 0.8rem;
+  padding: 0.7rem 2rem;
+  background: #2400a2;
+  color: #fff;
+  box-shadow:
+    inset 0 0 1.5rem rgb(75 0 221 / 38%),
+    0 0.75rem 1.75rem rgb(0 28 108 / 20%);
+  font-family: inherit;
+  font-size: clamp(1.1rem, 1.8vw, 1.8rem);
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.admin-login__submit:hover:not(:disabled) {
+  border-color: #a48aff;
+  background: #3010bd;
+  box-shadow:
+    inset 0 0 1.5rem rgb(102 37 255 / 40%),
+    0 1rem 2rem rgb(0 24 105 / 28%);
+  transform: translateY(-0.12rem) scale(1.012);
+}
+
+.admin-login__submit:focus-visible {
+  outline: 0.2rem solid #fff;
+  outline-offset: 0.22rem;
+}
+
+.admin-login__submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+.admin-login__submit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.admin-login__status {
+  position: absolute;
+  inset: calc(100% + 0.55rem) 0 auto;
+  min-height: 1.25rem;
+  margin: 0;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-login__status[data-state="error"] {
+  color: #ffe6e6;
+}
+
+.admin-login__status[data-state="success"] {
+  color: #d9ffe9;
+}
+
+@media (max-width: 900px) {
+  .admin-login {
+    padding: 0;
+  }
+
+  .admin-login__stage {
+    width: 100%;
+    min-height: 100dvh;
+    aspect-ratio: auto;
+    box-shadow: none;
+  }
+
+  .admin-login__background {
+    object-position: 47% center;
+  }
+
+  .admin-login__curtain {
+    inset: 0;
+    justify-content: center;
+    padding: 2.5rem clamp(1.25rem, 7vw, 4rem);
+    background: rgb(0 50 151 / 72%);
+  }
+
+  .admin-login__brand {
+    left: 0;
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .admin-login__panel {
+    left: 0;
+    height: auto;
+    min-height: auto;
+    margin-top: clamp(2.5rem, 8vh, 4rem);
+    padding: 2.5rem clamp(1.25rem, 5vw, 2.5rem);
+  }
+}
+
+@media (max-width: 440px) {
+  .admin-login__brand {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+    white-space: normal;
+  }
+
+  .admin-login__brand-admin {
+    flex-basis: 100%;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .admin-login__panel {
+    width: 100%;
+  }
+
+  .admin-login__submit {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-login *,
+  .admin-login *::before,
+  .admin-login *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
