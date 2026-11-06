@@ -1,21 +1,37 @@
+<<<<<<< HEAD
 import { partyLabel } from "@/components/features/voter-shared/candidate-utils";
 import { ArrowRight, Check, CheckCircle, Clock, UsersThree } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+=======
+import { Check } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+
+import campusBackground from "@/assets/campus-admin-bg.png";
+import { VOTER_BALLOT_PREVIEW } from "@/data/voter-ballot-preview";
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getVoterDraft, getVoterToken, saveVoterDraft } from "@/lib/voter-session";
 import { getVoterBallot } from "@/services/voter-auth-service";
 import type { BallotCandidate, BallotPosition, VoterBallotResponse, VoterSelection } from "@/types/voter";
 
 import "./voter-ballot-screen.css";
+<<<<<<< HEAD
 import { BallotSteps, CandidateAvatar, StudentLayout } from "@/components/features/voter-shared/student-layout";
 import { CandidateComparison } from "@/components/features/voter-shared/candidate-comparison";
+=======
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 
 type SelectionMap = Record<number, string[]>;
 
 function displayPosition(name: string): string {
+<<<<<<< HEAD
   if (name.toLowerCase() === "vice president") return "Vice President";
+=======
+  if (name.toLowerCase() === "vice president") return "Vice - President";
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
   if (name.toLowerCase() === "senator") return "Senators";
   return name;
 }
@@ -23,7 +39,11 @@ function displayPosition(name: string): string {
 export function VoterBallotScreen() {
   const navigate = useNavigate();
   const token = getVoterToken();
+<<<<<<< HEAD
   const [ballot, setBallot] = useState<VoterBallotResponse | null>(null);
+=======
+  const [ballot, setBallot] = useState<VoterBallotResponse>(VOTER_BALLOT_PREVIEW);
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
   const [selections, setSelections] = useState<SelectionMap>(() =>
     getVoterDraft().reduce<SelectionMap>((current, selection) => {
       current[selection.position_id] = [
@@ -33,18 +53,26 @@ export function VoterBallotScreen() {
       return current;
     }, {}),
   );
+<<<<<<< HEAD
   const [loading, setLoading] = useState(true);
+=======
+  const [loading, setLoading] = useState(Boolean(token));
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
   const [message, setMessage] = useState("");
 
   useDocumentTitle("Vote | CPC Vote");
 
   useEffect(() => {
+<<<<<<< HEAD
     saveVoterDraft(Object.entries(selections).flatMap(([positionId, candidates]) => candidates.map((id) => ({ position_id: Number(positionId), candidate_student_id: id }))));
   }, [selections]);
 
   useEffect(() => {
     if (!token) return;
 
+=======
+    if (!token) return;
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
     let active = true;
     getVoterBallot(token)
       .then((response) => { if (active) setBallot(response); })
@@ -55,6 +83,7 @@ export function VoterBallotScreen() {
     return () => { active = false; };
   }, [token]);
 
+<<<<<<< HEAD
   if (loading) {
     return <main className="student-loading" aria-live="polite">Loading your ballot…</main>;
   }
@@ -70,6 +99,10 @@ export function VoterBallotScreen() {
   const loadedBallot = ballot;
   const completedPositions = loadedBallot.positions.filter((position) => (selections[position.id]?.length ?? 0) > 0).length;
   const canReview = loadedBallot.can_submit_vote && loadedBallot.positions.length > 0 && completedPositions === loadedBallot.positions.length;
+=======
+  const topPositions = ballot.positions.slice(0, 2);
+  const remainingPositions = ballot.positions.slice(2);
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
   function toggleCandidate(position: BallotPosition, candidate: BallotCandidate) {
     setMessage("");
     setSelections((current) => {
@@ -89,8 +122,12 @@ export function VoterBallotScreen() {
   }
 
   function handleReview() {
+<<<<<<< HEAD
     if (!loadedBallot.can_submit_vote) return;
     const missing = loadedBallot.positions.filter((position) =>
+=======
+    const missing = ballot.positions.filter((position) =>
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
       position.candidates.length > 0 && (selections[position.id]?.length ?? 0) === 0,
     );
     if (missing.length > 0) {
@@ -108,6 +145,7 @@ export function VoterBallotScreen() {
     navigate("/voter/review");
   }
 
+<<<<<<< HEAD
   return (
     <StudentLayout title="Voting Ballot" description="Choose your representatives with confidence. Compare their profiles, make your selections, then review your ballot.">
       <BallotSteps />
@@ -131,14 +169,47 @@ export function VoterBallotScreen() {
 }
 
 
+=======
+  if (loading) {
+    return <main className="voter-ballot voter-ballot--loading" aria-live="polite">Loading your ballot…</main>;
+  }
+
+  return (
+    <main className="voter-ballot">
+      <img alt="" className="voter-ballot__background" src={campusBackground} />
+      <div className="voter-ballot__overlay" />
+      <div className="voter-ballot__content">
+        <section className="voter-ballot__top" aria-label="Executive positions">
+          {topPositions.map((position) => (
+            <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} />
+          ))}
+        </section>
+
+        {remainingPositions.map((position) => (
+          <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} wide />
+        ))}
+
+        <button className="voter-ballot__review" onClick={handleReview} type="button">Review Vote</button>
+        <p aria-live="polite" className="voter-ballot__status" role="status">{message}</p>
+      </div>
+    </main>
+  );
+}
+
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 function PositionGroup({
   position,
   selected,
   toggle,
+<<<<<<< HEAD
+=======
+  wide = false,
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 }: {
   position: BallotPosition;
   selected: string[];
   toggle: (position: BallotPosition, candidate: BallotCandidate) => void;
+<<<<<<< HEAD
 }) {
   return (
     <section className="ballot-position">
@@ -155,6 +226,34 @@ function PositionGroup({
       </div>
       {position.candidates.length === 0 && <div className="student-empty"><UsersThree aria-hidden="true" weight="light" /><div><h3>Candidates coming soon</h3><p>No candidates have been added yet.</p></div></div>}
       <CandidateComparison position={position} />
+=======
+  wide?: boolean;
+}) {
+  return (
+    <section className={wide ? "ballot-position ballot-position--wide" : "ballot-position"}>
+      <h2>{displayPosition(position.name)}</h2>
+      <p className="sr-only">Select up to {position.max_selections}</p>
+      <div className="ballot-position__options">
+        {position.candidates.map((candidate) => {
+          const checked = selected.includes(candidate.student_id);
+          return (
+            <button
+              aria-pressed={checked}
+              className="ballot-option"
+              data-checked={checked}
+              key={candidate.student_id}
+              onClick={() => toggle(position, candidate)}
+              type="button"
+            >
+              {wide && <span className="ballot-option__check" aria-hidden="true">{checked && <Check weight="bold" />}</span>}
+              <strong>{candidate.full_name}</strong>
+              <small>{candidate.team === "TEAM_A" ? "Partylist A" : candidate.team === "TEAM_B" ? "Partylist B" : candidate.team}</small>
+              {!wide && checked && <Check aria-hidden="true" className="ballot-option__selected" weight="bold" />}
+            </button>
+          );
+        })}
+      </div>
+>>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
     </section>
   );
 }
