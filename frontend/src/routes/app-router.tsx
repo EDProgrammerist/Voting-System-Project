@@ -17,12 +17,8 @@ const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
 const VoterLoginPage = lazy(() => import("@/pages/voter/login"));
 const VoterBallotPage = lazy(() => import("@/pages/voter/ballot"));
 const VoterReviewPage = lazy(() => import("@/pages/voter/review"));
-<<<<<<< HEAD
 const VoterTallyPage = lazy(() => import("@/components/features/voter-shared/voter-tally-screen"));
 const VoterCandidatesPage = lazy(() => import("@/components/features/voter-shared/voter-candidates-screen"));
-=======
-const VoterThankYouPage = lazy(() => import("@/pages/voter/thank-you"));
->>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 
 export default function AppRouter() {
   const hasAdminToken = Boolean(getAdminToken());
@@ -38,7 +34,6 @@ export default function AppRouter() {
       <Routes>
       <Route
         path="/"
-<<<<<<< HEAD
         element={<Navigate to={defaultRoute} replace />}
       />
       <Route path="/login" element={<Navigate to={defaultRoute} replace />} />
@@ -53,15 +48,6 @@ export default function AppRouter() {
         <Route path="/voter/candidates" element={<VoterCandidatesPage />} />
         <Route path="/voter/thank-you" element={<Navigate to="/voter/tally" replace />} />
       </Route>
-=======
-        element={<Navigate to={hasAdminToken ? "/admin/dashboard" : "/voter/login"} replace />}
-      />
-      <Route path="/login" element={<Navigate to="/voter/login" replace />} />
-      <Route path="/voter/login" element={<VoterLoginPage />} />
-      <Route path="/voter/ballot" element={<VoterBallotPage />} />
-      <Route path="/voter/review" element={<VoterReviewPage />} />
-      <Route path="/voter/thank-you" element={<VoterThankYouPage />} />
->>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
       <Route
         path="/admin/login"
         element={

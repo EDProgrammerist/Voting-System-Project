@@ -5,7 +5,6 @@ import type {
   VoterLoginResponse,
   VoterVotePayload,
   VoterVoteResponse,
-<<<<<<< HEAD
   VoterTallyResponse,
 } from "@/types/voter";
 
@@ -17,10 +16,6 @@ export function logoutVoter(token: string): Promise<{ message: string }> {
   return apiRequest("/voter/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
 }
 
-=======
-} from "@/types/voter";
-
->>>>>>> 74a2d47d756131abb6859b220084adc37dafd18d
 export function loginVoter(credentials: VoterLoginCredentials): Promise<VoterLoginResponse> {
   return apiRequest<VoterLoginResponse>("/voter/login", {
     method: "POST",
