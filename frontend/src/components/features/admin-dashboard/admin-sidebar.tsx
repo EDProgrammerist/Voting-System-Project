@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { CheckSquareOffset, Gauge, List, ListChecks, Medal, SignOut, UserList, Users, X } from "@phosphor-icons/react";
+import { CheckSquareOffset, Gauge, List, SignOut, UserList, Users, X } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 
 import { clearAdminSession, getAdminToken, getAdminUser } from "@/lib/admin-session";
 import { logoutAdmin } from "@/services/admin-dashboard-service";
 
-type AdminSection = "dashboard" | "votes" | "voters" | "position" | "candidates" | "ballot";
+type AdminSection = "dashboard" | "votes" | "voters" | "candidates";
 
 interface AdminSidebarProps {
   active: AdminSection;
-  onUnavailable?: (label: string) => void;
 }
 
 const navigationGroups = [
@@ -24,9 +23,7 @@ const navigationGroups = [
     label: "Manage",
     items: [
       { id: "voters", label: "Voters", icon: Users, path: "/admin/voters" },
-      { id: "position", label: "Position", icon: Medal, path: "/admin/positions" },
       { id: "candidates", label: "Candidates", icon: UserList, path: "/admin/candidates" },
-      { id: "ballot", label: "Ballot Position", icon: ListChecks, path: "/admin/ballot-position" },
     ],
   },
 ];
@@ -35,28 +32,21 @@ function initials(name: string): string {
   return name.split(" ").slice(0, 2).map((part) => part.charAt(0)).join("");
 }
 
-export function AdminSidebar({ active, onUnavailable }: AdminSidebarProps) {
+export function AdminSidebar({ active }: AdminSidebarProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const admin = getAdminUser();
 
   async function handleLogout() {
     const token = getAdminToken();
-    try {
-      if (token) await logoutAdmin(token);
-    } finally {
-      clearAdminSession();
-      navigate("/admin/login", { replace: true });
-    }
+    if (token) await logoutAdmin(token).catch(() => undefined);
+    clearAdminSession();
+    navigate("/admin/login", { replace: true });
   }
 
   function handleNavigation(item: (typeof navigationGroups)[number]["items"][number]) {
     setMenuOpen(false);
-    if ("path" in item && item.path) {
-      navigate(item.path);
-      return;
-    }
-    onUnavailable?.(item.label);
+    navigate(item.path);
   }
 
   return (

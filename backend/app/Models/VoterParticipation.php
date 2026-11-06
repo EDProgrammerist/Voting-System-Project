@@ -12,12 +12,16 @@ class VoterParticipation extends Model
         'election_id',
         'student_id',
         'voted_at',
+        'signature',
+        'thumbmark_confirmed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'voted_at' => 'datetime',
+            'signature' => 'encrypted:array',
+            'thumbmark_confirmed_at' => 'datetime',
         ];
     }
 }

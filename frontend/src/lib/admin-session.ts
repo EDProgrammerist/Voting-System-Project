@@ -1,7 +1,7 @@
 import type { AdminUser } from "@/types/admin";
 
-export const ADMIN_TOKEN_KEY = "admin_access_token";
-export const ADMIN_USER_KEY = "admin_user";
+const ADMIN_TOKEN_KEY = "admin_access_token";
+const ADMIN_USER_KEY = "admin_user";
 
 export function saveAdminSession(token: string, admin: AdminUser): void {
   sessionStorage.setItem(ADMIN_TOKEN_KEY, token);

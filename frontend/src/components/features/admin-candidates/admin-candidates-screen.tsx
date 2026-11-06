@@ -1,31 +1,32 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { MagnifyingGlass, Plus, User, X } from "@phosphor-icons/react";
+import { useNavigate } from "react-router";
 
 import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { AdminDataState, AdminElectionPicker } from "@/components/features/admin-dashboard/admin-data-state";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getAdminToken } from "@/lib/admin-session";
-import { listAdminCandidates, listAdminPositions, listAdminStudents, saveAdminCandidate } from "@/services/admin-dashboard-service";
+import { activateAdminElection, deleteAdminCandidate, listAdminCandidates, listAdminPositions, saveAdminCandidate } from "@/services/admin-dashboard-service";
 import { ApiError } from "@/services/api-client";
 import type { CandidateRecord } from "@/types/candidate";
 import type { PositionRecord } from "@/types/position";
-import type { StudentRecord } from "@/types/student";
 
 import "../admin-dashboard/admin-dashboard-screen.css";
 import "./admin-candidates-screen.css";
 
 export function AdminCandidatesScreen() {
+  const navigate = useNavigate();
   const { dashboard, dataState, dataNotice, elections, selectedElectionId, selectElection } = useAdminElectionDashboard("draft");
   const [candidates, setCandidates] = useState<CandidateRecord[]>([]);
   const [positions, setPositions] = useState<PositionRecord[]>([]);
-  const [students, setStudents] = useState<StudentRecord[]>([]);
   const [query, setQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateRecord | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [activating, setActivating] = useState(false);
 
   useDocumentTitle("Candidates | CPC Vote Admin");
 
@@ -37,13 +38,11 @@ export function AdminCandidatesScreen() {
     Promise.all([
       listAdminCandidates(token, dashboard.election.id),
       listAdminPositions(token, dashboard.election.id),
-      listAdminStudents(token),
     ])
-      .then(([candidateResponse, positionResponse, studentResponse]) => {
+      .then(([candidateResponse, positionResponse]) => {
         if (!active) return;
         setCandidates(candidateResponse.data);
         setPositions(positionResponse.data);
-        setStudents(studentResponse.data.filter((student) => student.academic_status === "enrolled"));
       })
       .catch((error: unknown) => {
         if (active) setNotice(error instanceof Error ? error.message : "Unable to load candidates.");
@@ -53,8 +52,8 @@ export function AdminCandidatesScreen() {
   }, [dashboard.election.id, dataState]);
 
   const countsByPosition = useMemo(() => {
-    const counts = new Map<string, number>();
-    candidates.forEach((candidate) => counts.set(candidate.position.name, (counts.get(candidate.position.name) ?? 0) + 1));
+    const counts = new Map<number, number>();
+    candidates.forEach((candidate) => counts.set(candidate.position.id, (counts.get(candidate.position.id) ?? 0) + 1));
     return counts;
   }, [candidates]);
 
@@ -68,10 +67,14 @@ export function AdminCandidatesScreen() {
     });
   }, [candidates, positionFilter, query]);
   const canEdit = dataState === "live" && dashboard.election.status === "draft";
+  const canAddCandidate = canEdit && positions.length > 0;
+  const canActivate = canEdit
+    && positions.length > 0
+    && positions.every((position) => (countsByPosition.get(position.id) ?? 0) > 0);
 
   function openAddModal() {
-    if (!canEdit) {
-      setNotice("Select a draft election to add candidates.");
+    if (!canAddCandidate) {
+      setNotice(canEdit ? "Default positions are still loading. Refresh the page and try again." : "Select a draft election to add candidates.");
       return;
     }
     setSelectedCandidate(null);
@@ -99,14 +102,13 @@ export function AdminCandidatesScreen() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const studentId = String(formData.get("student_id") ?? "");
+    const fullName = String(formData.get("full_name") ?? "").trim();
     const positionId = Number(formData.get("position_id"));
     const team = String(formData.get("team") ?? "");
-    const student = students.find((item) => item.student_id === studentId);
     const position = positions.find((item) => item.id === positionId);
 
-    if (!student || !position || !["TEAM_A", "TEAM_B"].includes(team)) {
-      setNotice("Choose a student, position, and partylist before saving.");
+    if (!fullName || !position || !["TEAM_A", "TEAM_B"].includes(team)) {
+      setNotice("Enter a candidate name and choose a position and partylist before saving.");
       return;
     }
 
@@ -123,17 +125,10 @@ export function AdminCandidatesScreen() {
     try {
       const response = await saveAdminCandidate(token, formData);
 
-      const photo = formData.get("profile_photo");
-      const profilePhotoUrl = photo instanceof File && photo.size > 0 ? URL.createObjectURL(photo) : selectedCandidate?.profile_photo_url ?? null;
-      const savedCandidate: CandidateRecord = {
-        student_id: student.student_id,
-        full_name: student.full_name,
-        profile_photo_url: profilePhotoUrl,
-        motto: String(formData.get("motto") ?? "").trim() || null,
-        team,
-        position: { id: position.id, name: position.name },
-      };
-      setCandidates((current) => [...current.filter((item) => item.student_id !== studentId), savedCandidate]);
+      setCandidates((current) => [
+        ...current.filter((item) => item.student_id !== response.data.student_id),
+        response.data,
+      ]);
       setNotice(response.message);
       setModalOpen(false);
       setSelectedCandidate(null);
@@ -144,16 +139,53 @@ export function AdminCandidatesScreen() {
     }
   }
 
-  function handleUnavailable(label: string) {
-    setNotice(`${label} management will be connected in the next screen.`);
+  async function handleDelete(candidate: CandidateRecord) {
+    if (!canEdit) {
+      setNotice("Select a draft election to delete candidates.");
+      return;
+    }
+    if (!window.confirm(`Remove ${candidate.full_name} from this election?`)) return;
+
+    const token = getAdminToken();
+    if (!token) return;
+
+    try {
+      const response = await deleteAdminCandidate(
+        token,
+        candidate.student_id,
+        dashboard.election.id,
+      );
+      setCandidates((current) => current.filter((item) => item.student_id !== candidate.student_id));
+      setNotice(response.message);
+    } catch (error) {
+      setNotice(error instanceof ApiError ? error.message : "Unable to delete the candidate right now.");
+    }
   }
 
-  const summaryPositions = ["President", "Vice President", "Senator"];
+  async function handleActivate() {
+    if (!canActivate) {
+      setNotice("Add at least one candidate to every position before activating the election.");
+      return;
+    }
+    if (!window.confirm("Activate this election now? Positions and candidates become read-only after activation.")) return;
+
+    const token = getAdminToken();
+    if (!token) return;
+
+    setActivating(true);
+    try {
+      await activateAdminElection(token, dashboard.election.id);
+      navigate("/admin/dashboard", { replace: true });
+    } catch (error) {
+      setNotice(error instanceof ApiError ? error.message : "Unable to activate the election right now.");
+      setActivating(false);
+    }
+  }
 
   if (dataState !== "live") {
     return (
       <main className="admin-dashboard admin-candidates">
-        <AdminSidebar active="candidates" onUnavailable={handleUnavailable} />
+        <AdminSidebar active="candidates" />
         <section className="admin-dashboard__content admin-candidates__content">
           <AdminDataState message={dataNotice} state={dataState} />
         </section>
@@ -163,18 +195,19 @@ export function AdminCandidatesScreen() {
 
   return (
     <main className="admin-dashboard admin-candidates">
-      <AdminSidebar active="candidates" onUnavailable={handleUnavailable} />
+      <AdminSidebar active="candidates" />
 
       <section className="admin-dashboard__content admin-candidates__content">
         <header className="admin-candidates__header">
           <div><h1>Candidates</h1><p>Manage the candidates running in the {dashboard.election.name}.</p></div>
           <AdminElectionPicker elections={elections} onChange={(id) => { setCandidates([]); setPositions([]); selectElection(id); }} selectedElectionId={selectedElectionId} />
-          <button disabled={!canEdit} onClick={openAddModal} title={!canEdit ? "Select a draft election to make changes" : undefined} type="button"><Plus aria-hidden="true" weight="bold" />Add Candidate</button>
+          <button className="admin-candidates__activate" disabled={!canActivate || activating} onClick={handleActivate} title={!canActivate ? "Add at least one candidate to every position first" : undefined} type="button">{activating ? "Activating…" : "Activate Election"}</button>
+          <button disabled={!canAddCandidate} onClick={openAddModal} title={!canEdit ? "Select a draft election to make changes" : positions.length === 0 ? "Wait for the default positions to load" : undefined} type="button"><Plus aria-hidden="true" weight="bold" />Add Candidate</button>
         </header>
 
         <section aria-label="Candidate summary" className="candidate-summary">
           <SummaryCard label="Total Candidates" value={candidates.length} />
-          {summaryPositions.map((positionName) => <SummaryCard key={positionName} label={positionName === "Senator" ? "Senators" : positionName} value={countsByPosition.get(positionName) ?? 0} />)}
+          {positions.map((position) => <SummaryCard key={position.id} label={position.name} value={countsByPosition.get(position.id) ?? 0} />)}
         </section>
 
         <section aria-label="Candidate filters" className="candidate-filters">
@@ -191,11 +224,11 @@ export function AdminCandidatesScreen() {
               </div>
               <div className="candidate-card__body">
                 <div><p className="candidate-card__eyebrow">{candidate.position.name}</p><h2>{candidate.full_name}</h2><p>{candidate.team === "TEAM_A" ? "Partylist A" : candidate.team === "TEAM_B" ? "Partylist B" : candidate.team}</p><small>{candidate.motto ?? "Platform details to follow."}</small></div>
-                <div className="candidate-card__actions"><button disabled={!canEdit} onClick={() => openEditModal(candidate)} type="button">Edit</button><button disabled title="Candidate deletion requires a backend endpoint" type="button">Delete</button></div>
+                <div className="candidate-card__actions"><button disabled={!canEdit} onClick={() => openEditModal(candidate)} type="button">Edit</button><button disabled={!canEdit} onClick={() => handleDelete(candidate)} type="button">Delete</button></div>
               </div>
             </article>
           ))}
-          {filteredCandidates.length === 0 && <p className="candidate-grid__empty">No candidates match this search.</p>}
+          {filteredCandidates.length === 0 && <p className="candidate-grid__empty">{candidates.length === 0 ? "No candidates have been added yet." : "No candidates match this search."}</p>}
         </section>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">{notice || (!canEdit ? "This election is read-only. Select a draft election to manage candidates." : dataNotice)}</p>
@@ -207,11 +240,14 @@ export function AdminCandidatesScreen() {
             <button aria-label="Close candidate dialog" className="candidate-modal__close" disabled={submitting} onClick={closeModal} type="button"><X aria-hidden="true" /></button>
             <h2 id="candidate-modal-title">{selectedCandidate ? "Edit Candidate" : "Add Candidate"}</h2>
             <form onSubmit={handleSave}>
-              <label>Full Name<select autoFocus defaultValue={selectedCandidate?.student_id ?? ""} disabled={Boolean(selectedCandidate)} name="student_id" required><option disabled value="">Select a student</option>{students.map((student) => <option key={student.student_id} value={student.student_id}>{student.full_name} · {student.student_id}</option>)}</select>{selectedCandidate && <input name="student_id" type="hidden" value={selectedCandidate.student_id} />}</label>
+              <label>Full Name<input autoFocus defaultValue={selectedCandidate?.full_name ?? ""} maxLength={255} name="full_name" placeholder="Enter candidate full name" required /></label>
+              {selectedCandidate && <input name="student_id" type="hidden" value={selectedCandidate.student_id} />}
               <label>Position<select defaultValue={selectedCandidate?.position.id ?? ""} name="position_id" required><option disabled value="">Select a position</option>{positions.map((position) => <option key={position.id} value={position.id}>{position.name}</option>)}</select></label>
               <label>Partylist<select defaultValue={selectedCandidate?.team ?? ""} name="team" required><option disabled value="">Select a partylist</option><option value="TEAM_A">Partylist A</option><option value="TEAM_B">Partylist B</option></select></label>
               <label>Platform<textarea defaultValue={selectedCandidate?.motto ?? ""} maxLength={255} name="motto" placeholder="Candidate platform or motto" rows={3} /></label>
               <label>Upload<input accept="image/jpeg,image/png,image/webp" name="profile_photo" type="file" /></label>
+              <div className="candidate-modal__field"><label htmlFor="candidate-profile">Profile</label><textarea defaultValue={selectedCandidate?.profile ?? ""} id="candidate-profile" maxLength={5000} name="profile" placeholder="Background, experience, and leadership interests" rows={4} /></div>
+              <div className="candidate-modal__field"><label htmlFor="candidate-achievements">Achievements</label><textarea defaultValue={selectedCandidate?.achievements ?? ""} id="candidate-achievements" maxLength={5000} name="achievements" placeholder="Awards, projects, and accomplishments" rows={4} /></div>
               <div className="candidate-modal__actions"><button disabled={submitting} onClick={closeModal} type="button">Cancel</button><button disabled={submitting} type="submit">{submitting ? "Saving…" : "Save"}</button></div>
             </form>
           </section>

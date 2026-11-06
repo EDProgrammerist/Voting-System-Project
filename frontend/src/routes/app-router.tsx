@@ -2,13 +2,13 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
 import { getAdminToken } from "@/lib/admin-session";
+import { getVoterToken, isVoterTallyOnly } from "@/lib/voter-session";
 import RequireAdmin from "@/routes/require-admin";
+import RequireVoter from "@/routes/require-voter";
 
-const AdminBallotPositionPage = lazy(() => import("@/pages/admin/ballot-position"));
 const AdminCandidatesPage = lazy(() => import("@/pages/admin/candidates"));
 const AdminDashboardPage = lazy(() => import("@/pages/admin/dashboard"));
 const AdminLoginPage = lazy(() => import("@/pages/admin/login"));
-const AdminPositionsPage = lazy(() => import("@/pages/admin/positions"));
 const AdminVotersPage = lazy(() => import("@/pages/admin/voters"));
 const AdminVotesPage = lazy(() => import("@/pages/admin/votes"));
 const HomePage = lazy(() => import("@/pages/guest/home"));
@@ -17,23 +17,37 @@ const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
 const VoterLoginPage = lazy(() => import("@/pages/voter/login"));
 const VoterBallotPage = lazy(() => import("@/pages/voter/ballot"));
 const VoterReviewPage = lazy(() => import("@/pages/voter/review"));
-const VoterThankYouPage = lazy(() => import("@/pages/voter/thank-you"));
+const VoterTallyPage = lazy(() => import("@/components/features/voter-shared/voter-tally-screen"));
+const VoterCandidatesPage = lazy(() => import("@/components/features/voter-shared/voter-candidates-screen"));
 
 export default function AppRouter() {
   const hasAdminToken = Boolean(getAdminToken());
+  const hasVoterToken = Boolean(getVoterToken());
+  const defaultRoute = hasAdminToken
+    ? "/admin/dashboard"
+    : hasVoterToken
+      ? isVoterTallyOnly() ? "/voter/tally" : "/voter/ballot"
+      : "/voter/login";
 
   return (
     <Suspense fallback={<div aria-live="polite" className="route-loading" role="status">Loading…</div>}>
       <Routes>
       <Route
         path="/"
-        element={<Navigate to={hasAdminToken ? "/admin/dashboard" : "/voter/login"} replace />}
+        element={<Navigate to={defaultRoute} replace />}
       />
-      <Route path="/login" element={<Navigate to="/voter/login" replace />} />
-      <Route path="/voter/login" element={<VoterLoginPage />} />
-      <Route path="/voter/ballot" element={<VoterBallotPage />} />
-      <Route path="/voter/review" element={<VoterReviewPage />} />
-      <Route path="/voter/thank-you" element={<VoterThankYouPage />} />
+      <Route path="/login" element={<Navigate to={defaultRoute} replace />} />
+      <Route
+        path="/voter/login"
+        element={hasVoterToken ? <Navigate to={isVoterTallyOnly() ? "/voter/tally" : "/voter/ballot"} replace /> : <VoterLoginPage />}
+      />
+      <Route element={<RequireVoter />}>
+        <Route path="/voter/ballot" element={<VoterBallotPage />} />
+        <Route path="/voter/review" element={<VoterReviewPage />} />
+        <Route path="/voter/tally" element={<VoterTallyPage />} />
+        <Route path="/voter/candidates" element={<VoterCandidatesPage />} />
+        <Route path="/voter/thank-you" element={<Navigate to="/voter/tally" replace />} />
+      </Route>
       <Route
         path="/admin/login"
         element={
@@ -48,11 +62,11 @@ export default function AppRouter() {
         <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
         <Route path="/admin/votes" element={<AdminVotesPage />} />
         <Route path="/admin/voters" element={<AdminVotersPage />} />
-        <Route path="/admin/positions" element={<AdminPositionsPage />} />
+        <Route path="/admin/positions" element={<Navigate to="/admin/candidates" replace />} />
         <Route path="/admin/candidates" element={<AdminCandidatesPage />} />
         <Route
           path="/admin/ballot-position"
-          element={<AdminBallotPositionPage />}
+          element={<Navigate to="/admin/candidates" replace />}
         />
       </Route>
       <Route element={<GuestLayout />}>

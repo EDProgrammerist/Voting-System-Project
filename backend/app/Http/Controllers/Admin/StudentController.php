@@ -34,6 +34,17 @@ class StudentController extends Controller
                 'string',
                 'max:255',
             ],
+            'page' => [
+                'nullable',
+                'integer',
+                'min:1',
+            ],
+            'per_page' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
         ]);
 
         $electionId = $validated['election_id']
@@ -80,7 +91,7 @@ class StudentController extends Controller
                 },
             )
             ->orderBy('full_name')
-            ->paginate(25);
+            ->paginate($validated['per_page'] ?? 25);
 
         $students->through(function (Student $student) use ($electionId): array {
             $hasVoted = (bool) ($student->has_voted ?? false);

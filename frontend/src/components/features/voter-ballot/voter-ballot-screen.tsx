@@ -1,20 +1,21 @@
-import { Check } from "@phosphor-icons/react";
+import { partyLabel } from "@/components/features/voter-shared/candidate-utils";
+import { ArrowRight, Check, CheckCircle, Clock, UsersThree } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-import campusBackground from "@/assets/campus-admin-bg.png";
-import { VOTER_BALLOT_PREVIEW } from "@/data/voter-ballot-preview";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getVoterDraft, getVoterToken, saveVoterDraft } from "@/lib/voter-session";
 import { getVoterBallot } from "@/services/voter-auth-service";
 import type { BallotCandidate, BallotPosition, VoterBallotResponse, VoterSelection } from "@/types/voter";
 
 import "./voter-ballot-screen.css";
+import { BallotSteps, CandidateAvatar, StudentLayout } from "@/components/features/voter-shared/student-layout";
+import { CandidateComparison } from "@/components/features/voter-shared/candidate-comparison";
 
 type SelectionMap = Record<number, string[]>;
 
 function displayPosition(name: string): string {
-  if (name.toLowerCase() === "vice president") return "Vice - President";
+  if (name.toLowerCase() === "vice president") return "Vice President";
   if (name.toLowerCase() === "senator") return "Senators";
   return name;
 }
@@ -22,7 +23,7 @@ function displayPosition(name: string): string {
 export function VoterBallotScreen() {
   const navigate = useNavigate();
   const token = getVoterToken();
-  const [ballot, setBallot] = useState<VoterBallotResponse>(VOTER_BALLOT_PREVIEW);
+  const [ballot, setBallot] = useState<VoterBallotResponse | null>(null);
   const [selections, setSelections] = useState<SelectionMap>(() =>
     getVoterDraft().reduce<SelectionMap>((current, selection) => {
       current[selection.position_id] = [
@@ -32,13 +33,18 @@ export function VoterBallotScreen() {
       return current;
     }, {}),
   );
-  const [loading, setLoading] = useState(Boolean(token));
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
   useDocumentTitle("Vote | CPC Vote");
 
   useEffect(() => {
+    saveVoterDraft(Object.entries(selections).flatMap(([positionId, candidates]) => candidates.map((id) => ({ position_id: Number(positionId), candidate_student_id: id }))));
+  }, [selections]);
+
+  useEffect(() => {
     if (!token) return;
+
     let active = true;
     getVoterBallot(token)
       .then((response) => { if (active) setBallot(response); })
@@ -49,8 +55,21 @@ export function VoterBallotScreen() {
     return () => { active = false; };
   }, [token]);
 
-  const topPositions = ballot.positions.slice(0, 2);
-  const remainingPositions = ballot.positions.slice(2);
+  if (loading) {
+    return <main className="student-loading" aria-live="polite">Loading your ballot…</main>;
+  }
+
+  if (!ballot) {
+    return (
+      <main className="student-loading" aria-live="polite">
+        {message || "Unable to load your ballot."}
+      </main>
+    );
+  }
+
+  const loadedBallot = ballot;
+  const completedPositions = loadedBallot.positions.filter((position) => (selections[position.id]?.length ?? 0) > 0).length;
+  const canReview = loadedBallot.can_submit_vote && loadedBallot.positions.length > 0 && completedPositions === loadedBallot.positions.length;
   function toggleCandidate(position: BallotPosition, candidate: BallotCandidate) {
     setMessage("");
     setSelections((current) => {
@@ -70,7 +89,8 @@ export function VoterBallotScreen() {
   }
 
   function handleReview() {
-    const missing = ballot.positions.filter((position) =>
+    if (!loadedBallot.can_submit_vote) return;
+    const missing = loadedBallot.positions.filter((position) =>
       position.candidates.length > 0 && (selections[position.id]?.length ?? 0) === 0,
     );
     if (missing.length > 0) {
@@ -88,67 +108,53 @@ export function VoterBallotScreen() {
     navigate("/voter/review");
   }
 
-  if (loading) {
-    return <main className="voter-ballot voter-ballot--loading" aria-live="polite">Loading your ballot…</main>;
-  }
-
   return (
-    <main className="voter-ballot">
-      <img alt="" className="voter-ballot__background" src={campusBackground} />
-      <div className="voter-ballot__overlay" />
-      <div className="voter-ballot__content">
-        <section className="voter-ballot__top" aria-label="Executive positions">
-          {topPositions.map((position) => (
-            <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} />
-          ))}
-        </section>
-
-        {remainingPositions.map((position) => (
-          <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} wide />
-        ))}
-
-        <button className="voter-ballot__review" onClick={handleReview} type="button">Review Vote</button>
-        <p aria-live="polite" className="voter-ballot__status" role="status">{message}</p>
+    <StudentLayout title="Voting Ballot" description="Choose your representatives with confidence. Compare their profiles, make your selections, then review your ballot.">
+      <BallotSteps />
+      {!loadedBallot.can_submit_vote && <div className="student-notice" role="status"><Clock aria-hidden="true" weight="light" /><div><strong>Take a look around</strong><p>You can browse the ballot and candidate profiles now. Vote submission becomes available when the election opens and candidates are ready.</p></div></div>}
+      <div className="ballot-layout">
+        <div className="ballot-offices">{loadedBallot.positions.map((position) => <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} />)}</div>
+        <aside className="ballot-summary" aria-label="Your ballot summary">
+          <div className="ballot-summary__title"><CheckCircle aria-hidden="true" weight="light" /><h2>Your ballot</h2></div>
+          <p className="ballot-summary__count"><strong>{completedPositions}</strong> of {loadedBallot.positions.length} positions selected</p>
+          <ul>{loadedBallot.positions.map((position) => {
+            const chosen = position.candidates.filter((candidate) => selections[position.id]?.includes(candidate.student_id));
+            return <li key={position.id} data-complete={chosen.length > 0}><CheckCircle aria-hidden="true" weight={chosen.length ? "fill" : "light"} /><div><strong>{displayPosition(position.name)}</strong><span>{chosen.length ? chosen.map((candidate) => candidate.full_name).join(", ") : "No selection yet"}</span></div></li>;
+          })}</ul>
+          <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Review Vote<ArrowRight aria-hidden="true" /></button>
+          <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : canReview ? "You can still make changes on the next screen." : "Select at least one candidate for each position to continue."}</p>
+          <p aria-live="polite" className="student-error" role="status">{message}</p>
+        </aside>
       </div>
-    </main>
+    </StudentLayout>
   );
 }
+
 
 function PositionGroup({
   position,
   selected,
   toggle,
-  wide = false,
 }: {
   position: BallotPosition;
   selected: string[];
   toggle: (position: BallotPosition, candidate: BallotCandidate) => void;
-  wide?: boolean;
 }) {
   return (
-    <section className={wide ? "ballot-position ballot-position--wide" : "ballot-position"}>
-      <h2>{displayPosition(position.name)}</h2>
-      <p className="sr-only">Select up to {position.max_selections}</p>
+    <section className="ballot-position">
+      <header className="ballot-position__heading"><div><h2>{displayPosition(position.name)}</h2><p>Select up to {position.max_selections} {position.max_selections === 1 ? "candidate" : "candidates"}</p></div><span className="ballot-position__counter" data-complete={selected.length > 0}>{selected.length} / {position.max_selections} selected</span></header>
       <div className="ballot-position__options">
         {position.candidates.map((candidate) => {
           const checked = selected.includes(candidate.student_id);
-          return (
-            <button
-              aria-pressed={checked}
-              className="ballot-option"
-              data-checked={checked}
-              key={candidate.student_id}
-              onClick={() => toggle(position, candidate)}
-              type="button"
-            >
-              {wide && <span className="ballot-option__check" aria-hidden="true">{checked && <Check weight="bold" />}</span>}
-              <strong>{candidate.full_name}</strong>
-              <small>{candidate.team === "TEAM_A" ? "Partylist A" : candidate.team === "TEAM_B" ? "Partylist B" : candidate.team}</small>
-              {!wide && checked && <Check aria-hidden="true" className="ballot-option__selected" weight="bold" />}
-            </button>
-          );
+          return <button aria-pressed={checked} className="ballot-option" data-checked={checked} key={candidate.student_id} onClick={() => toggle(position, candidate)} type="button">
+            <CandidateAvatar name={candidate.full_name} photo={candidate.profile_photo_url} />
+            <span className="ballot-option__identity"><strong>{candidate.full_name}</strong><small>{partyLabel(candidate.team)}</small></span>
+            <span aria-hidden="true" className="ballot-option__check">{checked && <Check weight="bold" />}</span>
+          </button>;
         })}
       </div>
+      {position.candidates.length === 0 && <div className="student-empty"><UsersThree aria-hidden="true" weight="light" /><div><h3>Candidates coming soon</h3><p>No candidates have been added yet.</p></div></div>}
+      <CandidateComparison position={position} />
     </section>
   );
 }

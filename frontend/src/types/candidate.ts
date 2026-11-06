@@ -1,4 +1,6 @@
 export interface CandidateRecord {
+  profile: string | null;
+  achievements: string | null;
   student_id: string;
   full_name: string;
   profile_photo_url: string | null;
@@ -16,4 +18,5 @@ export interface CandidatesResponse {
 
 export interface CandidateMutationResponse {
   message: string;
+  data: CandidateRecord;
 }

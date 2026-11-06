@@ -64,11 +64,23 @@ class VoteController extends Controller
         }
 
         $groupedSelections = $selections->groupBy('position_id');
+        $positions = Position::query()
+            ->where('election_id', $election->id)
+            ->orderBy('display_order')
+            ->get()
+            ->keyBy('id');
+        $selectedPositionIds = $groupedSelections
+            ->keys()
+            ->map(fn ($positionId): int => (int) $positionId);
+        $missingPositions = $positions
+            ->reject(
+                fn (Position $position): bool => $selectedPositionIds
+                    ->contains($position->id),
+            )
+            ->pluck('name');
 
         foreach ($groupedSelections as $positionId => $positionSelections) {
-            $position = Position::query()
-                ->where('election_id', $election->id)
-                ->find($positionId);
+            $position = $positions->get((int) $positionId);
 
             if (! $position) {
                 throw ValidationException::withMessages([
@@ -100,16 +112,25 @@ class VoteController extends Controller
             }
         }
 
+        if ($missingPositions->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'selections' => 'Choose at least one candidate for every position. Missing: '.$missingPositions->join(', ').'.',
+            ]);
+        }
+
         try {
             DB::transaction(function () use (
                 $student,
                 $election,
                 $selections,
+                $data,
             ): void {
                 VoterParticipation::create([
                     'election_id' => $election->id,
                     'student_id' => $student->student_id,
                     'voted_at' => now(),
+                    'signature' => $data['signature'],
+                    'thumbmark_confirmed_at' => now(),
                 ]);
 
                 $ballotId = (string) Str::uuid();
@@ -147,10 +168,11 @@ class VoteController extends Controller
             throw $exception;
         }
 
-        $student->currentAccessToken()?->delete();
+        $student->tokens()->where('name', 'voter-session')->update(['abilities' => json_encode(['tally-only'])]);
 
         return response()->json([
             'message' => 'Your vote was submitted successfully.',
+            'tally_only' => true,
         ], 201);
     }
 }

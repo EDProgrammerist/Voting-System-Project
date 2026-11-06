@@ -95,4 +95,53 @@ class AdminStudentManagementTest extends TestCase
             'course' => 'BSCS',
         ]);
     }
+
+    public function test_enrolled_filter_hides_graduated_and_stopped_students_from_the_voter_list(): void
+    {
+        Student::create([
+            'student_id' => '2026-1000',
+            'full_name' => 'Eligible Student',
+            'course' => 'BSIT',
+            'academic_status' => 'enrolled',
+        ]);
+        Student::create([
+            'student_id' => '2020-1001',
+            'full_name' => 'Graduate Student',
+            'course' => 'BSIT',
+            'academic_status' => 'graduated',
+        ]);
+        Student::create([
+            'student_id' => '2023-1002',
+            'full_name' => 'Stopped Student',
+            'course' => 'BSHM',
+            'academic_status' => 'stopped',
+        ]);
+
+        $response = $this->getJson('/api/admin/students?status=enrolled')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.student_id', '2026-1000');
+
+        $studentIds = collect($response->json('data'))->pluck('student_id');
+        $this->assertNotContains('2020-1001', $studentIds);
+        $this->assertNotContains('2023-1002', $studentIds);
+    }
+
+    public function test_student_list_supports_an_explicit_page_size_up_to_one_hundred(): void
+    {
+        foreach (range(1, 30) as $index) {
+            Student::create([
+                'student_id' => sprintf('2026-%04d', $index),
+                'full_name' => "Student {$index}",
+                'course' => 'BSIT',
+                'academic_status' => 'enrolled',
+            ]);
+        }
+
+        $this->getJson('/api/admin/students?status=enrolled&per_page=100')
+            ->assertOk()
+            ->assertJsonPath('per_page', 100)
+            ->assertJsonPath('total', 30)
+            ->assertJsonCount(30, 'data');
+    }
 }

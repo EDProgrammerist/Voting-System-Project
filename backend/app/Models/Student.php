@@ -24,6 +24,8 @@ class Student extends Authenticatable
         'academic_status',
     ];
 
+    protected $hidden = ['pin'];
+
     public function candidateProfile(): HasOne
     {
         return $this->hasOne(

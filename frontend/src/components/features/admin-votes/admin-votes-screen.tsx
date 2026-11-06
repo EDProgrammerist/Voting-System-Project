@@ -23,7 +23,6 @@ function electionYear(name: string): string {
 export function AdminVotesScreen() {
   const { dashboard, dataState, dataNotice } = useAdminElectionDashboard();
   const [activePosition, setActivePosition] = useState(ALL_POSITIONS);
-  const [notice, setNotice] = useState("");
 
   useDocumentTitle("Votes | CPC Vote Admin");
 
@@ -45,14 +44,10 @@ export function AdminVotesScreen() {
     ? groupedResults
     : groupedResults.filter((group) => group.position === activePosition);
 
-  function handleUnavailable(label: string) {
-    setNotice(`${label} management will be connected in the next screen.`);
-  }
-
   if (dataState !== "live") {
     return (
       <main className="admin-dashboard admin-votes">
-        <AdminSidebar active="votes" onUnavailable={handleUnavailable} />
+        <AdminSidebar active="votes" />
         <section className="admin-dashboard__content admin-votes__content">
           <AdminDataState message={dataNotice} state={dataState} />
         </section>
@@ -62,7 +57,7 @@ export function AdminVotesScreen() {
 
   return (
     <main className="admin-dashboard admin-votes">
-      <AdminSidebar active="votes" onUnavailable={handleUnavailable} />
+      <AdminSidebar active="votes" />
 
       <section className="admin-dashboard__content admin-votes__content">
         <header className="admin-votes__header">
@@ -77,6 +72,17 @@ export function AdminVotesScreen() {
             <span>Print/Export</span>
           </button>
         </header>
+
+        <section className="admin-votes__team-totals" aria-label="Live team totals">
+          <article data-team="TEAM_A">
+            <span>Team A selections</span>
+            <strong>{dashboard.team_totals.TEAM_A.toLocaleString()}</strong>
+          </article>
+          <article data-team="TEAM_B">
+            <span>Team B selections</span>
+            <strong>{dashboard.team_totals.TEAM_B.toLocaleString()}</strong>
+          </article>
+        </section>
 
         <div className="admin-votes__filters" aria-label="Filter results by position" role="group">
           <button
@@ -109,7 +115,7 @@ export function AdminVotesScreen() {
         </div>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">
-          {notice || dataNotice}
+          {dataNotice}
         </p>
       </section>
     </main>

@@ -4,18 +4,37 @@ const VOTER_TOKEN_KEY = "voter_access_token";
 const VOTER_IDENTITY_KEY = "voter_identity";
 const VOTER_ELECTION_KEY = "voter_election";
 const VOTER_DRAFT_KEY = "voter_ballot_draft";
+const VOTER_TALLY_ONLY_KEY = "voter_tally_only";
+
+export function syncVoterElection(election: VoterElection): void {
+  if (getVoterElection()?.id !== election.id) sessionStorage.removeItem(VOTER_DRAFT_KEY);
+  sessionStorage.setItem(VOTER_ELECTION_KEY, JSON.stringify(election));
+}
+
+export function isVoterTallyOnly(): boolean {
+  return sessionStorage.getItem(VOTER_TALLY_ONLY_KEY) === "true";
+}
+
+export function setVoterTallyOnly(value: boolean): void {
+  sessionStorage.setItem(VOTER_TALLY_ONLY_KEY, String(value));
+  if (value) sessionStorage.removeItem(VOTER_DRAFT_KEY);
+}
 
 export function saveVoterSession(
   token: string,
   student: VoterIdentity,
   election: VoterElection,
+  tallyOnly = false,
 ): void {
+  sessionStorage.removeItem(VOTER_DRAFT_KEY);
+  setVoterTallyOnly(tallyOnly);
   sessionStorage.setItem(VOTER_TOKEN_KEY, token);
   sessionStorage.setItem(VOTER_IDENTITY_KEY, JSON.stringify(student));
   sessionStorage.setItem(VOTER_ELECTION_KEY, JSON.stringify(election));
 }
 
 export function clearVoterSession(): void {
+  sessionStorage.removeItem(VOTER_TALLY_ONLY_KEY);
   sessionStorage.removeItem(VOTER_TOKEN_KEY);
   sessionStorage.removeItem(VOTER_IDENTITY_KEY);
   sessionStorage.removeItem(VOTER_ELECTION_KEY);
@@ -26,7 +45,7 @@ export function getVoterToken(): string | null {
   return sessionStorage.getItem(VOTER_TOKEN_KEY);
 }
 
-export function getVoterElection(): VoterElection | null {
+function getVoterElection(): VoterElection | null {
   const value = sessionStorage.getItem(VOTER_ELECTION_KEY);
   if (!value) return null;
 

@@ -16,6 +16,14 @@ export interface CandidateResult {
   votes: number;
 }
 
+interface CourseTurnout {
+  course: string;
+  eligible_students: number;
+  already_voted: number;
+  not_yet_voted: number;
+  percentage: number;
+}
+
 export interface DashboardData {
   election: ElectionSummary;
   turnout: {
@@ -23,6 +31,7 @@ export interface DashboardData {
     already_voted: number;
     not_yet_voted: number;
     percentage: number;
+    by_course: CourseTurnout[];
   };
   team_totals: {
     TEAM_A: number;

@@ -44,6 +44,51 @@ class DashboardController extends Controller
             ? round(($alreadyVoted / $eligibleStudents) * 100, 2)
             : 0;
 
+        $eligibleByCourse = Student::query()
+            ->selectRaw("COALESCE(NULLIF(course, ''), 'Unspecified') AS course")
+            ->selectRaw('COUNT(*) AS total')
+            ->where('academic_status', 'enrolled')
+            ->groupByRaw("COALESCE(NULLIF(course, ''), 'Unspecified')")
+            ->pluck('total', 'course');
+
+        $votedByCourse = VoterParticipation::query()
+            ->join(
+                'students',
+                'students.student_id',
+                '=',
+                'voter_participations.student_id',
+            )
+            ->selectRaw("COALESCE(NULLIF(students.course, ''), 'Unspecified') AS course")
+            ->selectRaw('COUNT(*) AS total')
+            ->where('voter_participations.election_id', $election->id)
+            ->groupByRaw("COALESCE(NULLIF(students.course, ''), 'Unspecified')")
+            ->pluck('total', 'course');
+
+        $turnoutByCourse = $eligibleByCourse
+            ->keys()
+            ->merge($votedByCourse->keys())
+            ->unique()
+            ->sort()
+            ->values()
+            ->map(function (string $course) use (
+                $eligibleByCourse,
+                $votedByCourse,
+            ): array {
+                $eligible = (int) ($eligibleByCourse[$course] ?? 0);
+                $voted = (int) ($votedByCourse[$course] ?? 0);
+                $notYetVoted = max($eligible - $voted, 0);
+
+                return [
+                    'course' => $course,
+                    'eligible_students' => $eligible,
+                    'already_voted' => $voted,
+                    'not_yet_voted' => $notYetVoted,
+                    'percentage' => $eligible > 0
+                        ? round(($voted / $eligible) * 100, 2)
+                        : 0,
+                ];
+            });
+
         $voteCounts = Vote::query()
             ->select(
                 'candidate_student_id',
@@ -101,6 +146,7 @@ class DashboardController extends Controller
                 'already_voted' => $alreadyVoted,
                 'not_yet_voted' => $notYetVoted,
                 'percentage' => $turnoutPercentage,
+                'by_course' => $turnoutByCourse,
             ],
             'team_totals' => [
                 'TEAM_A' => (int) (
@@ -123,6 +169,6 @@ class DashboardController extends Controller
                         ->sortByDesc('votes')
                         ->values(),
                 ),
-        ]);
+        ])->header('Cache-Control', 'no-store');
     }
 }

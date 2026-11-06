@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ElectionController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Voter\BallotController;
+use App\Http\Controllers\Voter\TallyController;
 use App\Http\Controllers\Voter\VoteController;
 use App\Http\Controllers\Voter\VoterAuthController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,7 @@ Route::prefix('voter')->group(function (): void {
         'auth:sanctum',
         'voter.only',
     ])->group(function (): void {
+        Route::get('/tally', [TallyController::class, 'show']);
         Route::get(
             '/ballot',
             [BallotController::class, 'show'],
@@ -103,11 +105,6 @@ Route::prefix('admin')->group(function (): void {
             [PositionController::class, 'index'],
         );
 
-        Route::post(
-            '/positions',
-            [PositionController::class, 'store'],
-        );
-
         Route::put(
             '/positions/reorder',
             [PositionController::class, 'reorder'],
@@ -116,11 +113,6 @@ Route::prefix('admin')->group(function (): void {
         Route::put(
             '/positions/{position}',
             [PositionController::class, 'update'],
-        );
-
-        Route::delete(
-            '/positions/{position}',
-            [PositionController::class, 'destroy'],
         );
 
         Route::get(

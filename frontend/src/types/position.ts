@@ -11,15 +11,3 @@ export interface PositionRecord {
 export interface PositionsResponse {
   data: PositionRecord[];
 }
-
-export interface PositionPayload {
-  election_id?: number;
-  name?: string;
-  max_selections?: number;
-  display_order?: number;
-}
-
-export interface PositionMutationResponse {
-  message: string;
-  data: PositionRecord;
-}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Voter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Election;
+use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,18 +12,17 @@ class BallotController extends Controller
 {
     public function show(): JsonResponse
     {
-        $election = Election::currentlyActive()
-            ->with([
-                'positions' => function ($query) {
-                    $query->orderBy('display_order')
-                        ->with([
-                            'candidacies' => function ($query) {
-                                $query->with('profile');
-                            },
-                        ]);
-                },
-            ])
-            ->first();
+        $election = VoterElection::current();
+        $election?->load([
+            'positions' => function ($query) {
+                $query->orderBy('display_order')
+                    ->with([
+                        'candidacies' => function ($query) {
+                            $query->with('profile');
+                        },
+                    ]);
+            },
+        ]);
 
         if (! $election) {
             return response()->json([
@@ -48,6 +48,8 @@ class BallotController extends Controller
                                     ? url(Storage::url($profile->profile_photo))
                                     : null,
                                 'motto' => $profile->motto,
+                                'profile' => $profile->profile,
+                                'achievements' => $profile->achievements,
                             ];
                         })
                         ->values(),
@@ -56,6 +58,9 @@ class BallotController extends Controller
             ->values();
 
         return response()->json([
+            'can_submit_vote' => Election::currentlyActive()->whereKey($election->id)->exists()
+                && $election->positions->isNotEmpty()
+                && $election->positions->every(fn ($position) => $position->candidacies->isNotEmpty()),
             'election' => [
                 'id' => $election->id,
                 'name' => $election->name,

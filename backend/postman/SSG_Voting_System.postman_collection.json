@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "4a0213db-a0b7-4bb8-91d7-83b9b632c139",
     "name": "SSG Voting System API",
-    "description": "Complete Laravel API collection for the College SSG Voting System. Run folders in order on a fresh development database. State-changing requests cast a vote, create records, close the seeded election, and exercise a second draft election. Reset with `php artisan migrate:fresh` followed by `php artisan db:seed --class=DevelopmentSeeder`.",
+    "description": "Complete Laravel API collection for the College SSG Voting System. Run folders in order on a freshly seeded development database. The collection configures the empty presentation election, casts votes, creates records, closes that election, and exercises a second draft election. Reset with `php artisan migrate:fresh --seed`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -32,23 +32,23 @@
     },
     {
       "key": "voter_student_id",
-      "value": "2024-0101"
+      "value": "20240101"
     },
     {
       "key": "voter_full_name",
-      "value": "Test Voter Two"
+      "value": "Bryan Amoin"
     },
     {
       "key": "election_id",
-      "value": "1"
+      "value": ""
     },
     {
       "key": "president_position_id",
-      "value": "1"
+      "value": ""
     },
     {
       "key": "vice_president_position_id",
-      "value": "2"
+      "value": ""
     },
     {
       "key": "draft_election_id",
@@ -68,7 +68,7 @@
     },
     {
       "key": "draft_candidate_student_id",
-      "value": "2024-0101"
+      "value": "20240101"
     }
   ],
   "item": [
@@ -116,6 +116,364 @@
           ]
         },
         {
+          "name": "Find Empty Presentation Election",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{base_url}}/admin/elections",
+            "description": "Finds the clean seeded draft election and stores its ID. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const election = pm.response.json().data.find(function (item) { return item.status === 'draft'; });",
+                  "pm.test('Empty draft election is available', function () { pm.expect(election).to.be.an('object'); });",
+                  "if (election) { pm.collectionVariables.set('election_id', String(election.id)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Create President Position",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"name\": \"President\",\n  \"max_selections\": 1,\n  \"display_order\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/positions",
+            "description": "Creates the first presentation position and stores its ID. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) { pm.collectionVariables.set('president_position_id', String(json.data.id)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Create Vice President Position",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"name\": \"Vice President\",\n  \"max_selections\": 1,\n  \"display_order\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/positions",
+            "description": "Creates the second presentation position and stores its ID. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) { pm.collectionVariables.set('vice_president_position_id', String(json.data.id)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Add BSIT Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"20240100\",\n  \"election_id\": {{election_id}},\n  \"position_id\": {{president_position_id}},\n  \"team\": \"TEAM_A\",\n  \"motto\": \"Leadership through service\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Adds the BSIT demo voter as a President candidate. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Add HM Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"20240101\",\n  \"election_id\": {{election_id}},\n  \"position_id\": {{president_position_id}},\n  \"team\": \"TEAM_B\",\n  \"motto\": \"Students first\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Adds the HM demo voter as a President candidate. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Add BEEd Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"20240102\",\n  \"election_id\": {{election_id}},\n  \"position_id\": {{vice_president_position_id}},\n  \"team\": \"TEAM_A\",\n  \"motto\": \"Serve with integrity\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Adds the BEEd demo voter as a Vice President candidate. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Add BSEd Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"20240103\",\n  \"election_id\": {{election_id}},\n  \"position_id\": {{vice_president_position_id}},\n  \"team\": \"TEAM_B\",\n  \"motto\": \"Together we improve\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/candidates",
+            "description": "Adds the BSEd demo voter as a Vice President candidate. Expected: 201."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Presentation Setup - Activate Election",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{base_url}}/admin/elections/{{election_id}}/activate",
+            "description": "Activates the presentation election after its positions and candidates are configured. Expected: 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Election is active', function () { pm.expect(pm.response.json().data.status).to.eql('active'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Secondary Voter Login - For Role Tests",
           "request": {
             "method": "POST",
@@ -131,7 +489,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2024-0101\",\n  \"full_name\": \"Test Voter Two\"\n}",
+              "raw": "{\n  \"student_id\": \"20240101\",\n  \"full_name\": \"Bryan Amoin\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -326,7 +684,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"full_name\": \"Wrong Name\"\n}",
+              "raw": "{\n  \"student_id\": \"20240100\",\n  \"full_name\": \"Wrong Name\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -363,7 +721,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2020-9999\",\n  \"full_name\": \"Graduate Student\"\n}",
+              "raw": "{\n  \"student_id\": \"20209999\",\n  \"full_name\": \"Sheehan Voila\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -385,7 +743,7 @@
           ]
         },
         {
-          "name": "Stopped Student - Forbidden",
+          "name": "John Doe - Forbidden",
           "request": {
             "method": "POST",
             "header": [
@@ -400,7 +758,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2023-8888\",\n  \"full_name\": \"Stopped Student\"\n}",
+              "raw": "{\n  \"student_id\": \"20238888\",\n  \"full_name\": \"John Doe\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -409,80 +767,6 @@
             },
             "url": "{{base_url}}/voter/login",
             "description": "Stopped students cannot vote. Expected: 403."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Inactive Student - Forbidden",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2022-7777\",\n  \"full_name\": \"Inactive Student\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{base_url}}/voter/login",
-            "description": "Inactive students cannot vote. Expected: 403."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Withdrawn Student - Forbidden",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2021-6666\",\n  \"full_name\": \"Withdrawn Student\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{base_url}}/voter/login",
-            "description": "Withdrawn students cannot vote. Expected: 403."
           },
           "event": [
             {
@@ -677,7 +961,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0003\"\n    }\n  ]\n}",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240102\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -685,7 +969,7 @@
               }
             },
             "url": "{{base_url}}/voter/vote",
-            "description": "Attempts to select Vice President candidate 2024-0003 for the President position. The backend must reject the mismatched candidacy. Expected: 422."
+            "description": "Attempts to select Vice President candidate 20240102 for the President position. The backend must reject the mismatched candidacy. Expected: 422."
           },
           "event": [
             {
@@ -726,7 +1010,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0002\"\n    }\n  ]\n}",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240100\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240101\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -775,7 +1059,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    }\n  ]\n}",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240100\"\n    },\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240100\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -783,7 +1067,7 @@
               }
             },
             "url": "{{base_url}}/voter/vote",
-            "description": "Submits candidate 2024-0001 twice in one ballot. Application validation must reject the duplicate before any participation, ballot, or vote record is written. Expected: 422."
+            "description": "Submits candidate 20240100 twice in one ballot. Application validation must reject the duplicate before any participation, ballot, or vote record is written. Expected: 422."
           },
           "event": [
             {
@@ -824,7 +1108,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"2024-0001\"\n    },\n    {\n      \"position_id\": {{vice_president_position_id}},\n      \"candidate_student_id\": \"2024-0003\"\n    }\n  ]\n}",
+              "raw": "{\n  \"election_id\": {{election_id}},\n  \"selections\": [\n    {\n      \"position_id\": {{president_position_id}},\n      \"candidate_student_id\": \"20240100\"\n    },\n    {\n      \"position_id\": {{vice_president_position_id}},\n      \"candidate_student_id\": \"20240102\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -905,7 +1189,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"full_name\": \"Test Voter One\"\n}",
+              "raw": "{\n  \"student_id\": \"20240100\",\n  \"full_name\": \"Ian Kurt Ardena\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -974,8 +1258,8 @@
                   "        raw: JSON.stringify({",
                   "            election_id: Number(pm.collectionVariables.get('election_id')),",
                   "            selections: [",
-                  "                { position_id: Number(pm.collectionVariables.get('president_position_id')), candidate_student_id: '2024-0002' },",
-                  "                { position_id: Number(pm.collectionVariables.get('vice_president_position_id')), candidate_student_id: '2024-0004' }",
+                  "                { position_id: Number(pm.collectionVariables.get('president_position_id')), candidate_student_id: '20240101' },",
+                  "                { position_id: Number(pm.collectionVariables.get('vice_president_position_id')), candidate_student_id: '20240103' }",
                   "            ]",
                   "        })",
                   "    }",
@@ -1075,7 +1359,16 @@
                 "exec": [
                   "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "pm.test('Dashboard sections exist', function () { pm.expect(json).to.have.all.keys('election', 'turnout', 'team_totals', 'candidate_results', 'results_by_position'); });"
+                  "pm.test('Dashboard sections exist', function () { pm.expect(json).to.have.all.keys('election', 'turnout', 'team_totals', 'candidate_results', 'results_by_position'); });",
+                  "pm.test('Course turnout is real and complete', function () {",
+                  "  pm.expect(json.turnout.by_course).to.be.an('array').that.is.not.empty;",
+                  "  json.turnout.by_course.forEach(function (course) {",
+                  "    pm.expect(course).to.have.all.keys('course', 'eligible_students', 'already_voted', 'not_yet_voted', 'percentage');",
+                  "  });",
+                  "  const courseVotes = json.turnout.by_course.reduce(function (total, course) { return total + course.already_voted; }, 0);",
+                  "  pm.expect(courseVotes).to.eql(json.turnout.already_voted);",
+                  "});",
+                  "pm.test('Live dashboard is not cached', function () { pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); });"
                 ]
               }
             }
@@ -2070,7 +2363,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"election_id\": {{draft_election_id}},\n  \"position_id\": {{draft_position_id}},\n  \"team\": \"TEAM_B\",\n  \"motto\": \"Temporary deletion test\"\n}",
+              "raw": "{\n  \"student_id\": \"20240100\",\n  \"election_id\": {{draft_election_id}},\n  \"position_id\": {{draft_position_id}},\n  \"team\": \"TEAM_B\",\n  \"motto\": \"Temporary deletion test\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2124,7 +2417,7 @@
                 }
               }
             },
-            "url": "{{base_url}}/admin/candidates/2024-0100",
+            "url": "{{base_url}}/admin/candidates/20240100",
             "description": "Removes the election-specific candidacy while preserving the reusable candidate profile. Expected: 200."
           },
           "event": [
@@ -2139,7 +2432,7 @@
           ]
         },
         {
-          "name": "Close Seeded Active Election",
+          "name": "Close Presentation Election",
           "request": {
             "method": "POST",
             "header": [
@@ -2188,7 +2481,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"student_id\": \"2024-0100\",\n  \"full_name\": \"Test Voter One\"\n}",
+              "raw": "{\n  \"student_id\": \"20240100\",\n  \"full_name\": \"Ian Kurt Ardena\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

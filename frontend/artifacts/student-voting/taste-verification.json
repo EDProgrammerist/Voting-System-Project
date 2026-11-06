@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "fixtureOnly": true,
+  "checks": [
+    "login show/hide password",
+    "incorrect credentials error",
+    "desktop and mobile layouts",
+    "320px horizontal overflow",
+    "candidate selection",
+    "comparison",
+    "ballot draft retention",
+    "candidate search and position filter",
+    "search empty state",
+    "review profiles and achievements",
+    "signature keyboard and clear",
+    "signature drawing",
+    "thumbmark gating",
+    "submit payload",
+    "post-vote tally-only navigation",
+    "direct ballot URL restriction",
+    "logout",
+    "no browser errors"
+  ]
+}

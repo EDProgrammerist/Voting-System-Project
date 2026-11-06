@@ -58,6 +58,40 @@
   transform: translateY(-0.08rem);
 }
 
+.admin-votes__team-totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.admin-votes__team-totals article {
+  display: flex;
+  min-height: 5.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-left: 0.35rem solid #06439b;
+  border-radius: 0.65rem;
+  padding: 1rem 1.4rem;
+  background: #fff;
+  box-shadow: 0 0.45rem 1.25rem rgb(21 51 91 / 8%);
+}
+
+.admin-votes__team-totals article[data-team="TEAM_B"] {
+  border-left-color: #ff323b;
+}
+
+.admin-votes__team-totals span {
+  color: #55637a;
+  font-weight: 700;
+}
+
+.admin-votes__team-totals strong {
+  color: #071329;
+  font-size: 1.9rem;
+}
+
 .admin-votes__filters {
   display: flex;
   flex-wrap: wrap;
@@ -215,6 +249,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.7rem;
     margin-top: 1.65rem;
+  }
+
+  .admin-votes__team-totals {
+    grid-template-columns: 1fr;
   }
 
   .admin-votes__filters button {

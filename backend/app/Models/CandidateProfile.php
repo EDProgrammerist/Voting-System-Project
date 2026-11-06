@@ -19,6 +19,8 @@ class CandidateProfile extends Model
         'full_name',
         'profile_photo',
         'motto',
+        'profile',
+        'achievements',
     ];
 
     public function student(): BelongsTo

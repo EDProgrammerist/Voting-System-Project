@@ -15,6 +15,7 @@ export interface VoterElection {
 }
 
 export interface VoterLoginResponse {
+  tally_only: boolean;
   message: string;
   token: string;
   student: VoterIdentity;
@@ -22,6 +23,8 @@ export interface VoterLoginResponse {
 }
 
 export interface BallotCandidate {
+  profile: string | null;
+  achievements: string | null;
   student_id: string;
   full_name: string;
   team: "TEAM_A" | "TEAM_B" | string;
@@ -37,6 +40,7 @@ export interface BallotPosition {
 }
 
 export interface VoterBallotResponse {
+  can_submit_vote: boolean;
   election: VoterElection;
   positions: BallotPosition[];
 }
@@ -47,10 +51,21 @@ export interface VoterSelection {
 }
 
 export interface VoterVotePayload {
+  signature: SignaturePoint[][];
+  thumbmark_confirmed: boolean;
   election_id: number;
   selections: VoterSelection[];
 }
 
 export interface VoterVoteResponse {
   message: string;
+}
+
+export interface SignaturePoint { x: number; y: number }
+
+export interface VoterTallyResponse {
+  election: VoterElection & { status: string };
+  tally_only: boolean;
+  updated_at: string;
+  positions: { id: number; name: string; candidates: { student_id: string; full_name: string; team: string; votes: number }[] }[];
 }

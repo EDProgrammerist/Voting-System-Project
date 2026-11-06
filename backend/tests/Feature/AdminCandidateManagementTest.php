@@ -39,54 +39,66 @@ class AdminCandidateManagementTest extends TestCase
             'name' => 'Draft Election',
             'status' => 'draft',
         ]);
-        $president = Position::create([
+        $president = Position::firstOrCreate([
             'election_id' => $election->id,
             'name' => 'President',
             'max_selections' => 1,
             'display_order' => 1,
         ]);
-        $vicePresident = Position::create([
+        $vicePresident = Position::firstOrCreate([
             'election_id' => $election->id,
             'name' => 'Vice President',
             'max_selections' => 1,
             'display_order' => 2,
         ]);
 
-        $this->postJson('/api/admin/candidates', [
-            'student_id' => $student->student_id,
+        $created = $this->postJson('/api/admin/candidates', [
+            'full_name' => 'Candidate Student',
             'election_id' => $election->id,
             'position_id' => $president->id,
             'team' => 'TEAM_A',
             'motto' => 'Serve first',
-        ])->assertCreated();
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.position.id', $president->id)
+            ->assertJsonPath('data.team', 'TEAM_A');
+        $candidateId = $created->json('data.student_id');
+        $this->assertNotSame($student->student_id, $candidateId);
+        $this->assertDatabaseCount('students', 1);
 
         $this->postJson('/api/admin/candidates', [
-            'student_id' => $student->student_id,
+            'student_id' => $candidateId,
+            'full_name' => 'Candidate Student',
             'election_id' => $election->id,
             'position_id' => $vicePresident->id,
             'team' => 'TEAM_B',
             'motto' => 'Serve better',
-        ])->assertCreated();
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.student_id', $candidateId)
+            ->assertJsonPath('data.position.id', $vicePresident->id)
+            ->assertJsonPath('data.team', 'TEAM_B')
+            ->assertJsonPath('data.motto', 'Serve better');
 
         $this->assertDatabaseCount('candidacies', 1);
         $this->assertDatabaseHas('candidacies', [
             'election_id' => $election->id,
-            'student_id' => $student->student_id,
+            'student_id' => $candidateId,
             'position_id' => $vicePresident->id,
             'team' => 'TEAM_B',
         ]);
 
         $this->deleteJson(
-            "/api/admin/candidates/{$student->student_id}",
+            "/api/admin/candidates/{$candidateId}",
             ['election_id' => $election->id],
         )->assertOk();
 
         $this->assertDatabaseMissing('candidacies', [
             'election_id' => $election->id,
-            'student_id' => $student->student_id,
+            'student_id' => $candidateId,
         ]);
         $this->assertDatabaseHas('candidate_profiles', [
-            'student_id' => $student->student_id,
+            'student_id' => $candidateId,
         ]);
     }
 
@@ -108,7 +120,7 @@ class AdminCandidateManagementTest extends TestCase
             'starts_at' => now()->subHour(),
             'ends_at' => now()->addHour(),
         ]);
-        $position = Position::create([
+        $position = Position::firstOrCreate([
             'election_id' => $election->id,
             'name' => 'President',
             'max_selections' => 1,

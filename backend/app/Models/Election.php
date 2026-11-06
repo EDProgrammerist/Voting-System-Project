@@ -8,6 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Election extends Model
 {
+    protected static function booted(): void
+    {
+        static::created(function (Election $election): void {
+            foreach (['President', 'Vice President', 'Senator'] as $index => $name) {
+                $election->positions()->create([
+                    'name' => $name, 'max_selections' => 1, 'display_order' => $index + 1,
+                ]);
+            }
+        });
+    }
+
     protected $fillable = [
         'name',
         'starts_at',

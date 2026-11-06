@@ -49,24 +49,24 @@ function useCountdown(target: string | null) {
 }
 
 function buildVoterSegments(data: DashboardData) {
-  const voted = data.turnout.already_voted;
-  const first = Math.round(voted * 0.29);
-  const second = Math.round(voted * 0.26);
-  const third = Math.round(voted * 0.24);
-  const fourth = Math.max(voted - first - second - third, 0);
-
   return [
-    { name: "BSIT", value: first },
-    { name: "BSHM", value: second },
-    { name: "BEED", value: third },
-    { name: "BSED", value: fourth },
+    ...data.turnout.by_course.map((course) => ({
+      name: displayCourse(course.course),
+      value: course.already_voted,
+    })),
     { name: "NOT VOTED", value: data.turnout.not_yet_voted },
   ];
 }
 
+function displayCourse(course: string): string {
+  if (course === "BSHM") return "HM";
+  if (course === "BEED") return "BEEd";
+  if (course === "BSED") return "BSEd";
+  return course;
+}
+
 export function AdminDashboardScreen() {
   const { dashboard, dataState, dataNotice } = useAdminElectionDashboard();
-  const [notice, setNotice] = useState("");
   const countdown = useCountdown(dashboard.election.starts_at);
 
   useDocumentTitle("Admin Dashboard | CPC Vote");
@@ -103,14 +103,10 @@ export function AdminDashboardScreen() {
     },
   ];
 
-  function handleUnavailable(label: string) {
-    setNotice(`${label} management will be connected in the next screen.`);
-  }
-
   if (dataState !== "live") {
     return (
       <main className="admin-dashboard">
-        <AdminSidebar active="dashboard" onUnavailable={handleUnavailable} />
+        <AdminSidebar active="dashboard" />
         <section className="admin-dashboard__content">
           <AdminDataState message={dataNotice} state={dataState} />
         </section>
@@ -120,7 +116,7 @@ export function AdminDashboardScreen() {
 
   return (
     <main className="admin-dashboard">
-      <AdminSidebar active="dashboard" onUnavailable={handleUnavailable} />
+      <AdminSidebar active="dashboard" />
 
       <section className="admin-dashboard__content">
         <div className="admin-dashboard__top-grid">
@@ -166,7 +162,7 @@ export function AdminDashboardScreen() {
                       strokeWidth={2}
                     >
                       {voterSegments.map((segment, index) => (
-                        <Cell fill={PIE_COLORS[index]} key={segment.name} />
+                        <Cell fill={PIE_COLORS[index % PIE_COLORS.length]} key={segment.name} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatNumber(Number(value))} />
@@ -176,7 +172,7 @@ export function AdminDashboardScreen() {
               <ul className="voters-card__legend">
                 {voterSegments.map((segment, index) => (
                   <li key={segment.name}>
-                    <i style={{ backgroundColor: PIE_COLORS[index] }} />
+                    <i style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }} />
                     <span>{segment.name}</span>
                     <strong>{formatNumber(segment.value)}</strong>
                   </li>
@@ -234,7 +230,7 @@ export function AdminDashboardScreen() {
         </section>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">
-          {notice || dataNotice}
+          {dataNotice}
         </p>
       </section>
     </main>

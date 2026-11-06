@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    "admin default positions",
+    "admin PIN assignment",
+    "candidate profile editing",
+    "incorrect PIN rejected",
+    "candidate directory",
+    "draft preserved across navigation",
+    "side-by-side desktop/mobile comparison",
+    "review candidate details",
+    "signature and thumbmark required",
+    "drawn signature submission",
+    "live tally refresh in another session",
+    "post-vote navigation restricted",
+    "direct ballot URL redirects",
+    "logout",
+    "repeat login tally only",
+    "mobile horizontal overflow",
+    "keyboard signature and clear",
+    "admin default-seat editing",
+    "320px comparison",
+    "no browser runtime errors"
+  ]
+}

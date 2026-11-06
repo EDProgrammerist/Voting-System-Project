@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Election;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class ElectionController extends Controller
 {
@@ -77,6 +79,19 @@ class ElectionController extends Controller
             ],
         ]);
 
+        $startsAt = array_key_exists('starts_at', $validated)
+            ? ($validated['starts_at'] ? Carbon::parse($validated['starts_at']) : null)
+            : $election->starts_at;
+        $endsAt = array_key_exists('ends_at', $validated)
+            ? ($validated['ends_at'] ? Carbon::parse($validated['ends_at']) : null)
+            : $election->ends_at;
+
+        if ($startsAt && $endsAt && $endsAt->lessThanOrEqualTo($startsAt)) {
+            throw ValidationException::withMessages([
+                'ends_at' => 'The election end time must be after its start time.',
+            ]);
+        }
+
         $election->update($validated);
 
         return response()->json([
@@ -98,7 +113,13 @@ class ElectionController extends Controller
             ! $election->candidacies()->exists()
         ) {
             return response()->json([
-                'message' => 'Add positions and candidates before activating the election.',
+                'message' => 'Add at least one candidate to every default position before activating the election.',
+            ], 422);
+        }
+
+        if ($election->positions()->whereDoesntHave('candidacies')->exists()) {
+            return response()->json([
+                'message' => 'Add at least one candidate to every position before activating the election.',
             ], 422);
         }
 

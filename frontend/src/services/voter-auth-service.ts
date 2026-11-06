@@ -5,7 +5,16 @@ import type {
   VoterLoginResponse,
   VoterVotePayload,
   VoterVoteResponse,
+  VoterTallyResponse,
 } from "@/types/voter";
+
+export function getVoterTally(token: string, signal?: AbortSignal): Promise<VoterTallyResponse> {
+  return apiRequest<VoterTallyResponse>("/voter/tally", { headers: { Authorization: `Bearer ${token}` }, signal, cache: "no-store" });
+}
+
+export function logoutVoter(token: string): Promise<{ message: string }> {
+  return apiRequest("/voter/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+}
 
 export function loginVoter(credentials: VoterLoginCredentials): Promise<VoterLoginResponse> {
   return apiRequest<VoterLoginResponse>("/voter/login", {

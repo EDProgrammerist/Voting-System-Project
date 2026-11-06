@@ -24,33 +24,14 @@ class AdminPositionManagementTest extends TestCase
         ]), ['admin']);
     }
 
-    public function test_admin_can_create_update_and_delete_a_draft_position(): void
+    public function test_admin_can_adjust_default_seats_but_cannot_add_or_delete_positions(): void
     {
-        $election = Election::create([
-            'name' => 'Draft Election',
-            'status' => 'draft',
-        ]);
-
-        $created = $this->postJson('/api/admin/positions', [
-            'election_id' => $election->id,
-            'name' => 'Auditor',
-            'max_selections' => 1,
-            'display_order' => 1,
-        ])->assertCreated();
-
-        $positionId = $created->json('data.id');
-
-        $this->putJson("/api/admin/positions/{$positionId}", [
-            'name' => 'Internal Auditor',
-            'max_selections' => 1,
-        ])->assertOk();
-
-        $this->deleteJson("/api/admin/positions/{$positionId}")
-            ->assertOk();
-
-        $this->assertDatabaseMissing('positions', [
-            'id' => $positionId,
-        ]);
+        $election = Election::create(['name' => 'Draft Election', 'status' => 'draft']);
+        $position = $election->positions()->where('name', 'Senator')->sole();
+        $this->postJson('/api/admin/positions', ['election_id' => $election->id, 'name' => 'Auditor'])->assertStatus(405);
+        $this->putJson("/api/admin/positions/{$position->id}", ['max_selections' => 6])->assertOk()->assertJsonPath('data.max_selections', 6);
+        $this->deleteJson("/api/admin/positions/{$position->id}")->assertStatus(405);
+        $this->assertDatabaseCount('positions', 3);
     }
 
     public function test_all_positions_are_reordered_in_one_transaction(): void
@@ -61,7 +42,7 @@ class AdminPositionManagementTest extends TestCase
         ]);
         $first = $this->position($election, 'President', 1);
         $second = $this->position($election, 'Vice President', 2);
-        $third = $this->position($election, 'Secretary', 3);
+        $third = $this->position($election, 'Senator', 3);
 
         $this->putJson('/api/admin/positions/reorder', [
             'election_id' => $election->id,
@@ -131,7 +112,7 @@ class AdminPositionManagementTest extends TestCase
         string $name,
         int $displayOrder,
     ): Position {
-        return Position::create([
+        return Position::firstOrCreate([
             'election_id' => $election->id,
             'name' => $name,
             'max_selections' => 1,
