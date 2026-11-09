@@ -18,14 +18,14 @@ class StudentVotingSpecificationsTest extends TestCase
 
     private function student(): Student
     {
-        return Student::create(['student_id' => 'S001', 'full_name' => 'Test Student', 'academic_status' => 'enrolled']);
+        return Student::create(['password' => 'PersonalPassword123!', 'password_change_required' => false, 'student_id' => 'S001', 'full_name' => 'Test Student', 'academic_status' => 'enrolled']);
     }
 
     private function login(array $overrides = [])
     {
         $this->app['auth']->forgetGuards();
 
-        return $this->postJson('/api/voter/login', array_merge(['student_id' => 'S001', 'full_name' => 'Test Student'], $overrides));
+        return $this->postJson('/api/voter/login', array_merge(['student_id' => 'S001', 'password' => 'PersonalPassword123!'], $overrides));
     }
 
     public function test_default_positions_exist_and_cannot_be_added_renamed_or_deleted(): void
@@ -55,16 +55,15 @@ class StudentVotingSpecificationsTest extends TestCase
         $this->assertSame(['President', 'Vice President', 'Senator'], $draft->positions()->pluck('name')->all());
     }
 
-    public function test_student_logs_in_with_full_name_and_id_number_without_a_pin(): void
+    public function test_student_logs_in_with_id_and_personal_password_without_a_pin(): void
     {
         $this->student();
         Election::create(['name' => 'Election', 'status' => 'active']);
-        $this->login()->assertOk()->assertJsonPath('student.student_id', 'S001')->assertJsonPath('tally_only', false);
-        $this->login(['full_name' => 'Wrong Name'])->assertUnauthorized();
+        $this->login()->assertOk()->assertJsonPath('student.student_id', 'S001')->assertJsonPath('tally_only', false)->assertJsonPath('password_change_required', false);
+        $this->login(['password' => 'WrongPassword123!'])->assertUnauthorized();
         $this->login(['student_id' => 'WRONG-ID'])->assertUnauthorized();
         $this->login(['student_id' => ''])->assertUnprocessable()->assertJsonValidationErrors('student_id');
-        $this->login(['full_name' => ''])->assertUnprocessable()->assertJsonValidationErrors('full_name');
-        $this->login(['full_name' => '  test   STUDENT  '])->assertOk();
+        $this->login(['password' => ''])->assertUnprocessable()->assertJsonValidationErrors('password');
     }
 
     public function test_admin_pin_management_is_removed(): void

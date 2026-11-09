@@ -1,0 +1,87 @@
+{
+  "phase": "after",
+  "screens": [
+    {
+      "page": "login",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0
+    },
+    {
+      "page": "login",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0
+    },
+    {
+      "page": "login",
+      "width": 390,
+      "height": 844,
+      "overflow": 0
+    },
+    {
+      "page": "votes",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "votes",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "votes",
+      "width": 390,
+      "height": 844,
+      "overflow": 0,
+      "heading": "24px"
+    },
+    {
+      "page": "voters",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "voters",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "voters",
+      "width": 390,
+      "height": 1227,
+      "overflow": 0,
+      "heading": "24px"
+    },
+    {
+      "page": "candidates",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "candidates",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0,
+      "heading": "26px"
+    },
+    {
+      "page": "candidates",
+      "width": 390,
+      "height": 1012,
+      "overflow": 0,
+      "heading": "24px"
+    }
+  ],
+  "errors": []
+}

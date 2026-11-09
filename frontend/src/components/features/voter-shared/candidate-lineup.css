@@ -1,0 +1,221 @@
+/* Portrait panels used by ballot candidate comparison. */
+.candidate-lineup {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.lineup-party {
+  --lineup-dark: #511b2b;
+  --lineup-accent: #9b3048;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #e1e8f2;
+}
+.lineup-party[data-tone="blue"] {
+  --lineup-dark: #152f5b;
+  --lineup-accent: #28529a;
+}
+.lineup-party__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px 22px;
+  background: var(--lineup-dark);
+  color: #fff;
+  border-bottom: 1px solid rgb(255 255 255 / 16%);
+}
+.lineup-party__heading h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin: 0;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.lineup-party__heading > span {
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+}
+.lineup-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  background: var(--lineup-dark);
+  color: #fff;
+  min-height: 246px;
+}
+.lineup-party[data-tone="blue"] .lineup-portrait {
+  order: 2;
+}
+.lineup-party[data-tone="blue"] .lineup-hero__identity {
+  order: 1;
+}
+.lineup-portrait {
+  position: relative;
+  min-width: 0;
+  min-height: 246px;
+  background: var(--lineup-accent);
+}
+.lineup-portrait > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+.lineup-portrait__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 246px;
+  padding: 20px 10px;
+  gap: 12px;
+}
+.lineup-portrait__fallback > span {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -3px;
+}
+.lineup-portrait__fallback > small {
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+}
+.lineup-hero__identity {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 24px;
+  min-width: 0;
+}
+.lineup-hero__identity > span {
+  font-size: 11px;
+  font-weight: 650;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.lineup-hero__identity h4 {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 29px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+}
+.lineup-hero__identity > p {
+  margin: 16px 0 0;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.lineup-details {
+  padding: 24px;
+  display: grid;
+  gap: 24px;
+}
+.lineup-details h5 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 9px;
+  color: #203b63;
+  font-size: 13px;
+  font-weight: 750;
+}
+.lineup-details h5 svg {
+  width: 20px;
+  height: 20px;
+  color: var(--lineup-accent);
+}
+.lineup-details p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+  color: #586c86;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@supports (grid-template-rows: subgrid) {
+  .candidate-lineup {
+    grid-template-rows: repeat(3, auto);
+    row-gap: 0;
+  }
+  .lineup-party {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+  .lineup-party__profile {
+    display: contents;
+  }
+  .lineup-party:nth-child(n + 3) {
+    margin-top: 20px;
+  }
+}
+@media (max-width: 1000px) {
+  .lineup-hero__identity {
+    padding: 22px 18px;
+  }
+  .lineup-hero__identity h4 {
+    font-size: 23px;
+  }
+  .lineup-portrait__fallback > span {
+    font-size: 48px;
+  }
+}
+@media (max-width: 760px) {
+  .candidate-lineup {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 16px;
+  }
+  .lineup-party {
+    display: block;
+    grid-row: auto;
+  }
+  .lineup-party:nth-child(n + 3) {
+    margin-top: 0;
+  }
+  .lineup-party__profile {
+    display: block;
+  }
+  .lineup-party__heading {
+    padding: 16px 18px;
+  }
+  .lineup-party__heading h3 {
+    font-size: 15px;
+  }
+  .lineup-hero,
+  .lineup-portrait,
+  .lineup-portrait__fallback {
+    min-height: 220px;
+  }
+  .lineup-hero__identity {
+    padding: 24px 18px;
+  }
+  .lineup-hero__identity h4 {
+    font-size: 24px;
+  }
+  .lineup-details {
+    padding: 22px 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .candidate-lineup * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

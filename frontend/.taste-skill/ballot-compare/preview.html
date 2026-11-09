@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Candidate comparison component QA</title></head>
+<body><div id="root"></div>
+<script type="module">
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {CandidateComparison} from '/src/components/features/voter-shared/candidate-comparison.tsx';
+import '/src/components/features/voter-shared/voter-shared.css';
+import '/src/components/features/voter-ballot/voter-ballot-screen.css';
+import '/src/styles/global.css';
+const root=createRoot(document.getElementById('root'));
+window.renderComparison=(position)=>root.render(React.createElement('main',{className:'student-page'},
+  React.createElement('div',{className:'student-container'},
+    React.createElement('p',{role:'note'},'COMPONENT PREVIEW · SAMPLE CANDIDATES FOR TESTING ONLY'),
+    React.createElement('div',{className:'ballot-layout'},
+      React.createElement('section',{className:'ballot-position'},React.createElement('header',{className:'ballot-position__heading'},React.createElement('h2',null,position.name)),React.createElement(CandidateComparison,{position})),
+      React.createElement('aside',{className:'ballot-summary'},React.createElement('h2',null,'Your ballot'),React.createElement('p',null,'Component preview only. No vote is being cast.'))))));
+</script></body></html>

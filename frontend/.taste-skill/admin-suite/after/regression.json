@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Existing dashboard response is unchanged; layout dimensions preserved; pixel difference recorded",
+    "Logout after a refreshed authenticated page renders the actual admin login, fixing the reproduced stale redirect",
+    "Real student login and read-only ballot/candidates/tally navigation still work, with no admin styling applied",
+    "Student logout after refresh renders student login; admin route remains guarded",
+    "Public home remains separate from admin styling"
+  ],
+  "errors": [],
+  "dashboardPixels": {
+    "previous": [
+      1440,
+      954
+    ],
+    "current": [
+      1440,
+      954
+    ],
+    "changed": 0
+  },
+  "passed": true
+}

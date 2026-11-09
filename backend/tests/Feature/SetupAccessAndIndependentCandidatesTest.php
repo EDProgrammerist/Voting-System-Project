@@ -19,8 +19,12 @@ class SetupAccessAndIndependentCandidatesTest extends TestCase
     {
         Student::create(['student_id' => '20240100', 'full_name' => 'Ian Kurt Ardena', 'academic_status' => 'enrolled']);
         $election = Election::create(['name' => 'Election setup', 'status' => 'draft']);
-        $token = $this->postJson('/api/voter/login', ['student_id' => '20240100', 'full_name' => 'Ian Kurt Ardena'])
+        $token = $this->postJson('/api/voter/login', ['student_id' => '20240100', 'password' => '123456'])
             ->assertOk()->assertJsonPath('tally_only', false)->json('token');
+        $this->app['auth']->forgetGuards();
+        $token = $this->withToken($token)->postJson('/api/voter/password', [
+            'password' => 'PersonalPassword123!', 'password_confirmation' => 'PersonalPassword123!',
+        ])->assertOk()->json('token');
         $this->app['auth']->forgetGuards();
         $this->withToken($token)->getJson('/api/voter/tally')->assertOk()->assertJsonPath('tally_only', false);
         $this->withToken($token)->getJson('/api/voter/ballot')->assertOk()->assertJsonPath('can_submit_vote', false)->assertJsonCount(3, 'positions');
@@ -47,7 +51,7 @@ class SetupAccessAndIndependentCandidatesTest extends TestCase
         $this->postJson('/api/admin/candidates', [...$payload, 'student_id' => $id, 'full_name' => 'Updated Candidate'])->assertCreated()->assertJsonPath('data.full_name', 'Updated Candidate');
         $this->assertDatabaseCount('candidate_profiles', 1);
         $this->assertDatabaseCount('candidacies', 1);
-        $this->postJson('/api/voter/login', ['student_id' => $id, 'full_name' => 'Updated Candidate'])->assertUnauthorized();
+        $this->postJson('/api/voter/login', ['student_id' => $id, 'password' => '123456'])->assertUnauthorized();
     }
 
     public function test_a_draft_cannot_rename_candidates_from_another_or_active_election(): void

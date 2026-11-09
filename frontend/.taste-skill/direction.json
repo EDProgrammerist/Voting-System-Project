@@ -1,0 +1,15 @@
+{
+  "workflow": "App-screen fallback: installed project skill has no references/app-screens.md; user-level v2 also lacks that reference and --app draw/inspect modes. No landing-page direction was dealt or substituted.",
+  "style": "Election desk",
+  "rationale": "A compact administrative workspace that puts election status, participation and missing setup ahead of results. CPC Vote blue and yellow branding is retained; neutral surfaces, one blue data accent, semantic amber/green statuses.",
+  "typography": "Existing self-hosted Plus Jakarta Sans Variable; tabular numeric figures; 26px desktop title, 24px mobile; 14px primary labels.",
+  "density": "Four compact summary cells; participation and course table side by side on desktop; two-column metrics and stacked panels on phones. No photography or decorative animation.",
+  "scope": "Dashboard component and new overview CSS; opt-in sidebar accessibility variant only used by dashboard. Existing other-page sidebar/rendering/styles remain compatible and unchanged.",
+  "data": "Existing useAdminElectionDashboard hook and API untouched. eligible_students, already_voted, not_yet_voted, percentage, by_course and candidate_results.length. Candidate support retains min(votes / ballots cast * 100, 100). The misleading Win Rate label is clarified, not recalculated.",
+  "implementationPlan": [
+    "Capture baseline lint, legitimate login screenshots and measured layout at 1440/768/390; record real response and other page baselines.",
+    "Replace dashboard composition with election heading/status and real schedule, metrics, turnout chart, course counts, candidate result rows and meaningful empty states. Preserve existing requests and polling.",
+    "Opt dashboard into light navigation with keyboard focus, mobile dialog focus management, Escape/backdrop closure and unchanged navigation/logout actions.",
+    "Repeat authenticated visual measurements, exercise all controls and guards, test transient loading/error states using request delay/failure only, compare other page screenshots, lint/typecheck/build. Do not modify election records or backend."
+  ]
+}

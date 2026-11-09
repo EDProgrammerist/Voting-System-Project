@@ -1,8 +1,12 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 
 import { getAdminToken } from "@/lib/admin-session";
-import { getVoterToken, isVoterTallyOnly } from "@/lib/voter-session";
+import {
+  getVoterToken,
+  isVoterTallyOnly,
+  isVoterPasswordRequired,
+} from "@/lib/voter-session";
 import RequireAdmin from "@/routes/require-admin";
 import RequireVoter from "@/routes/require-voter";
 
@@ -15,64 +19,100 @@ const HomePage = lazy(() => import("@/pages/guest/home"));
 const GuestLayout = lazy(() => import("@/pages/guest/layout"));
 const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
 const VoterLoginPage = lazy(() => import("@/pages/voter/login"));
+const VoterPasswordPage = lazy(() =>
+  import("@/components/features/voter-auth/voter-login-screen").then(
+    (module) => ({ default: module.VoterPasswordScreen }),
+  ),
+);
 const VoterBallotPage = lazy(() => import("@/pages/voter/ballot"));
 const VoterReviewPage = lazy(() => import("@/pages/voter/review"));
-const VoterTallyPage = lazy(() => import("@/components/features/voter-shared/voter-tally-screen"));
-const VoterCandidatesPage = lazy(() => import("@/components/features/voter-shared/voter-candidates-screen"));
+const VoterTallyPage = lazy(
+  () => import("@/components/features/voter-shared/voter-tally-screen"),
+);
 
 export default function AppRouter() {
+  // Refresh session-based redirects after sign-in or sign-out navigation.
+  useLocation();
   const hasAdminToken = Boolean(getAdminToken());
   const hasVoterToken = Boolean(getVoterToken());
   const defaultRoute = hasAdminToken
     ? "/admin/dashboard"
     : hasVoterToken
-      ? isVoterTallyOnly() ? "/voter/tally" : "/voter/ballot"
+      ? isVoterPasswordRequired()
+        ? "/voter/password"
+        : isVoterTallyOnly()
+          ? "/voter/tally"
+          : "/voter/ballot"
       : "/voter/login";
 
   return (
-    <Suspense fallback={<div aria-live="polite" className="route-loading" role="status">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div aria-live="polite" className="route-loading" role="status">
+          Loading…
+        </div>
+      }
+    >
       <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={defaultRoute} replace />}
-      />
-      <Route path="/login" element={<Navigate to={defaultRoute} replace />} />
-      <Route
-        path="/voter/login"
-        element={hasVoterToken ? <Navigate to={isVoterTallyOnly() ? "/voter/tally" : "/voter/ballot"} replace /> : <VoterLoginPage />}
-      />
-      <Route element={<RequireVoter />}>
-        <Route path="/voter/ballot" element={<VoterBallotPage />} />
-        <Route path="/voter/review" element={<VoterReviewPage />} />
-        <Route path="/voter/tally" element={<VoterTallyPage />} />
-        <Route path="/voter/candidates" element={<VoterCandidatesPage />} />
-        <Route path="/voter/thank-you" element={<Navigate to="/voter/tally" replace />} />
-      </Route>
-      <Route
-        path="/admin/login"
-        element={
-          hasAdminToken ? (
-            <Navigate to="/admin/dashboard" replace />
-          ) : (
-            <AdminLoginPage />
-          )
-        }
-      />
-      <Route element={<RequireAdmin />}>
-        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-        <Route path="/admin/votes" element={<AdminVotesPage />} />
-        <Route path="/admin/voters" element={<AdminVotersPage />} />
-        <Route path="/admin/positions" element={<Navigate to="/admin/candidates" replace />} />
-        <Route path="/admin/candidates" element={<AdminCandidatesPage />} />
+        <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+        <Route path="/login" element={<Navigate to={defaultRoute} replace />} />
         <Route
-          path="/admin/ballot-position"
-          element={<Navigate to="/admin/candidates" replace />}
+          path="/voter/login"
+          element={
+            hasVoterToken ? (
+              <Navigate
+                to={
+                  isVoterPasswordRequired()
+                    ? "/voter/password"
+                    : isVoterTallyOnly()
+                      ? "/voter/tally"
+                      : "/voter/ballot"
+                }
+                replace
+              />
+            ) : (
+              <VoterLoginPage />
+            )
+          }
         />
-      </Route>
-      <Route element={<GuestLayout />}>
-        <Route path="/home" element={<HomePage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Route>
+        <Route element={<RequireVoter />}>
+          <Route path="/voter/password" element={<VoterPasswordPage />} />
+          <Route path="/voter/ballot" element={<VoterBallotPage />} />
+          <Route path="/voter/review" element={<VoterReviewPage />} />
+          <Route path="/voter/tally" element={<VoterTallyPage />} />
+          <Route
+            path="/voter/thank-you"
+            element={<Navigate to="/voter/tally" replace />}
+          />
+        </Route>
+        <Route
+          path="/admin/login"
+          element={
+            hasAdminToken ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <AdminLoginPage />
+            )
+          }
+        />
+        <Route element={<RequireAdmin />}>
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/votes" element={<AdminVotesPage />} />
+          <Route path="/admin/voters" element={<AdminVotersPage />} />
+          <Route
+            path="/admin/positions"
+            element={<Navigate to="/admin/candidates" replace />}
+          />
+          <Route path="/admin/candidates" element={<AdminCandidatesPage />} />
+          <Route
+            path="/admin/ballot-position"
+            element={<Navigate to="/admin/candidates" replace />}
+          />
+        </Route>
+        <Route element={<GuestLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Routes>
     </Suspense>
   );

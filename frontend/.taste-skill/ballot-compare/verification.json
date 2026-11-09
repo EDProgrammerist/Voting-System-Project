@@ -1,0 +1,61 @@
+{
+  "checks": [
+    "Every candidate has a static name and profile panel; no name dropdowns, links or buttons remain.",
+    "All candidates remain visible, with party colours, existing profile text, achievements and missing-data fallbacks.",
+    "Responsive comparison panels and overflow checked at 1440/768/390; desktop is paired and narrow layouts stack.",
+    "Comparison remains hidden with fewer than two candidates."
+  ],
+  "errors": [],
+  "measurements": [
+    {
+      "width": 1440,
+      "document": 1440,
+      "panels": [
+        {
+          "x": 128,
+          "y": 234.96875,
+          "width": 409
+        },
+        {
+          "x": 557,
+          "y": 234.96875,
+          "width": 409
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "document": 768,
+      "panels": [
+        {
+          "x": 60,
+          "y": 256.5625,
+          "width": 350
+        },
+        {
+          "x": 60,
+          "y": 786.484375,
+          "width": 350
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "document": 390,
+      "panels": [
+        {
+          "x": 34,
+          "y": 261.375,
+          "width": 322
+        },
+        {
+          "x": 34,
+          "y": 756.109375,
+          "width": 322
+        }
+      ]
+    }
+  ],
+  "limitation": "Comparison is tested in a standalone component harness with labelled sample candidates. No student password, candidate, or election record is changed.",
+  "passed": true
+}

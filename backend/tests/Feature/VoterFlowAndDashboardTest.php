@@ -85,7 +85,7 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $this->postJson('/api/voter/login', [
             'student_id' => '20209999',
-            'full_name' => 'Sheehan Voila',
+            'password' => '123456',
         ])
             ->assertForbidden()
             ->assertJsonPath('message', 'You cannot log in because your student record shows that you have already graduated.')
@@ -93,7 +93,7 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $this->postJson('/api/voter/login', [
             'student_id' => '20238888',
-            'full_name' => 'John Doe',
+            'password' => '123456',
         ])
             ->assertForbidden()
             ->assertJsonPath('message', 'You cannot log in because your enrollment status is stopped.')
@@ -101,20 +101,20 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $this->postJson('/api/voter/login', [
             'student_id' => 'TEST-INACTIVE',
-            'full_name' => 'Inactive Test Student',
+            'password' => '123456',
         ])
             ->assertForbidden()
             ->assertJsonPath('academic_status', 'inactive');
 
         $this->postJson('/api/voter/login', [
             'student_id' => 'TEST-WITHDRAWN',
-            'full_name' => 'Withdrawn Test Student',
+            'password' => '123456',
         ])
             ->assertForbidden()
             ->assertJsonPath('academic_status', 'withdrawn');
     }
 
-    public function test_all_four_supplied_enrolled_accounts_can_log_in_with_their_id_passwords(): void
+    public function test_all_four_supplied_enrolled_accounts_can_log_in_with_the_default_password(): void
     {
         $this->seed(DevelopmentSeeder::class);
         Election::sole()->update(['status' => 'active']);
@@ -124,7 +124,7 @@ class VoterFlowAndDashboardTest extends TestCase
             ['20240102', 'Janvenedict Emeliano'],
             ['20240103', 'Demi Arnold'],
         ] as [$id, $name]) {
-            $this->postJson('/api/voter/login', ['student_id' => $id, 'full_name' => $name])
+            $this->postJson('/api/voter/login', ['student_id' => $id, 'password' => '123456'])
                 ->assertOk()->assertJsonPath('student.full_name', $name)->assertJsonPath('student.student_id', $id);
         }
     }
@@ -181,10 +181,13 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $voterLogin = $this->postJson('/api/voter/login', [
             'student_id' => '20240100',
-            'full_name' => 'Ian Kurt Ardena',
+            'password' => '123456',
         ])->assertOk();
 
-        $voterToken = $voterLogin->json('token');
+        $this->app['auth']->forgetGuards();
+        $voterToken = $this->withToken($voterLogin->json('token'))->postJson('/api/voter/password', [
+            'password' => 'PersonalPassword123!', 'password_confirmation' => 'PersonalPassword123!',
+        ])->assertOk()->json('token');
         $electionId = $voterLogin->json('election.id');
 
         $this->app['auth']->forgetGuards();
@@ -292,7 +295,7 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $this->postJson('/api/voter/login', [
             'student_id' => '20240100',
-            'full_name' => 'Ian Kurt Ardena',
+            'password' => 'PersonalPassword123!',
         ])->assertOk()->assertJsonPath('tally_only', true);
 
         $student = Student::findOrFail('20240100');

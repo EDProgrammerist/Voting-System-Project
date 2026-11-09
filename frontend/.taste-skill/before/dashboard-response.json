@@ -1,0 +1,51 @@
+{
+  "election": {
+    "id": 1,
+    "name": "SSG Election 2026 Presentation",
+    "status": "draft",
+    "starts_at": null,
+    "ends_at": null
+  },
+  "turnout": {
+    "eligible_students": 4,
+    "already_voted": 0,
+    "not_yet_voted": 4,
+    "percentage": 0,
+    "by_course": [
+      {
+        "course": "BEED",
+        "eligible_students": 1,
+        "already_voted": 0,
+        "not_yet_voted": 1,
+        "percentage": 0
+      },
+      {
+        "course": "BSED",
+        "eligible_students": 1,
+        "already_voted": 0,
+        "not_yet_voted": 1,
+        "percentage": 0
+      },
+      {
+        "course": "BSHM",
+        "eligible_students": 1,
+        "already_voted": 0,
+        "not_yet_voted": 1,
+        "percentage": 0
+      },
+      {
+        "course": "BSIT",
+        "eligible_students": 1,
+        "already_voted": 0,
+        "not_yet_voted": 1,
+        "percentage": 0
+      }
+    ]
+  },
+  "team_totals": {
+    "TEAM_A": 0,
+    "TEAM_B": 0
+  },
+  "candidate_results": [],
+  "results_by_position": []
+}

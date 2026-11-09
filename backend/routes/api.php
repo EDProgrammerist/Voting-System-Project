@@ -22,6 +22,8 @@ Route::prefix('voter')->group(function (): void {
         'auth:sanctum',
         'voter.only',
     ])->group(function (): void {
+        Route::get('/session', [VoterAuthController::class, 'session']);
+        Route::post('/password', [VoterAuthController::class, 'changePassword'])->middleware('throttle:10,1');
         Route::get('/tally', [TallyController::class, 'show']);
         Route::get(
             '/ballot',

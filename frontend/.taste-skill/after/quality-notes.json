@@ -1,0 +1,26 @@
+{
+  "frontendChecks": {
+    "npm run lint": "passed",
+    "npm run typecheck": "passed",
+    "npm run build": "passed",
+    "git diff --check": "passed"
+  },
+  "skillMismatch": {
+    "projectSkill": ".agents/skills/design-taste-frontend/SKILL.md is an older single-file installation and contains no scripts or app-screen reference.",
+    "userSkill": "C:/Users/ED/.agents/skills/design-taste-frontend includes draw.mjs, inspect.mjs and lint.mjs, but no references/app-screens.md and no --app support. Its documented target excludes dashboards.",
+    "fallback": "User-authorized app-appropriate fallback: subject/data audit, explicitly chosen compact Election desk direction, authenticated Playwright screenshots and DOM measurements at 1440/768/390, screenshot critique and fix loop. No landing-page direction was dealt or reproduced. No frontend/design images were used.",
+    "staticScanner": "Ran the available source scanner before and after. It does not pass: it applies landing-page rules to application surfaces, flags box-shadow: none as shadows, flags structural sidebar/table-summary dividers, and warns about the existing self-hosted font and outlined panels. These are recorded in source-lint.json, not treated as an app-screen approval. App inspection was performed with equivalent browser checks instead."
+  },
+  "scope": "Only admin-dashboard-screen.tsx, admin-sidebar.tsx and new dashboard-scoped admin-overview.css contain product changes. Sidebar enhancements are opt-in via overview, only on /admin/dashboard. Services, hooks, types, guards, routes, backend and records were not edited.",
+  "dataSemantics": {
+    "eligibleVoters": "Existing turnout.eligible_students; enrolled students.",
+    "ballotsCast": "Existing turnout.already_voted; participating voters, not summed candidate selections.",
+    "remaining": "Existing turnout.not_yet_voted.",
+    "turnout": "Existing turnout.percentage, unaltered.",
+    "courseTable": "Existing by_course already_voted, eligible_students and percentage.",
+    "candidateTotal": "Existing candidate_results.length.",
+    "candidateRate": "Preserved voters > 0 ? Math.min((candidate.votes / voters) * 100, 100) : 0; label clarified from Win Rate to Ballots selecting candidate."
+  },
+  "visualJudgment": "The restrained palette and stronger grouping are design judgments. Summary position, document height, overflow, target sizes and image differences are measured separately.",
+  "baselineLimitations": "Dashboard baseline was authenticated and verified at all three widths. Some ancillary baseline captures caught loading or authenticated redirects; these are not claimed as matching original populated pages. A separate regression check compares unchanged management pages with dashboard CSS absent versus loaded."
+}

@@ -1,6 +1,6 @@
 export interface VoterLoginCredentials {
   student_id: string;
-  full_name: string;
+  password: string;
 }
 
 export interface VoterIdentity {
@@ -15,10 +15,17 @@ export interface VoterElection {
 }
 
 export interface VoterLoginResponse {
+  password_change_required: boolean;
   tally_only: boolean;
   message: string;
   token: string;
   student: VoterIdentity;
+  election: VoterElection;
+}
+
+export interface VoterSessionResponse {
+  password_change_required: boolean;
+  tally_only: boolean;
   election: VoterElection;
 }
 
@@ -61,11 +68,23 @@ export interface VoterVoteResponse {
   message: string;
 }
 
-export interface SignaturePoint { x: number; y: number }
+export interface SignaturePoint {
+  x: number;
+  y: number;
+}
 
 export interface VoterTallyResponse {
   election: VoterElection & { status: string };
   tally_only: boolean;
   updated_at: string;
-  positions: { id: number; name: string; candidates: { student_id: string; full_name: string; team: string; votes: number }[] }[];
+  positions: {
+    id: number;
+    name: string;
+    candidates: {
+      student_id: string;
+      full_name: string;
+      team: string;
+      votes: number;
+    }[];
+  }[];
 }

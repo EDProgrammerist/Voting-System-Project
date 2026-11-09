@@ -1,0 +1,290 @@
+{
+  "phase": "after",
+  "capturedAt": "2026-11-06T23:07:57.943Z",
+  "authentication": "Real login through existing admin form; no guard bypass",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "documentHeight": 954,
+      "horizontalOverflow": 0,
+      "heading": {
+        "x": 256,
+        "y": 52,
+        "width": 212.8125,
+        "height": 35.09375,
+        "fontSize": "26px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "summary": {
+        "x": 256,
+        "y": 261.34375,
+        "width": 1152,
+        "height": 127.1875,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "chart": {
+        "x": 256,
+        "y": 408.53125,
+        "width": 526.5,
+        "height": 317,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "results": {
+        "x": 256,
+        "y": 745.53125,
+        "width": 1152,
+        "height": 168.5,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "content": {
+        "x": 224,
+        "y": 0,
+        "width": 1216,
+        "height": 954.03125,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "smallTargets": [],
+      "text": "Skip to election overview\nCPC\nVote\n\nReports\n\nDashboard\nVotes\n\nManage\n\nVoters\nCandidates\nSA\n\nSSG Admin\nAdministrator\n\nAdministration / Dashboard\n\nElection overview\nAuto-updates every 2s\nDraft election\nSSG Election 2026 Presentation\n\nElection setup is in progress. Voting has not opened.\n\nOpens\nNot scheduled\nCloses\nNot scheduled\nEligible voters\n4\nEnrolled students\nBallots cast\n0\n0% turnout\nNot yet voted\n4\nEligible voters remaining\nCandidates\n0\nIn this election\nVoter turnout\n\nParticipation in the current election\n\n0%\nturnout\n\nBallots cast\n0\n\nNot yet voted\n4\n\nEligible voters\n4\n\nNo ballots have been cast in this election yet.\n\nParticipation by course\n\nBallots cast out of eligible voters\n\nCourse\tCast / eligible\tTurnout\nBEED\t0 / 1\t\n0%\n\nBSED\t0 / 1\t\n0%\n\nBSHM\t0 / 1\t\n0%\n\nBSIT\t0 / 1\t\n0%\nCandidate results 0\n\nRecorded votes for each candidate in this election\n\nView votes\nNo candidates in this election\n\nCandidate results will appear here once candidates are added.\n\nManage candidates"
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "documentHeight": 1024,
+      "horizontalOverflow": 0,
+      "heading": {
+        "x": 24,
+        "y": 110,
+        "width": 212.8125,
+        "height": 35.09375,
+        "fontSize": "26px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "summary": {
+        "x": 24,
+        "y": 353.34375,
+        "width": 720,
+        "height": 127.1875,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "chart": {
+        "x": 24,
+        "y": 500.53125,
+        "width": 350,
+        "height": 293,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "results": {
+        "x": 24,
+        "y": 813.53125,
+        "width": 720,
+        "height": 168.5,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "content": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 1024,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "smallTargets": [],
+      "text": "Skip to election overview\n\nAdministration / Dashboard\n\nElection overview\nAuto-updates every 2s\nDraft election\nSSG Election 2026 Presentation\n\nElection setup is in progress. Voting has not opened.\n\nOpens\nNot scheduled\nCloses\nNot scheduled\nEligible voters\n4\nEnrolled students\nBallots cast\n0\n0% turnout\nNot yet voted\n4\nEligible voters remaining\nCandidates\n0\nIn this election\nVoter turnout\n\nParticipation in the current election\n\n0%\nturnout\n\nBallots cast\n0\n\nNot yet voted\n4\n\nEligible voters\n4\n\nNo ballots have been cast in this election yet.\n\nParticipation by course\n\nBallots cast out of eligible voters\n\nCourse\tCast / eligible\tTurnout\nBEED\t0 / 1\t\n0%\n\nBSED\t0 / 1\t\n0%\n\nBSHM\t0 / 1\t\n0%\n\nBSIT\t0 / 1\t\n0%\nCandidate results 0\n\nRecorded votes for each candidate in this election\n\nView votes\nNo candidates in this election\n\nCandidate results will appear here once candidates are added.\n\nManage candidates"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "documentHeight": 1415,
+      "horizontalOverflow": 0,
+      "heading": {
+        "x": 16,
+        "y": 102,
+        "width": 195.40625,
+        "height": 32.390625,
+        "fontSize": "24px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "summary": {
+        "x": 16,
+        "y": 344.140625,
+        "width": 358,
+        "height": 230.59375,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "chart": {
+        "x": 16,
+        "y": 588.734375,
+        "width": 358,
+        "height": 258,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "results": {
+        "x": 16,
+        "y": 1152.234375,
+        "width": 358,
+        "height": 238.5,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgb(255, 255, 255)"
+      },
+      "content": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 1414.734375,
+        "fontSize": "14px",
+        "fontFamily": "\"Plus Jakarta Sans Variable\", \"Segoe UI\", sans-serif",
+        "color": "rgb(32, 46, 67)",
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      "smallTargets": [],
+      "text": "Skip to election overview\n\nAdministration / Dashboard\n\nElection overview\nAuto-updates every 2s\nDraft election\nSSG Election 2026 Presentation\n\nElection setup is in progress. Voting has not opened.\n\nOpens\nNot scheduled\nCloses\nNot scheduled\nEligible voters\n4\nEnrolled students\nBallots cast\n0\n0% turnout\nNot yet voted\n4\nEligible voters remaining\nCandidates\n0\nIn this election\nVoter turnout\n\nParticipation in the current election\n\n0%\nturnout\n\nBallots cast\n0\n\nNot yet voted\n4\n\nEligible voters\n4\n\nNo ballots have been cast in this election yet.\n\nParticipation by course\n\nBallots cast out of eligible voters\n\nCourse\tCast / eligible\tTurnout\nBEED\t0 / 1\t\n0%\n\nBSED\t0 / 1\t\n0%\n\nBSHM\t0 / 1\t\n0%\n\nBSIT\t0 / 1\t\n0%\nCandidate results 0\n\nRecorded votes for each candidate in this election\n\nView votes\nNo candidates in this election\n\nCandidate results will appear here once candidates are added.\n\nManage candidates"
+    }
+  ],
+  "errors": [],
+  "otherPages": [
+    {
+      "route": "/admin/votes",
+      "url": "http://localhost:5173/admin/votes",
+      "measurement": {
+        "width": 1440,
+        "height": 900,
+        "documentHeight": 900,
+        "horizontalOverflow": 0,
+        "heading": null,
+        "summary": null,
+        "chart": null,
+        "results": null,
+        "content": {
+          "x": 244,
+          "y": 0,
+          "width": 1196,
+          "height": 900,
+          "fontSize": "16px",
+          "fontFamily": "Satoshi, \"Segoe UI\", sans-serif",
+          "color": "rgb(23, 34, 53)",
+          "background": "rgb(237, 243, 248)"
+        },
+        "smallTargets": [
+          {
+            "name": "Log out",
+            "width": 38.390625,
+            "height": 38.390625
+          }
+        ],
+        "text": "CPC\nVote\n\nReports\n\nDashboard\nVotes\n\nManage\n\nVoters\nCandidates\nSA\n\nSSG Admin\nAdministrator\n\nLoading election data…"
+      }
+    },
+    {
+      "route": "/admin/voters",
+      "url": "http://localhost:5173/admin/voters",
+      "measurement": {
+        "width": 1440,
+        "height": 900,
+        "documentHeight": 900,
+        "horizontalOverflow": 0,
+        "heading": {
+          "x": 290.796875,
+          "y": 60.796875,
+          "width": 1102.40625,
+          "height": 57.453125,
+          "fontSize": "60.48px",
+          "fontFamily": "Satoshi, \"Segoe UI\", sans-serif",
+          "color": "rgb(7, 19, 41)",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "summary": null,
+        "chart": null,
+        "results": null,
+        "content": {
+          "x": 244,
+          "y": 0,
+          "width": 1196,
+          "height": 900,
+          "fontSize": "16px",
+          "fontFamily": "Satoshi, \"Segoe UI\", sans-serif",
+          "color": "rgb(23, 34, 53)",
+          "background": "rgb(237, 243, 248)"
+        },
+        "smallTargets": [
+          {
+            "name": "Log out",
+            "width": 38.390625,
+            "height": 38.390625
+          }
+        ],
+        "text": "CPC\nVote\n\nReports\n\nDashboard\nVotes\n\nManage\n\nVoters\nCandidates\nSA\n\nSSG Admin\nAdministrator\n\nVoters\n\nReview enrolled students and their live voting status.\n\nSearch Student Name or ID\nFilter by academic status\nAll Status\nStudent ID\tName\tCourse\tAcademic Status\tVoting Status\n\nLoading student records…"
+      }
+    },
+    {
+      "route": "/admin/candidates",
+      "url": "http://localhost:5173/admin/candidates",
+      "measurement": {
+        "width": 1440,
+        "height": 900,
+        "documentHeight": 900,
+        "horizontalOverflow": 0,
+        "heading": null,
+        "summary": null,
+        "chart": null,
+        "results": null,
+        "content": {
+          "x": 244,
+          "y": 0,
+          "width": 1196,
+          "height": 900,
+          "fontSize": "16px",
+          "fontFamily": "Satoshi, \"Segoe UI\", sans-serif",
+          "color": "rgb(23, 34, 53)",
+          "background": "rgb(237, 243, 248)"
+        },
+        "smallTargets": [
+          {
+            "name": "Log out",
+            "width": 38.390625,
+            "height": 38.390625
+          }
+        ],
+        "text": "CPC\nVote\n\nReports\n\nDashboard\nVotes\n\nManage\n\nVoters\nCandidates\nSA\n\nSSG Admin\nAdministrator\n\nLoading election data…"
+      }
+    }
+  ],
+  "otherPageCaptureNote": "Initial before admin-votes/admin-voters snapshots caught loading, so they are not used as populated pixel comparisons. Initial before admin-login/public-home captures redirected to dashboard due an active session; verification.json records actual signed-out access separately."
+}

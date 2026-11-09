@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Printer, User } from "@phosphor-icons/react";
+import { ChartBar, Printer, User } from "@phosphor-icons/react";
+import { Link } from "react-router";
 
 import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { AdminDataState } from "@/components/features/admin-dashboard/admin-data-state";
@@ -8,16 +9,14 @@ import { useDocumentTitle } from "@/hooks/use-document-title";
 import type { CandidateResult } from "@/types/dashboard";
 
 import "../admin-dashboard/admin-dashboard-screen.css";
+import "../admin-dashboard/admin-overview.css";
+import "../admin-dashboard/admin-management.css";
 import "./admin-votes-screen.css";
 
 const ALL_POSITIONS = "All";
 
 function displayPosition(position: string): string {
   return position.toLowerCase() === "senator" ? "Senators" : position;
-}
-
-function electionYear(name: string): string {
-  return name.match(/\b(20\d{2})\b/)?.[1] ?? "2026";
 }
 
 export function AdminVotesScreen() {
@@ -40,14 +39,15 @@ export function AdminVotesScreen() {
     }));
   }, [dashboard]);
 
-  const visibleGroups = activePosition === ALL_POSITIONS
-    ? groupedResults
-    : groupedResults.filter((group) => group.position === activePosition);
+  const visibleGroups =
+    activePosition === ALL_POSITIONS
+      ? groupedResults
+      : groupedResults.filter((group) => group.position === activePosition);
 
   if (dataState !== "live") {
     return (
-      <main className="admin-dashboard admin-votes">
-        <AdminSidebar active="votes" />
+      <main className="admin-dashboard admin-overview admin-management admin-votes">
+        <AdminSidebar active="votes" overview />
         <section className="admin-dashboard__content admin-votes__content">
           <AdminDataState message={dataNotice} state={dataState} />
         </section>
@@ -56,24 +56,29 @@ export function AdminVotesScreen() {
   }
 
   return (
-    <main className="admin-dashboard admin-votes">
-      <AdminSidebar active="votes" />
+    <main className="admin-dashboard admin-overview admin-management admin-votes">
+      <AdminSidebar active="votes" overview />
 
       <section className="admin-dashboard__content admin-votes__content">
         <header className="admin-votes__header">
           <div>
             <h1>Votes</h1>
-            <p>
-              Live results of the CPC Election {electionYear(dashboard.election.name)}, grouped by position.
-            </p>
+            <p>{dashboard.election.name} · Results grouped by position.</p>
           </div>
-          <button className="admin-votes__print" onClick={() => window.print()} type="button">
+          <button
+            className="admin-votes__print"
+            onClick={() => window.print()}
+            type="button"
+          >
             <Printer aria-hidden="true" weight="fill" />
             <span>Print/Export</span>
           </button>
         </header>
 
-        <section className="admin-votes__team-totals" aria-label="Live team totals">
+        <section
+          className="admin-votes__team-totals"
+          aria-label="Live team totals"
+        >
           <article data-team="TEAM_A">
             <span>Team A selections</span>
             <strong>{dashboard.team_totals.TEAM_A.toLocaleString()}</strong>
@@ -84,7 +89,11 @@ export function AdminVotesScreen() {
           </article>
         </section>
 
-        <div className="admin-votes__filters" aria-label="Filter results by position" role="group">
+        <div
+          className="admin-votes__filters"
+          aria-label="Filter results by position"
+          role="group"
+        >
           <button
             aria-pressed={activePosition === ALL_POSITIONS}
             onClick={() => setActivePosition(ALL_POSITIONS)}
@@ -105,6 +114,16 @@ export function AdminVotesScreen() {
         </div>
 
         <div className="admin-votes__results" aria-live="polite">
+          {visibleGroups.length === 0 && (
+            <section className="management-empty">
+              <ChartBar aria-hidden="true" />
+              <h2>No candidate results yet</h2>
+              <p>
+                Results will appear when candidates are added to this election.
+              </p>
+              <Link to="/admin/candidates">View candidates</Link>
+            </section>
+          )}
           {visibleGroups.map((group) => (
             <PositionResults
               candidates={group.candidates}
@@ -129,7 +148,10 @@ function PositionResults({
   candidates: CandidateResult[];
   position: string;
 }) {
-  const maxVotes = Math.max(...candidates.map((candidate) => candidate.votes), 1);
+  const maxVotes = Math.max(
+    ...candidates.map((candidate) => candidate.votes),
+    1,
+  );
 
   return (
     <article className="position-results">
@@ -138,7 +160,10 @@ function PositionResults({
         {candidates.map((candidate, index) => {
           const percentage = Math.max((candidate.votes / maxVotes) * 100, 8);
           return (
-            <div className="vote-result" key={`${candidate.student_id}-${candidate.position}`}>
+            <div
+              className="vote-result"
+              key={`${candidate.student_id}-${candidate.position}`}
+            >
               <div className="vote-result__avatar">
                 {candidate.profile_photo_url ? (
                   <img alt="" src={candidate.profile_photo_url} />
@@ -146,14 +171,17 @@ function PositionResults({
                   <User aria-hidden="true" weight="fill" />
                 )}
               </div>
-              <div className="vote-result__track">
-                <div
-                  className="vote-result__bar"
-                  data-rank={index + 1}
-                  style={{ width: `${percentage}%` }}
-                >
+              <div className="vote-result__details">
+                <div className="vote-result__label">
                   <strong>{candidate.full_name}</strong>
                   <span>{candidate.votes.toLocaleString()} votes</span>
+                </div>
+                <div className="vote-result__track" aria-hidden="true">
+                  <div
+                    className="vote-result__bar"
+                    data-rank={index + 1}
+                    style={{ width: `${percentage}%` }}
+                  ></div>
                 </div>
               </div>
             </div>

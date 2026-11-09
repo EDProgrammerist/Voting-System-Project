@@ -15,6 +15,8 @@
 .voter-login__switch { align-self: flex-start; display: inline-flex; gap: 8px; align-items: center; padding: 8px 0; color: #536b8b; font-size: 12px; font-weight: 650; text-decoration: none; }
 .voter-login__switch svg { width: 17px; height: 17px; }
 .voter-login__switch:hover { color: #164dc4; }
+.voter-login__signout { border: 0; background: transparent; cursor: pointer; }
+.voter-login__switch:focus-visible, .voter-login__password button:focus-visible, .voter-login__submit:focus-visible { outline: 3px solid #164dc4; outline-offset: 3px; }
 .voter-login__panel { width: min(100%,420px); margin: auto; padding: 40px 0; }
 .voter-login__form-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: #e9f0ff; color: #164dc4; margin-bottom: 26px; }
 .voter-login__form-icon svg { width: 28px; height: 28px; }

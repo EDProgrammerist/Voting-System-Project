@@ -1,274 +1,229 @@
-.admin-voters__content {
-  min-height: 100dvh;
-  padding-top: 3.8rem;
-  background: #edf3f8;
-}
-
-.admin-voters__header h1 {
-  margin: 0;
-  color: #071329;
-  font-size: clamp(2.8rem, 4.2vw, 3.8rem);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
-}
-
-.admin-voters__header p {
-  margin: 0.8rem 0 0;
-  color: #152038;
-  font-size: clamp(1rem, 1.7vw, 1.45rem);
-  font-weight: 500;
-}
-
 .voter-filters {
   display: grid;
-  grid-template-columns: minmax(22rem, 1.35fr) minmax(12rem, 0.58fr) minmax(12rem, 0.62fr);
-  gap: 1.2rem;
-  margin-top: 1.35rem;
-  border-radius: 0.65rem;
-  padding: 1.3rem 1.5rem;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 20px;
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 0.55rem 1.45rem rgb(21 51 91 / 9%);
+  padding: 20px;
+  margin-bottom: 20px;
 }
-
 .voter-filters__search {
-  position: relative;
-  display: flex;
-  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
 }
-
-.voter-filters__search label,
-.voter-filters__select > span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
+.voter-filters__search label {
+  grid-column: 1/-1;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: #58677c;
+  font-weight: 600;
 }
-
 .voter-filters input,
 .voter-filters select {
   width: 100%;
-  min-height: 3.85rem;
-  border: 1px solid #cfd7e3;
-  border-radius: 0.5rem;
-  background: #f0f3f7;
-  color: #4b5568;
-  box-shadow: inset 0 0.15rem 0.4rem rgb(16 43 82 / 5%);
-  font-family: inherit;
-  font-size: 1.05rem;
-  font-weight: 500;
-  outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
-}
-
-.voter-filters input {
-  border-radius: 0.5rem 0 0 0.5rem;
-  padding: 0.8rem 1.2rem;
-}
-
-.voter-filters input::placeholder {
-  color: #596274;
-  opacity: 1;
-}
-
-.voter-filters input:focus,
-.voter-filters select:focus {
-  border-color: #1768d4;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d5deea;
   background: #fff;
-  box-shadow: 0 0 0 0.22rem rgb(23 104 212 / 14%);
+  color: #202e43;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
 }
-
+.voter-filters input {
+  border-radius: 7px 0 0 7px;
+}
+.voter-filters input::placeholder {
+  color: #66758a;
+}
 .voter-filters__search button {
   display: grid;
-  width: 5.75rem;
-  flex: 0 0 auto;
   place-items: center;
+  width: 44px;
+  min-height: 44px;
   border: 0;
-  border-radius: 0 0.5rem 0.5rem 0;
-  background: #484b52;
-  color: #d9dde4;
-  box-shadow: 0 0.45rem 0.8rem rgb(18 29 48 / 18%);
-  cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease;
-}
-
-.voter-filters__search button:hover,
-.voter-filters__search button:focus-visible {
-  background: #073f92;
+  border-radius: 0 7px 7px 0;
+  background: #2459b8;
   color: #fff;
-  outline: none;
+  cursor: pointer;
 }
-
-.voter-filters__search button svg {
-  width: 1.8rem;
-  height: 1.8rem;
+.voter-filters__search button:hover {
+  background: #1b4896;
 }
-
+.voter-filters__search svg {
+  width: 19px;
+  height: 19px;
+}
 .voter-filters__select {
+  display: grid;
+  gap: 7px;
   position: relative;
+  color: #58677c;
+  font-size: 12px;
+  font-weight: 600;
 }
-
 .voter-filters select {
   appearance: none;
-  padding: 0.8rem 3.2rem 0.8rem 1.2rem;
-  cursor: pointer;
+  padding-right: 36px;
+  font-weight: 500;
 }
-
 .voter-filters__select > svg {
   position: absolute;
-  top: 50%;
-  right: 1.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #19243a;
+  bottom: 16px;
+  right: 14px;
+  width: 14px;
+  height: 14px;
   pointer-events: none;
-  transform: translateY(-50%);
 }
-
 .voters-table-card {
-  position: relative;
-  min-height: 30.5rem;
-  margin-top: 1.85rem;
-  border-radius: 0.65rem;
-  padding: 0.55rem 0.65rem 1rem;
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 0.55rem 1.45rem rgb(21 51 91 / 10%);
+  overflow: hidden;
 }
-
+.voters-table__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+}
+.voters-table__heading h2 {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+.voters-table__heading > span {
+  color: #58677c;
+  font-size: 12px;
+}
 .voters-table__scroll {
   overflow-x: auto;
 }
-
 .voters-table {
   width: 100%;
-  min-width: 58rem;
   border-collapse: collapse;
   text-align: left;
 }
-
 .voters-table thead {
-  background: #073f92;
-  color: #fff;
+  background: #f8fafc;
+  color: #58677c;
 }
-
 .voters-table th {
-  width: 20%;
-  padding: 1rem 1.3rem;
-  font-size: 1rem;
-  font-weight: 800;
-  text-align: center;
+  padding: 13px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
-
-.voters-table th:first-child {
-  border-radius: 0.5rem 0 0 0.5rem;
-}
-
-.voters-table th:last-child {
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-
 .voters-table td {
-  border-bottom: 1px solid #edf1f5;
-  padding: 0.9rem 1.3rem;
-  color: #536176;
-  font-size: 0.86rem;
-  text-align: center;
+  padding: 17px 20px;
+  color: #58677c;
+  font-size: 12px;
+  border-top: 1px solid #e4e9f0;
+  font-variant-numeric: tabular-nums;
 }
-
-.voters-table tbody tr:hover {
-  background: #f7faff;
-}
-
 .voters-table td strong {
-  color: #18243a;
-  font-weight: 800;
+  color: #202e43;
+  font-weight: 650;
 }
-
+.voters-table tbody tr:hover {
+  background: #fafcff;
+}
 .voter-status {
   display: inline-flex;
-  min-width: 5.3rem;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 0.35rem 0.7rem;
-  background: #e6edf5;
-  color: #526075;
-  font-size: 0.72rem;
-  font-weight: 800;
+  width: fit-content;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #edf0f4;
+  color: #536175;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
-
 .voter-status[data-status="voted"],
 .voter-status[data-status="enrolled"] {
-  background: #d9f7e9;
-  color: #08794c;
+  background: #e8f5ed;
+  color: #176440;
 }
-
 .voter-status[data-status="not-voted"] {
-  background: #fff1c8;
-  color: #9d6a00;
+  background: #fff3da;
+  color: #82500c;
 }
-
-.voter-status[data-status="ineligible"],
-.voter-status[data-status="graduated"],
-.voter-status[data-status="withdrawn"],
-.voter-status[data-status="stopped"],
-.voter-status[data-status="inactive"] {
-  background: #ffe1df;
-  color: #b12d25;
+.voter-status:is(
+  [data-status="ineligible"],
+  [data-status="graduated"],
+  [data-status="withdrawn"],
+  [data-status="stopped"],
+  [data-status="inactive"]
+) {
+  background: #fff0ef;
+  color: #a13530;
 }
-
 .voters-table__empty {
-  position: absolute;
-  inset: 7.5rem 1rem 1rem;
-  display: grid;
-  place-content: center;
-  color: #7b8799;
+  padding: 40px 20px;
   text-align: center;
+  color: #58677c;
 }
-
 .voters-table__empty svg {
-  width: 2.4rem;
-  height: 2.4rem;
-  margin: 0 auto 0.7rem;
+  width: 26px;
+  height: 26px;
+  margin: 0 auto 12px;
 }
-
 .voters-table__empty strong {
-  color: #243249;
+  display: block;
+  color: #202e43;
+  font-size: 15px;
 }
-
 .voters-table__empty p {
-  margin: 0.25rem 0 0;
-  font-size: 0.82rem;
+  font-size: 13px;
+  margin-top: 8px;
 }
-
-@media (max-width: 1050px) {
-  .voter-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .voter-filters__search {
-    grid-column: 1 / -1;
+@media (max-width: 1180px) {
+  .voters-table th,
+  .voters-table td {
+    padding-inline: 12px;
   }
 }
-
-@media (max-width: 760px) {
-  .admin-voters__content {
-    padding-top: 5.2rem;
-  }
-
+@media (max-width: 640px) {
   .voter-filters {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    gap: 16px;
+    padding: 18px;
   }
-
-  .voter-filters__search {
-    grid-column: auto;
+  .voters-table,
+  .voters-table tbody {
+    display: block;
   }
-
-  .voters-table-card {
-    min-height: 27rem;
-    margin-top: 1rem;
+  .voters-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .voters-table tbody tr {
+    display: grid;
+    padding: 12px 18px;
+    border-top: 1px solid #e4e9f0;
+  }
+  .voters-table td {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+  .voters-table td::before {
+    content: attr(data-label);
+    color: #58677c;
+    font-size: 11px;
+  }
+  .voters-table__heading {
+    padding: 18px;
   }
 }
