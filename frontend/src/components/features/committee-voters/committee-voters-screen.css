@@ -1,0 +1,258 @@
+.voter-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 20px;
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.voter-filters__search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+}
+.voter-filters__election {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 7px;
+  min-width: 0;
+  color: #58677c;
+  font-size: 12px;
+  font-weight: 600;
+}
+.voter-filters__election select {
+  appearance: auto;
+}
+.voter-ballot-code {
+  display: block;
+  max-width: 210px;
+  margin-top: 5px;
+  color: #58677c;
+  font-size: 10px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.voter-attendance-time {
+  display: block;
+  max-width: 180px;
+  margin-top: 6px;
+  color: #58677c;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.voter-filters__search label {
+  grid-column: 1/-1;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: #58677c;
+  font-weight: 600;
+}
+.voter-filters input,
+.voter-filters select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d5deea;
+  background: #fff;
+  color: #202e43;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+}
+.voter-filters input {
+  border-radius: 7px 0 0 7px;
+}
+.voter-filters input::placeholder {
+  color: #66758a;
+}
+.voter-filters__search button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0 7px 7px 0;
+  background: #2459b8;
+  color: #fff;
+  cursor: pointer;
+}
+.voter-filters__search button:hover {
+  background: #1b4896;
+}
+.voter-filters__search svg {
+  width: 19px;
+  height: 19px;
+}
+.voter-filters__select {
+  display: grid;
+  gap: 7px;
+  position: relative;
+  color: #58677c;
+  font-size: 12px;
+  font-weight: 600;
+}
+.voter-filters select {
+  appearance: none;
+  padding-right: 36px;
+  font-weight: 500;
+}
+.voter-filters__select > svg {
+  position: absolute;
+  bottom: 16px;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.voters-table-card {
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.voters-table__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+}
+.voters-table__heading h2 {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+.voters-table__heading > span {
+  color: #58677c;
+  font-size: 12px;
+}
+.voters-table__scroll {
+  overflow-x: auto;
+}
+.voters-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.voters-table thead {
+  background: #f8fafc;
+  color: #58677c;
+}
+.voters-table th {
+  padding: 13px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.voters-table td {
+  padding: 17px 20px;
+  color: #58677c;
+  font-size: 12px;
+  border-top: 1px solid #e4e9f0;
+  font-variant-numeric: tabular-nums;
+}
+.voters-table td strong {
+  color: #202e43;
+  font-weight: 650;
+}
+.voters-table tbody tr:hover {
+  background: #fafcff;
+}
+.voter-status {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #edf0f4;
+  color: #536175;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.voter-status[data-status="voted"],
+.voter-status[data-status="enrolled"] {
+  background: #e8f5ed;
+  color: #176440;
+}
+.voter-status[data-status="not-voted"] {
+  background: #fff3da;
+  color: #82500c;
+}
+.voter-status:is(
+  [data-status="ineligible"],
+  [data-status="graduated"],
+  [data-status="withdrawn"],
+  [data-status="stopped"],
+  [data-status="inactive"]
+) {
+  background: #fff0ef;
+  color: #a13530;
+}
+.voters-table__empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #58677c;
+}
+.voters-table__empty svg {
+  width: 26px;
+  height: 26px;
+  margin: 0 auto 12px;
+}
+.voters-table__empty strong {
+  display: block;
+  color: #202e43;
+  font-size: 15px;
+}
+.voters-table__empty p {
+  font-size: 13px;
+  margin-top: 8px;
+}
+@media (max-width: 1180px) {
+  .voters-table th,
+  .voters-table td {
+    padding-inline: 12px;
+  }
+}
+@media (max-width: 640px) {
+  .voter-filters {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+  .voters-table,
+  .voters-table tbody {
+    display: block;
+  }
+  .voters-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .voters-table tbody tr {
+    display: grid;
+    padding: 12px 18px;
+    border-top: 1px solid #e4e9f0;
+  }
+  .voters-table td {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+  .voters-table td::before {
+    content: attr(data-label);
+    color: #58677c;
+    font-size: 11px;
+  }
+  .voters-table__heading {
+    padding: 18px;
+  }
+}

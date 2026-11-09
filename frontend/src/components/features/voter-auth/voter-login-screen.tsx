@@ -14,6 +14,8 @@ import {
   clearVoterSession,
   getVoterToken,
   saveVoterSession,
+  getVoterQrEntry,
+  clearVoterQrEntry,
 } from "@/lib/voter-session";
 import {
   createVoterPassword,
@@ -42,6 +44,7 @@ export function VoterLoginScreen({
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [qrEntry, setQrEntry] = useState(getVoterQrEntry);
 
   useDocumentTitle(
     setupPassword ? "Create Password | CPC Vote" : "Voter Login | CPC Vote",
@@ -74,7 +77,11 @@ export function VoterLoginScreen({
             password,
             confirmation,
           )
-        : await loginVoter({ student_id: studentId.trim(), password });
+        : await loginVoter({
+            student_id: studentId.trim(),
+            password,
+            ...(qrEntry ? { entry_code: qrEntry.code } : {}),
+          });
       saveVoterSession(
         response.token,
         response.student,
@@ -122,7 +129,9 @@ export function VoterLoginScreen({
   }
 
   return (
-    <main className={setupPassword ? "voter-login" : "voter-login login-transition"}>
+    <main
+      className={setupPassword ? "voter-login" : "voter-login login-transition"}
+    >
       <section
         className="voter-login__visual"
         aria-label="CPC student elections"
@@ -163,12 +172,12 @@ export function VoterLoginScreen({
             <ArrowLeft aria-hidden="true" />
             Sign out
           </button>
-        ) : (
+        ) : !qrEntry ? (
           <Link className="voter-login__switch" to="/admin/login">
             <ArrowLeft aria-hidden="true" />
             Admin Login
           </Link>
-        )}
+        ) : null}
         <div className="voter-login__panel">
           <span className="voter-login__form-icon">
             <CheckSquareOffset aria-hidden="true" weight="light" />
@@ -185,6 +194,23 @@ export function VoterLoginScreen({
             onSubmit={handleVerification}
             aria-describedby={message ? "login-status" : undefined}
           >
+            {!setupPassword && qrEntry && (
+              <div className="voter-login__qr-context">
+                <p>
+                  Voting for <strong>{qrEntry.election.name}</strong>
+                </p>
+                <button
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => {
+                    clearVoterQrEntry();
+                    setQrEntry(null);
+                  }}
+                >
+                  Use regular student login
+                </button>
+              </div>
+            )}
             {!setupPassword && (
               <div className="voter-login__field">
                 <label htmlFor="student-id">Student ID number</label>

@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Election extends Model
 {
     protected static function booted(): void
     {
+        static::creating(function (Election $election): void {
+            $election->qr_entry_code = (string) Str::uuid();
+        });
         static::created(function (Election $election): void {
             foreach (['President', 'Vice President', 'Senator'] as $index => $name) {
                 $election->positions()->create([

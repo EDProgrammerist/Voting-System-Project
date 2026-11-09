@@ -1,0 +1,42 @@
+.ballot-reference {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px 28px;
+  margin: 0 0 24px;
+  padding: 18px 22px;
+  background: #fff;
+  border: 1px solid #d9e3f1;
+  border-radius: 12px;
+  color: #203b63;
+}
+.ballot-reference > div {
+  min-width: 0;
+}
+.ballot-reference h2 {
+  margin: 0 0 5px;
+  font-size: 12px;
+  font-weight: 750;
+}
+.ballot-reference code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.ballot-reference strong {
+  font-size: 12px;
+}
+.ballot-reference p {
+  margin: 5px 0 0;
+  max-width: 52ch;
+  color: #536b86;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.ballot-reference[data-complete="true"] {
+  border-color: #b9ddcc;
+}
+.ballot-reference[data-complete="true"] strong {
+  color: #176440;
+}

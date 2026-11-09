@@ -9,16 +9,23 @@ import {
 } from "@/lib/voter-session";
 import RequireAdmin from "@/routes/require-admin";
 import RequireVoter from "@/routes/require-voter";
+import RequireCommittee from "@/routes/require-committee";
+import { getCommitteeToken } from "@/lib/committee-session";
 
 const AdminCandidatesPage = lazy(() => import("@/pages/admin/candidates"));
 const AdminDashboardPage = lazy(() => import("@/pages/admin/dashboard"));
 const AdminLoginPage = lazy(() => import("@/pages/admin/login"));
-const AdminVotersPage = lazy(() => import("@/pages/admin/voters"));
+const CommitteeVotersPage = lazy(() => import("@/pages/committee/voters"));
+const CommitteeLoginPage = lazy(() => import("@/pages/committee/login"));
 const AdminVotesPage = lazy(() => import("@/pages/admin/votes"));
+const AdminSettingsPage = lazy(() => import("@/pages/admin/settings"));
 const HomePage = lazy(() => import("@/pages/guest/home"));
 const GuestLayout = lazy(() => import("@/pages/guest/layout"));
 const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
 const VoterLoginPage = lazy(() => import("@/pages/voter/login"));
+const VoterQrEntryPage = lazy(
+  () => import("@/components/features/voter-auth/voter-qr-entry-screen"),
+);
 const VoterPasswordPage = lazy(() =>
   import("@/components/features/voter-auth/voter-login-screen").then(
     (module) => ({ default: module.VoterPasswordScreen }),
@@ -35,15 +42,18 @@ export default function AppRouter() {
   useLocation();
   const hasAdminToken = Boolean(getAdminToken());
   const hasVoterToken = Boolean(getVoterToken());
+  const hasCommitteeToken = Boolean(getCommitteeToken());
   const defaultRoute = hasAdminToken
     ? "/admin/dashboard"
-    : hasVoterToken
-      ? isVoterPasswordRequired()
-        ? "/voter/password"
-        : isVoterTallyOnly()
-          ? "/voter/tally"
-          : "/voter/ballot"
-      : "/voter/login";
+    : hasCommitteeToken
+      ? "/committee/voters"
+      : hasVoterToken
+        ? isVoterPasswordRequired()
+          ? "/voter/password"
+          : isVoterTallyOnly()
+            ? "/voter/tally"
+            : "/voter/ballot"
+        : "/voter/login";
 
   return (
     <Suspense
@@ -54,6 +64,24 @@ export default function AppRouter() {
       }
     >
       <Routes>
+        <Route
+          path="/committee/login"
+          element={
+            hasCommitteeToken ? (
+              <Navigate to="/committee/voters" replace />
+            ) : (
+              <CommitteeLoginPage />
+            )
+          }
+        />
+        <Route element={<RequireCommittee />}>
+          <Route path="/committee/voters" element={<CommitteeVotersPage />} />
+        </Route>
+        <Route
+          path="/admin/voters"
+          element={<Navigate to="/committee/voters" replace />}
+        />
+        <Route path="/vote/:code" element={<VoterQrEntryPage />} />
         <Route path="/" element={<Navigate to={defaultRoute} replace />} />
         <Route path="/login" element={<Navigate to={defaultRoute} replace />} />
         <Route
@@ -96,9 +124,9 @@ export default function AppRouter() {
           }
         />
         <Route element={<RequireAdmin />}>
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/votes" element={<AdminVotesPage />} />
-          <Route path="/admin/voters" element={<AdminVotersPage />} />
           <Route
             path="/admin/positions"
             element={<Navigate to="/admin/candidates" replace />}

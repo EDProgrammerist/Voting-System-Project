@@ -8,6 +8,7 @@ use App\Models\CandidateProfile;
 use App\Models\Election;
 use App\Models\Student;
 use App\Models\Vote;
+use App\Models\VoterBallotId;
 use App\Models\VoterParticipation;
 use Database\Seeders\StudentAccountsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,6 +23,7 @@ class StudentAccountUpdateTest extends TestCase
         $student = Student::create(['student_id' => '2024-0100', 'full_name' => 'Demo BSIT Voter', 'academic_status' => 'enrolled', 'course' => 'BSIT']);
         CandidateProfile::create(['student_id' => $student->student_id, 'full_name' => $student->full_name, 'achievements' => 'Existing award']);
         $election = Election::create(['name' => 'Existing election', 'status' => 'active']);
+        $reference = VoterBallotId::issue($student, $election);
         $position = $election->positions->first();
         Candidacy::create(['election_id' => $election->id, 'position_id' => $position->id, 'student_id' => $student->student_id, 'team' => 'TEAM_A']);
         Ballot::create(['id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'election_id' => $election->id, 'cast_at' => now()]);
@@ -39,6 +41,7 @@ class StudentAccountUpdateTest extends TestCase
         $this->assertDatabaseHas('candidacies', ['student_id' => '20240100']);
         $this->assertDatabaseHas('votes', ['candidate_student_id' => '20240100']);
         $this->assertDatabaseHas('voter_participations', ['student_id' => '20240100']);
+        $this->assertDatabaseHas('voter_ballot_ids', ['id' => $reference->id, 'student_id' => '20240100', 'election_id' => $election->id]);
         $this->assertDatabaseHas('elections', ['id' => $election->id, 'status' => 'active']);
         $this->assertDatabaseCount('personal_access_tokens', 0);
         $this->assertDatabaseHas('students', ['student_id' => '20209999', 'full_name' => 'Sheehan Voila', 'academic_status' => 'graduated']);

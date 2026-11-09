@@ -1,4 +1,5 @@
 export interface VoterLoginCredentials {
+  entry_code?: string;
   student_id: string;
   password: string;
 }
@@ -15,6 +16,7 @@ export interface VoterElection {
 }
 
 export interface VoterLoginResponse {
+  ballot_reference: VoterBallotReference | null;
   password_change_required: boolean;
   tally_only: boolean;
   message: string;
@@ -24,6 +26,7 @@ export interface VoterLoginResponse {
 }
 
 export interface VoterSessionResponse {
+  ballot_reference: VoterBallotReference | null;
   password_change_required: boolean;
   tally_only: boolean;
   election: VoterElection;
@@ -47,6 +50,7 @@ export interface BallotPosition {
 }
 
 export interface VoterBallotResponse {
+  ballot_reference: VoterBallotReference | null;
   can_submit_vote: boolean;
   election: VoterElection;
   positions: BallotPosition[];
@@ -58,6 +62,7 @@ export interface VoterSelection {
 }
 
 export interface VoterVotePayload {
+  ballot_reference_id?: string;
   signature: SignaturePoint[][];
   thumbmark_confirmed: boolean;
   election_id: number;
@@ -65,6 +70,7 @@ export interface VoterVotePayload {
 }
 
 export interface VoterVoteResponse {
+  ballot_reference: VoterBallotReference;
   message: string;
 }
 
@@ -74,6 +80,7 @@ export interface SignaturePoint {
 }
 
 export interface VoterTallyResponse {
+  ballot_reference: VoterBallotReference | null;
   election: VoterElection & { status: string };
   tally_only: boolean;
   updated_at: string;
@@ -87,4 +94,16 @@ export interface VoterTallyResponse {
       votes: number;
     }[];
   }[];
+}
+
+export interface VoterBallotReference {
+  id: string;
+  issued_at: string;
+  attendance_recorded: boolean;
+  voted_at: string | null;
+}
+
+export interface VoterQrEntry {
+  code: string;
+  election: VoterElection & { status: string };
 }

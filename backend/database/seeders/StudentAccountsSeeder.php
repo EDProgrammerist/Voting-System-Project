@@ -45,6 +45,7 @@ class StudentAccountsSeeder extends Seeder
                         DB::table('candidate_profiles')->where('student_id', $oldId)->delete();
                     }
                     DB::table('voter_participations')->where('student_id', $oldId)->update(['student_id' => $newId]);
+                    DB::table('voter_ballot_ids')->where('student_id', $oldId)->update(['student_id' => $newId]);
                     $old->tokens()->delete();
                     $old->delete();
                 } elseif ($current) {

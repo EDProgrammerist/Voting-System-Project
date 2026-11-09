@@ -14,6 +14,7 @@ class SubmitVoteRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'ballot_reference_id' => ['nullable', 'uuid'],
             'thumbmark_confirmed' => ['required', 'accepted'],
             'signature' => ['required', 'array', 'min:1', 'max:100', function ($attribute, $value, $fail) {
                 if (! is_array($value)) {

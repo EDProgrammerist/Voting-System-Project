@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Voter;
 use App\Http\Controllers\Controller;
 use App\Models\Election;
 use App\Models\Student;
+use App\Models\VoterBallotId;
 use App\Models\VoterParticipation;
 use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ class VoterAuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'entry_code' => ['nullable', 'uuid', 'exists:elections,qr_entry_code'],
             'student_id' => [
                 'required',
                 'string',
@@ -55,20 +57,26 @@ class VoterAuthController extends Controller
                 ], 403);
             }
 
-            return $this->issueSession($student);
+            $election = isset($validated['entry_code']) ? Election::where('qr_entry_code', $validated['entry_code'])->firstOrFail() : VoterElection::current();
+            if (isset($validated['entry_code']) && (! in_array($election->status, ['draft', 'active'], true) || ($election->ends_at && $election->ends_at->isPast()))) {
+                return response()->json(['message' => 'This election is closed. Its QR code no longer accepts voters.'], 409);
+            }
+
+            return $this->issueSession($student, $election);
         });
     }
 
     public function session(Request $request): JsonResponse
     {
         $student = $request->user();
-        $election = VoterElection::current();
+        $election = VoterElection::forStudent($student);
 
         if (! $election) {
             return response()->json(['message' => 'There is currently no active SSG election.'], 409);
         }
 
         return response()->json([
+            'ballot_reference' => VoterBallotId::summary($student, $election),
             'password_change_required' => $student->password_change_required,
             'tally_only' => VoterElection::tallyOnly($student, $election),
             'election' => ['id' => $election->id, 'name' => $election->name, 'ends_at' => $election->ends_at],
@@ -95,20 +103,20 @@ class VoterAuthController extends Controller
                 return response()->json(['message' => 'Password setup has already been completed. Please sign in again.'], 403);
             }
 
-            if (! VoterElection::current()) {
+            $election = VoterElection::forStudent($request->user());
+            if (! $election) {
                 return response()->json(['message' => 'There is currently no active SSG election.'], 409);
             }
 
             $student->update(['password' => $validated['password'], 'password_change_required' => false]);
             $student->tokens()->delete();
 
-            return $this->issueSession($student);
+            return $this->issueSession($student, $election);
         });
     }
 
-    private function issueSession(Student $student): JsonResponse
+    private function issueSession(Student $student, ?Election $election): JsonResponse
     {
-        $election = VoterElection::current();
 
         if (! $election) {
             return response()->json([
@@ -123,18 +131,23 @@ class VoterAuthController extends Controller
 
         $tallyOnly = $alreadyVoted || ($election->status !== 'draft' && ! Election::currentlyActive()->whereKey($election->id)->exists());
 
+        if (! $student->password_change_required) {
+            VoterBallotId::issue($student, $election);
+        }
+
         $student->tokens()
             ->where('name', 'voter-session')
             ->delete();
 
         $token = $student->createToken(
             'voter-session',
-            $student->password_change_required ? ['password-setup'] : ($tallyOnly ? ['tally-only'] : ['vote']),
+            [$student->password_change_required ? 'password-setup' : ($tallyOnly ? 'tally-only' : 'vote'), 'election:'.$election->id],
             now()->addHours(2),
         )->plainTextToken;
 
         return response()->json([
             'message' => 'Voter verified.',
+            'ballot_reference' => $student->password_change_required ? null : VoterBallotId::summary($student, $election),
             'password_change_required' => $student->password_change_required,
             'tally_only' => $tallyOnly,
             'token' => $token,

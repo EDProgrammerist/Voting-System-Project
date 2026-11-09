@@ -25,6 +25,7 @@ class AdminAuthController extends Controller
 
         $admin = User::query()
             ->where('email', $validated['email'])
+            ->where('role', 'admin')
             ->first();
 
         if (
@@ -52,6 +53,7 @@ class AdminAuthController extends Controller
             'admin' => [
                 'name' => $admin->name,
                 'email' => $admin->email,
+                'role' => $admin->role,
             ],
         ]);
     }

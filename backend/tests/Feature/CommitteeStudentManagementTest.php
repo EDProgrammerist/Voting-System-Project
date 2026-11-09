@@ -1,0 +1,149 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Election;
+use App\Models\Student;
+use App\Models\User;
+use App\Models\VoterParticipation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
+
+class CommitteeStudentManagementTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Sanctum::actingAs(User::create([
+            'role' => 'committee',
+            'name' => 'Election Committee',
+            'email' => 'admin@ssg.local',
+            'password' => 'Admin123!',
+        ]), ['committee']);
+    }
+
+    public function test_student_list_includes_course_and_election_participation(): void
+    {
+        $election = Election::create([
+            'name' => 'Test Election',
+            'status' => 'active',
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
+
+        Student::create([
+            'student_id' => '2026-0001',
+            'full_name' => 'Voted Student',
+            'course' => 'BSIT',
+            'academic_status' => 'enrolled',
+        ]);
+
+        Student::create([
+            'student_id' => '2026-0002',
+            'full_name' => 'Waiting Student',
+            'course' => 'BSHM',
+            'academic_status' => 'enrolled',
+        ]);
+
+        VoterParticipation::create([
+            'election_id' => $election->id,
+            'student_id' => '2026-0001',
+            'voted_at' => now(),
+        ]);
+
+        $response = $this->getJson(
+            "/api/committee/students?election_id={$election->id}",
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonFragment([
+                'student_id' => '2026-0001',
+                'course' => 'BSIT',
+                'has_voted' => true,
+                'voting_status' => 'voted',
+            ])
+            ->assertJsonFragment([
+                'student_id' => '2026-0002',
+                'course' => 'BSHM',
+                'has_voted' => false,
+                'voting_status' => 'not_voted',
+            ]);
+    }
+
+    public function test_committee_can_create_and_update_a_student_with_course_without_credentials(): void
+    {
+        $this->postJson('/api/committee/students', [
+            'student_id' => '2026-0100',
+            'full_name' => 'New Student',
+            'course' => 'BSIT',
+            'academic_status' => 'enrolled',
+        ])->assertCreated();
+
+        $this->putJson('/api/committee/students/2026-0100', [
+            'full_name' => 'Updated Student',
+            'course' => 'BSCS',
+            'password' => null,
+            'academic_status' => 'enrolled',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('students', [
+            'student_id' => '2026-0100',
+            'full_name' => 'Updated Student',
+            'course' => 'BSCS',
+        ]);
+    }
+
+    public function test_enrolled_filter_hides_graduated_and_stopped_students_from_the_voter_list(): void
+    {
+        Student::create([
+            'student_id' => '2026-1000',
+            'full_name' => 'Eligible Student',
+            'course' => 'BSIT',
+            'academic_status' => 'enrolled',
+        ]);
+        Student::create([
+            'student_id' => '2020-1001',
+            'full_name' => 'Graduate Student',
+            'course' => 'BSIT',
+            'academic_status' => 'graduated',
+        ]);
+        Student::create([
+            'student_id' => '2023-1002',
+            'full_name' => 'Stopped Student',
+            'course' => 'BSHM',
+            'academic_status' => 'stopped',
+        ]);
+
+        $response = $this->getJson('/api/committee/students?status=enrolled')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.student_id', '2026-1000');
+
+        $studentIds = collect($response->json('data'))->pluck('student_id');
+        $this->assertNotContains('2020-1001', $studentIds);
+        $this->assertNotContains('2023-1002', $studentIds);
+    }
+
+    public function test_student_list_supports_an_explicit_page_size_up_to_one_hundred(): void
+    {
+        foreach (range(1, 30) as $index) {
+            Student::create([
+                'student_id' => sprintf('2026-%04d', $index),
+                'full_name' => "Student {$index}",
+                'course' => 'BSIT',
+                'academic_status' => 'enrolled',
+            ]);
+        }
+
+        $this->getJson('/api/committee/students?status=enrolled&per_page=100')
+            ->assertOk()
+            ->assertJsonPath('per_page', 100)
+            ->assertJsonPath('total', 30)
+            ->assertJsonCount(30, 'data');
+    }
+}

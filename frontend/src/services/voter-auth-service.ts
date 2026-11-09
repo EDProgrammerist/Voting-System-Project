@@ -7,7 +7,18 @@ import type {
   VoterVoteResponse,
   VoterTallyResponse,
   VoterSessionResponse,
+  VoterQrEntry,
 } from "@/types/voter";
+
+export function resolveVoterQr(
+  code: string,
+  signal?: AbortSignal,
+): Promise<Omit<VoterQrEntry, "code">> {
+  return apiRequest(`/voter/entry/${encodeURIComponent(code)}`, {
+    signal,
+    cache: "no-store",
+  });
+}
 
 export function getVoterSession(
   token: string,

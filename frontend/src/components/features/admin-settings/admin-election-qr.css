@@ -1,0 +1,203 @@
+.election-qr-open,
+.election-qr-print {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #2459b8;
+  border-radius: 8px;
+  background: #2459b8;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.election-qr-open {
+  margin-top: 18px;
+}
+.election-qr-open svg,
+.election-qr-print svg {
+  width: 20px;
+  height: 20px;
+}
+.election-qr-open:hover,
+.election-qr-print:hover {
+  background: #1b4896;
+}
+.election-qr-open:disabled,
+.election-qr-print:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.election-qr-dialog {
+  box-sizing: border-box;
+  width: min(620px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  margin: auto;
+  padding: 32px;
+  border: 1px solid #d9e3ef;
+  border-radius: 16px;
+  background: #fff;
+  color: #203b63;
+  font-family: "Plus Jakarta Sans Variable", "Segoe UI", sans-serif;
+}
+.election-qr-dialog::backdrop {
+  background: rgb(12 31 61 / 45%);
+}
+.election-qr-dialog header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 32px;
+}
+.election-qr-dialog header img {
+  flex: none;
+  object-fit: contain;
+}
+.election-qr-dialog header p {
+  margin: 0 0 5px;
+  font-size: 12px;
+  color: #58677c;
+}
+.election-qr-dialog h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 750;
+}
+.election-qr-dialog h3 {
+  margin: 24px 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.election-qr-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #edf2fa;
+  color: #203b63;
+  cursor: pointer;
+}
+.election-qr-close svg {
+  width: 20px;
+  height: 20px;
+}
+.election-qr-address {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.election-qr-address input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #cbd6e5;
+  border-radius: 8px;
+  background: #fff;
+  color: #203b63;
+  font: inherit;
+  font-size: 14px;
+}
+.election-qr-screen-note,
+.election-qr-error {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 12px 0;
+}
+.election-qr-screen-note {
+  color: #58677c;
+}
+.election-qr-error {
+  color: #a13530;
+}
+.election-qr-image {
+  display: block;
+  width: min(100%, 360px);
+  height: auto;
+  margin: 16px auto 0;
+}
+.election-qr-link {
+  text-align: center;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.election-qr-steps {
+  list-style: decimal;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.9;
+  margin: 20px 0 8px;
+}
+.election-qr-attendance {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.7;
+}
+.election-qr-print {
+  margin-top: 18px;
+  width: 100%;
+}
+.election-qr-dialog :is(input, button):focus-visible,
+.election-qr-open:focus-visible {
+  outline: 3px solid #2459b8;
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .election-qr-dialog {
+    padding: 24px 20px;
+  }
+}
+@media print {
+  body:has(> .election-qr-dialog[open]) {
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  body:has(> .election-qr-dialog[open]) > :not(.election-qr-dialog) {
+    display: none !important;
+  }
+  .election-qr-dialog[open] {
+    position: static;
+    display: block;
+    width: 100%;
+    max-width: 180mm;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    margin: 0 auto;
+    padding: 12mm;
+    color: #000;
+    break-inside: avoid;
+  }
+  .election-qr-dialog::backdrop {
+    display: none;
+  }
+  .election-qr-dialog
+    :is(
+      .election-qr-close,
+      .election-qr-print,
+      .election-qr-address,
+      .election-qr-screen-note
+    ) {
+    display: none !important;
+  }
+  .election-qr-dialog h3 {
+    text-align: center;
+  }
+  .election-qr-image {
+    width: 90mm;
+    max-width: 100%;
+  }
+}

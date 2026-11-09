@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Voter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vote;
+use App\Models\VoterBallotId;
 use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class TallyController extends Controller
 {
     public function show(Request $request): JsonResponse
     {
-        $election = VoterElection::current();
+        $election = VoterElection::forStudent($request->user());
         if (! $election) {
             return response()->json(['message' => 'No election results are available yet.'], 409);
         }
@@ -31,6 +32,7 @@ class TallyController extends Controller
         ]);
 
         return response()->json([
+            'ballot_reference' => VoterBallotId::summary($request->user(), $election),
             'election' => ['id' => $election->id, 'name' => $election->name, 'status' => $election->status, 'ends_at' => $election->ends_at],
             'tally_only' => VoterElection::tallyOnly($request->user(), $election),
             'positions' => $positions,

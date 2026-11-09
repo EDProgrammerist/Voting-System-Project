@@ -24,6 +24,9 @@
 .voter-login__intro { margin: 0 0 34px; color: #61738c; font-size: 14px; line-height: 1.8; max-width: 360px; }
 .voter-login__panel form { display: grid; gap: 22px; }
 .voter-login__field { display: grid; gap: 9px; min-width: 0; }
+.voter-login__qr-context { padding: 14px 16px; border: 1px solid #d5dfed; border-radius: 10px; background: #eef4ff; overflow-wrap: anywhere; }
+.voter-login__qr-context p { margin: 0; color: #223f65; font-size: 13px; line-height: 1.7; }
+.voter-login__qr-context button { margin-top: 8px; min-height: 44px; padding: 0; color: #164dc4; border: 0; background: transparent; text-decoration: underline; font-size: 12px; cursor: pointer; }
 .voter-login__field label { font-size: 12px; color: #2f486b; font-weight: 750; }
 .voter-login__field input { width: 100%; min-height: 54px; padding: 14px 16px; border: 0; border-radius: 12px; box-shadow: inset 0 0 0 1px #d5dfed; background: #fff; color: #223f65; font-size: 14px; transition: box-shadow 180ms cubic-bezier(.2,.8,.2,1); }
 .voter-login__field input::placeholder { color: #536b86; opacity: 1; }
