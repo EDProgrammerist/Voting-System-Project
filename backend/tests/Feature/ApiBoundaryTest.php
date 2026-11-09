@@ -18,7 +18,7 @@ class ApiBoundaryTest extends TestCase
 
     public function test_api_authentication_failure_is_json_without_accept_header(): void
     {
-        $this->get('/api/admin/students')
+        $this->get('/api/committee/students')
             ->assertUnauthorized()
             ->assertHeader('content-type', 'application/json')
             ->assertJson([

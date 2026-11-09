@@ -11,6 +11,7 @@ import type { BallotCandidate, BallotPosition, VoterBallotResponse, VoterSelecti
 import "./voter-ballot-screen.css";
 import { BallotSteps, CandidateAvatar, StudentLayout } from "@/components/features/voter-shared/student-layout";
 import { CandidateComparison } from "@/components/features/voter-shared/candidate-comparison";
+import { BallotReference } from "@/components/features/voter-shared/ballot-reference";
 
 type SelectionMap = Record<number, string[]>;
 
@@ -111,6 +112,7 @@ export function VoterBallotScreen() {
   return (
     <StudentLayout title="Voting Ballot" description="Choose your representatives with confidence. Compare their profiles, make your selections, then review your ballot.">
       <BallotSteps />
+      <BallotReference reference={loadedBallot.ballot_reference} />
       {!loadedBallot.can_submit_vote && <div className="student-notice" role="status"><Clock aria-hidden="true" weight="light" /><div><strong>Take a look around</strong><p>You can browse the ballot and candidate profiles now. Vote submission becomes available when the election opens and candidates are ready.</p></div></div>}
       <div className="ballot-layout">
         <div className="ballot-offices">{loadedBallot.positions.map((position) => <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} />)}</div>

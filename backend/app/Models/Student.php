@@ -23,6 +23,8 @@ class Student extends Authenticatable
         'full_name',
         'course',
         'academic_status',
+        'year_level',
+        'section',
         'password',
         'password_change_required',
     ];
@@ -42,6 +44,11 @@ class Student extends Authenticatable
         });
     }
 
+    public static function createDataRecord(array $record): self
+    {
+        return static::withoutEvents(fn () => static::create([...$record, 'password' => null, 'password_change_required' => false]));
+    }
+
     public function candidateProfile(): HasOne
     {
         return $this->hasOne(
@@ -58,5 +65,10 @@ class Student extends Authenticatable
             'student_id',
             'student_id',
         );
+    }
+
+    public function ballotIds(): HasMany
+    {
+        return $this->hasMany(VoterBallotId::class, 'student_id', 'student_id');
     }
 }

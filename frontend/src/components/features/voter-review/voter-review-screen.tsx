@@ -11,6 +11,7 @@ import { getVoterBallot, submitVoterVote } from "@/services/voter-auth-service";
 import type { BallotPosition, VoterBallotResponse, VoterSelection, SignaturePoint } from "@/types/voter";
 import { CandidateProfile } from "@/components/features/voter-shared/candidate-profile";
 import { VoteVerification } from "@/components/features/voter-shared/vote-verification";
+import { BallotReference } from "@/components/features/voter-shared/ballot-reference";
 import { BallotSteps, StudentLayout } from "@/components/features/voter-shared/student-layout";
 import { ArrowLeft, ArrowRight, CheckCircle, LockSimple } from "@phosphor-icons/react";
 
@@ -96,6 +97,7 @@ export function VoterReviewScreen() {
 
     try {
       const response = await submitVoterVote(token, {
+        ballot_reference_id: ballot.ballot_reference?.id,
         election_id: ballot.election.id,
         selections,
         signature,
@@ -128,6 +130,7 @@ export function VoterReviewScreen() {
   return (
     <StudentLayout title="Review your vote" description="Take a final look at your choices. You cannot change your vote after confirming.">
       <BallotSteps review />
+      <BallotReference reference={ballot?.ballot_reference} />
       <div className="review-layout">
         <div><div className="voter-review__positions">{reviewedPositions.map((position) => <ReviewPosition key={position.id} position={position} />)}</div>
           <VoteVerification signature={signature} onSignature={setSignature} thumbmark={thumbmark} onThumbmark={setThumbmark} disabled={submitting} />

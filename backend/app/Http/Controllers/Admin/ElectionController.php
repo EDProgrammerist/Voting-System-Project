@@ -11,6 +11,14 @@ use Illuminate\Validation\ValidationException;
 
 class ElectionController extends Controller
 {
+    public function qr(Election $election): JsonResponse
+    {
+        return response()->json([
+            'election' => ['id' => $election->id, 'name' => $election->name, 'status' => $election->status],
+            'entry_path' => '/vote/'.$election->qr_entry_code,
+        ])->header('Cache-Control', 'no-store');
+    }
+
     public function index(): JsonResponse
     {
         return response()->json([

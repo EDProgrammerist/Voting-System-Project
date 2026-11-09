@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   CheckSquareOffset,
   Gauge,
+  GearSix,
   List,
   SignOut,
   UserList,
@@ -16,15 +17,23 @@ import {
   getAdminUser,
 } from "@/lib/admin-session";
 import { logoutAdmin } from "@/services/admin-dashboard-service";
+import {
+  clearCommitteeSession,
+  getCommitteeToken,
+  getCommitteeUser,
+} from "@/lib/committee-session";
+import { logoutCommittee } from "@/services/committee-service";
 
-type AdminSection = "dashboard" | "votes" | "voters" | "candidates";
+type AdminSection =
+  "dashboard" | "votes" | "voters" | "candidates" | "settings";
 
 interface AdminSidebarProps {
   active: AdminSection;
   overview?: boolean;
+  portal?: "admin" | "committee";
 }
 
-const navigationGroups = [
+const adminNavigationGroups = [
   {
     label: "Reports",
     items: [
@@ -45,13 +54,32 @@ const navigationGroups = [
   {
     label: "Manage",
     items: [
-      { id: "voters", label: "Voters", icon: Users, path: "/admin/voters" },
       {
         id: "candidates",
         label: "Candidates",
         icon: UserList,
         path: "/admin/candidates",
       },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      {
+        id: "settings",
+        label: "Settings",
+        icon: GearSix,
+        path: "/admin/settings",
+      },
+    ],
+  },
+];
+
+const committeeNavigationGroups = [
+  {
+    label: "Committee",
+    items: [
+      { id: "voters", label: "Voters", icon: Users, path: "/committee/voters" },
     ],
   },
 ];
@@ -64,12 +92,23 @@ function initials(name: string): string {
     .join("");
 }
 
-export function AdminSidebar({ active, overview = false }: AdminSidebarProps) {
+export function AdminSidebar({
+  active,
+  overview = false,
+  portal = "admin",
+}: AdminSidebarProps) {
+  const committee = portal === "committee";
+  const navigationGroups = committee
+    ? committeeNavigationGroups
+    : adminNavigationGroups;
+  const navigationLabel = committee
+    ? "Committee navigation"
+    : "Admin navigation";
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const admin = getAdminUser();
+  const admin = committee ? getCommitteeUser() : getAdminUser();
 
   useEffect(() => {
     if (!overview || !menuOpen) return;
@@ -117,6 +156,13 @@ export function AdminSidebar({ active, overview = false }: AdminSidebarProps) {
   }, [overview, menuOpen]);
 
   async function handleLogout() {
+    if (committee) {
+      const token = getCommitteeToken();
+      if (token) await logoutCommittee(token).catch(() => undefined);
+      clearCommitteeSession();
+      navigate("/committee/login", { replace: true });
+      return;
+    }
     const token = getAdminToken();
     if (token) await logoutAdmin(token).catch(() => undefined);
     clearAdminSession();
@@ -148,7 +194,7 @@ export function AdminSidebar({ active, overview = false }: AdminSidebarProps) {
         ref={sidebarRef}
         role={overview && menuOpen ? "dialog" : undefined}
         aria-modal={overview && menuOpen ? true : undefined}
-        aria-label={overview && menuOpen ? "Admin navigation" : undefined}
+        aria-label={overview && menuOpen ? navigationLabel : undefined}
         className="admin-dashboard__sidebar"
         data-open={menuOpen}
         id="admin-navigation"
@@ -168,7 +214,7 @@ export function AdminSidebar({ active, overview = false }: AdminSidebarProps) {
           <strong>Vote</strong>
         </div>
         <nav
-          aria-label="Admin navigation"
+          aria-label={navigationLabel}
           className="admin-dashboard__navigation"
         >
           {navigationGroups.map((group) => (
@@ -202,7 +248,9 @@ export function AdminSidebar({ active, overview = false }: AdminSidebarProps) {
             <span>{admin ? initials(admin.name) : "AD"}</span>
             <p>
               <strong>{admin?.name ?? "CPC Admin"}</strong>
-              <small>Administrator</small>
+              <small>
+                {committee ? "Election committee" : "Administrator"}
+              </small>
             </p>
           </div>
           <button aria-label="Log out" onClick={handleLogout} type="button">

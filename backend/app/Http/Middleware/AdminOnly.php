@@ -13,7 +13,7 @@ class AdminOnly
     {
         $user = $request->user();
 
-        if (! $user instanceof User || ! $user->tokenCan('admin')) {
+        if (! $user instanceof User || $user->role !== 'admin' || ! $user->tokenCan('admin')) {
             return response()->json([
                 'message' => 'Administrator access required.',
             ], 403);

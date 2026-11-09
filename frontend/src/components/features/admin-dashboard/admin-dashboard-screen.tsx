@@ -167,7 +167,6 @@ export function AdminDashboardScreen() {
                   label: "Eligible voters",
                   value: dashboard.turnout.eligible_students,
                   detail: "Enrolled students",
-                  href: "/admin/voters",
                 },
                 {
                   label: "Ballots cast",
@@ -179,7 +178,6 @@ export function AdminDashboardScreen() {
                   label: "Not yet voted",
                   value: dashboard.turnout.not_yet_voted,
                   detail: "Eligible voters remaining",
-                  href: "/admin/voters",
                 },
                 {
                   label: "Candidates",
@@ -187,20 +185,28 @@ export function AdminDashboardScreen() {
                   detail: "In this election",
                   href: "/admin/candidates",
                 },
-              ].map((metric) => (
-                <Link
-                  className="overview-metric"
-                  key={metric.label}
-                  to={metric.href}
-                >
-                  <span>
-                    {metric.label}
-                    <ArrowRight aria-hidden="true" />
-                  </span>
-                  <strong>{formatNumber(metric.value)}</strong>
-                  <small>{metric.detail}</small>
-                </Link>
-              ))}
+              ].map((metric) =>
+                metric.href ? (
+                  <Link
+                    className="overview-metric"
+                    key={metric.label}
+                    to={metric.href}
+                  >
+                    <span>
+                      {metric.label}
+                      <ArrowRight aria-hidden="true" />
+                    </span>
+                    <strong>{formatNumber(metric.value)}</strong>
+                    <small>{metric.detail}</small>
+                  </Link>
+                ) : (
+                  <article className="overview-metric" key={metric.label}>
+                    <span>{metric.label}</span>
+                    <strong>{formatNumber(metric.value)}</strong>
+                    <small>{metric.detail}</small>
+                  </article>
+                ),
+              )}
             </section>
 
             <div className="overview-analysis">
@@ -214,13 +220,6 @@ export function AdminDashboardScreen() {
                     <h2 id="course-heading">Participation by course</h2>
                     <p>Ballots cast out of eligible voters</p>
                   </div>
-                  <Link
-                    aria-label="View voters"
-                    className="overview-icon-link"
-                    to="/admin/voters"
-                  >
-                    <ArrowRight aria-hidden="true" />
-                  </Link>
                 </header>
                 {dashboard.turnout.by_course.length === 0 ? (
                   <p className="overview-empty">

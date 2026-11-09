@@ -4,14 +4,22 @@ RUN apk add --no-cache \
         git \
         icu-libs \
         libzip \
+        libpng \
+        libjpeg-turbo \
+        freetype \
         oniguruma \
         unzip \
     && apk add --no-cache --virtual .build-dependencies \
         $PHPIZE_DEPS \
         icu-dev \
         libzip-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
         oniguruma-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
+        gd \
         bcmath \
         intl \
         mbstring \

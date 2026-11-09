@@ -9,7 +9,9 @@ use App\Models\Candidacy;
 use App\Models\Election;
 use App\Models\Position;
 use App\Models\Vote;
+use App\Models\VoterBallotId;
 use App\Models\VoterParticipation;
+use App\Support\VoterElection;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +24,10 @@ class VoteController extends Controller
     {
         $student = $request->user();
         $data = $request->validated();
+
+        if (VoterElection::forStudent($student)?->id !== (int) $data['election_id']) {
+            return response()->json(['message' => 'This session belongs to a different election. Please scan its QR code and sign in again.'], 403);
+        }
 
         if ($student->academic_status !== 'enrolled') {
             return response()->json([
@@ -125,6 +131,10 @@ class VoteController extends Controller
                 $selections,
                 $data,
             ): void {
+                $reference = VoterBallotId::issue($student, $election);
+                if (isset($data['ballot_reference_id']) && $data['ballot_reference_id'] !== $reference->id) {
+                    throw ValidationException::withMessages(['ballot_reference_id' => 'This ballot ID does not belong to your account and election.']);
+                }
                 VoterParticipation::create([
                     'election_id' => $election->id,
                     'student_id' => $student->student_id,
@@ -168,11 +178,12 @@ class VoteController extends Controller
             throw $exception;
         }
 
-        $student->tokens()->where('name', 'voter-session')->update(['abilities' => json_encode(['tally-only'])]);
+        $student->tokens()->where('name', 'voter-session')->update(['abilities' => json_encode(['tally-only', 'election:'.$election->id])]);
 
         return response()->json([
             'message' => 'Your vote was submitted successfully.',
             'tally_only' => true,
+            'ballot_reference' => VoterBallotId::summary($student, $election),
         ], 201);
     }
 }

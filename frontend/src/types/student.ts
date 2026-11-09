@@ -6,8 +6,13 @@ interface StudentRecord {
 
 export interface VoterRecord extends StudentRecord {
   course: string | null;
+  year_level: string | null;
+  section: string | null;
   election_id: number | null;
   has_voted: boolean;
+  ballot_id: string | null;
+  attendance_recorded: boolean;
+  voted_at: string | null;
   voting_status: "voted" | "not_voted" | "ineligible" | string;
 }
 

@@ -2,6 +2,7 @@ import type {
   VoterElection,
   VoterIdentity,
   VoterSelection,
+  VoterQrEntry,
 } from "@/types/voter";
 
 const VOTER_TOKEN_KEY = "voter_access_token";
@@ -10,6 +11,41 @@ const VOTER_ELECTION_KEY = "voter_election";
 const VOTER_DRAFT_KEY = "voter_ballot_draft";
 const VOTER_TALLY_ONLY_KEY = "voter_tally_only";
 const VOTER_PASSWORD_REQUIRED_KEY = "voter_password_change_required";
+const VOTER_QR_ENTRY_KEY = "voter_qr_entry";
+
+export function getVoterQrEntry(): VoterQrEntry | null {
+  try {
+    const value: unknown = JSON.parse(
+      sessionStorage.getItem(VOTER_QR_ENTRY_KEY) ?? "null",
+    );
+    if (
+      value &&
+      typeof value === "object" &&
+      "code" in value &&
+      typeof value.code === "string" &&
+      "election" in value &&
+      value.election &&
+      typeof value.election === "object" &&
+      "id" in value.election &&
+      typeof value.election.id === "number" &&
+      "name" in value.election &&
+      typeof value.election.name === "string"
+    )
+      return value as VoterQrEntry;
+  } catch {
+    /* An invalid saved scan is discarded. */
+  }
+  sessionStorage.removeItem(VOTER_QR_ENTRY_KEY);
+  return null;
+}
+
+export function setVoterQrEntry(entry: VoterQrEntry): void {
+  sessionStorage.setItem(VOTER_QR_ENTRY_KEY, JSON.stringify(entry));
+}
+
+export function clearVoterQrEntry(): void {
+  sessionStorage.removeItem(VOTER_QR_ENTRY_KEY);
+}
 
 export function isVoterPasswordRequired(): boolean {
   return sessionStorage.getItem(VOTER_PASSWORD_REQUIRED_KEY) === "true";
@@ -50,6 +86,7 @@ export function saveVoterSession(
 }
 
 export function clearVoterSession(): void {
+  clearVoterQrEntry();
   sessionStorage.removeItem(VOTER_PASSWORD_REQUIRED_KEY);
   sessionStorage.removeItem(VOTER_TALLY_ONLY_KEY);
   sessionStorage.removeItem(VOTER_TOKEN_KEY);

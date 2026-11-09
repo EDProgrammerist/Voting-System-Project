@@ -6,17 +6,26 @@ import { useDocumentTitle } from "@/hooks/use-document-title";
 import { saveAdminSession } from "@/lib/admin-session";
 import { ApiError } from "@/services/api-client";
 import { loginAdmin } from "@/services/admin-auth-service";
+import { loginCommittee } from "@/services/committee-service";
+import { saveCommitteeSession } from "@/lib/committee-session";
 import "./admin-login-screen.css";
 import "@/components/features/shared/login-transition.css";
 
 type SubmissionStatus = "idle" | "submitting" | "success" | "error";
 
-export function AdminLoginScreen() {
+export function AdminLoginScreen({
+  portal = "admin",
+}: {
+  portal?: "admin" | "committee";
+}) {
+  const committee = portal === "committee";
   const navigate = useNavigate();
   const [status, setStatus] = useState<SubmissionStatus>("idle");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  useDocumentTitle("Admin Login | CPC Vote");
+  useDocumentTitle(
+    committee ? "Committee Login | CPC Vote" : "Admin Login | CPC Vote",
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,6 +37,13 @@ export function AdminLoginScreen() {
     const password = String(formData.get("password") ?? "");
 
     try {
+      if (committee) {
+        const response = await loginCommittee({ email, password });
+        saveCommitteeSession(response.token, response.committee);
+        setStatus("success");
+        navigate("/committee/voters", { replace: true });
+        return;
+      }
       const response = await loginAdmin({ email, password });
       saveAdminSession(response.token, response.admin);
       setStatus("success");
@@ -73,10 +89,16 @@ export function AdminLoginScreen() {
           >
             <header>
               <span className="admin-login__section-label">
-                Administrator access
+                {committee
+                  ? "Election committee access"
+                  : "Administrator access"}
               </span>
               <h1 id="admin-login-title">Welcome back</h1>
-              <p>Sign in with your administrator account.</p>
+              <p>
+                {committee
+                  ? "Sign in with your assigned committee account."
+                  : "Sign in with your administrator account."}
+              </p>
             </header>
             <form
               className="admin-login__form"
@@ -91,7 +113,11 @@ export function AdminLoginScreen() {
                   id="admin-email"
                   inputMode="email"
                   name="email"
-                  placeholder="Your administrator email"
+                  placeholder={
+                    committee
+                      ? "Your committee email"
+                      : "Your administrator email"
+                  }
                   required
                   type="email"
                   aria-describedby={
@@ -151,8 +177,18 @@ export function AdminLoginScreen() {
               </button>
             </form>
             <p className="admin-login__help">
-              For election administrators. Students can use{" "}
-              <Link to="/voter/login">Voter Login</Link>.
+              {committee ? (
+                <>
+                  Manage class-list records and voting attendance.{" "}
+                  <Link to="/admin/login">Admin Login</Link>.
+                </>
+              ) : (
+                <>
+                  For election administrators.{" "}
+                  <Link to="/committee/login">Committee Login</Link> ·{" "}
+                  <Link to="/voter/login">Voter Login</Link>.
+                </>
+              )}
             </p>
           </section>
         </div>

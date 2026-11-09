@@ -4,15 +4,17 @@ namespace App\Http\Controllers\Voter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Election;
+use App\Models\VoterBallotId;
 use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class BallotController extends Controller
 {
-    public function show(): JsonResponse
+    public function show(Request $request): JsonResponse
     {
-        $election = VoterElection::current();
+        $election = VoterElection::forStudent($request->user());
         $election?->load([
             'positions' => function ($query) {
                 $query->orderBy('display_order')
@@ -57,7 +59,10 @@ class BallotController extends Controller
             })
             ->values();
 
+        VoterBallotId::issue($request->user(), $election);
+
         return response()->json([
+            'ballot_reference' => VoterBallotId::summary($request->user(), $election),
             'can_submit_vote' => Election::currentlyActive()->whereKey($election->id)->exists()
                 && $election->positions->isNotEmpty()
                 && $election->positions->every(fn ($position) => $position->candidacies->isNotEmpty()),
@@ -67,6 +72,6 @@ class BallotController extends Controller
                 'ends_at' => $election->ends_at,
             ],
             'positions' => $positions,
-        ]);
+        ])->header('Cache-Control', 'no-store');
     }
 }

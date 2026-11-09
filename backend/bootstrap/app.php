@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminOnly;
+use App\Http\Middleware\CommitteeOnly;
 use App\Http\Middleware\VoterOnly;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.only' => AdminOnly::class,
             'voter.only' => VoterOnly::class,
+            'committee.only' => CommitteeOnly::class,
         ]);
 
         $middleware->redirectGuestsTo(

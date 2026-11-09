@@ -32,7 +32,7 @@ class VoterOnly
             return response()->json(['message' => 'Please sign in again.'], 401);
         }
 
-        $election = VoterElection::current();
+        $election = VoterElection::forStudent($user);
         if ($election && VoterElection::tallyOnly($user, $election) && ! $request->is('api/voter/tally', 'api/voter/logout', 'api/voter/password', 'api/voter/session')) {
             return response()->json(['message' => 'Your access is restricted to Live Tally.', 'tally_only' => true], 403);
         }

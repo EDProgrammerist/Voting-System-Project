@@ -21,4 +21,17 @@ class VoterElection
             || ($election->status !== 'draft' && ! Election::currentlyActive()->whereKey($election->id)->exists())
             || VoterParticipation::where('election_id', $election->id)->where('student_id', $student->student_id)->exists();
     }
+
+    public static function forStudent(Student $student): ?Election
+    {
+        $abilities = $student->currentAccessToken()?->abilities ?? [];
+        foreach ($abilities as $ability) {
+            if (str_starts_with($ability, 'election:')) {
+                return Election::find((int) substr($ability, 9));
+            }
+        }
+
+        // Existing sessions issued before QR support retain their original behavior.
+        return static::current();
+    }
 }
