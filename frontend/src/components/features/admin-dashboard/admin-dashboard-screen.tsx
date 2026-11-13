@@ -1,8 +1,8 @@
+import { PageSkeleton } from "@/components/common/page-skeleton";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
   CheckSquareOffset,
-  Clock,
   Info,
   Users,
   WarningCircle,
@@ -10,7 +10,6 @@ import {
 import { Link } from "react-router";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import type { CandidateResult, DashboardData } from "@/types/dashboard";
@@ -44,16 +43,12 @@ export function AdminDashboardScreen() {
   const countdown = useCountdown(dashboard.election.starts_at);
   useDocumentTitle("Admin Dashboard | CPC Vote");
 
+  if (dataState === "loading") return <section className="admin-dashboard__content"><PageSkeleton kind="dashboard" label="Loading election overview" /></section>;
+
   return (
-    <main className="admin-dashboard admin-overview" data-ui>
-      <a className="overview-skip" href="#election-overview">
-        Skip to election overview
-      </a>
-      <AdminSidebar active="dashboard" overview />
+    <>
       <section
         className="admin-dashboard__content"
-        id="election-overview"
-        tabIndex={-1}
       >
         <header className="overview-heading">
           <div>
@@ -70,42 +65,19 @@ export function AdminDashboardScreen() {
               ? dataNotice
                 ? "Updates interrupted"
                 : "Auto-updates every 2s"
-              : dataState === "loading"
-                ? "Connecting…"
-                : "Connection unavailable"}
+              : "Connection unavailable"}
           </span>
         </header>
 
         {dataState !== "live" ? (
           <section
             className="overview-state overview-panel"
-            aria-busy={dataState === "loading"}
             aria-live="polite"
             role="status"
           >
-            {dataState === "loading" ? (
-              <Clock aria-hidden="true" />
-            ) : (
-              <WarningCircle aria-hidden="true" />
-            )}
-            <h2>
-              {dataState === "loading"
-                ? "Loading election data…"
-                : "Election data unavailable"}
-            </h2>
-            <p>
-              {dataState === "loading"
-                ? "Fetching election status, participation and results."
-                : dataNotice || "Please refresh the page and try again."}
-            </p>
-            {dataState === "loading" && (
-              <div className="overview-skeleton" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
-            )}
+            <WarningCircle aria-hidden="true" />
+            <h2>Election data unavailable</h2>
+            <p>{dataNotice || "Please refresh the page and try again."}</p>
           </section>
         ) : (
           <>
@@ -338,7 +310,7 @@ export function AdminDashboardScreen() {
           </>
         )}
       </section>
-    </main>
+    </>
   );
 }
 
@@ -436,12 +408,12 @@ function CandidateRow({
   voters: number;
 }) {
   const rate = voters > 0 ? Math.min((candidate.votes / voters) * 100, 100) : 0;
-  const team =
+  const team = candidate.partylist?.name ?? (
     candidate.team === "TEAM_A"
       ? "Team A"
       : candidate.team === "TEAM_B"
         ? "Team B"
-        : candidate.team;
+        : candidate.team);
   return (
     <tr>
       <th scope="row">

@@ -22,7 +22,11 @@ class ClassListReader
     public const MAX_ROWS = 5000;
 
     private const ALIASES = [
-        'studentid' => 'student_id', 'studentno' => 'student_id', 'studentnumber' => 'student_id', 'idno' => 'student_id',
+        'studentid' => 'student_id', 'studentidnumber' => 'student_id', 'studentno' => 'student_id', 'studentnumber' => 'student_id', 'idno' => 'student_id', 'idnumber' => 'student_id',
+        'lastname' => 'last_name', 'surname' => 'last_name', 'familyname' => 'last_name',
+        'firstname' => 'first_name', 'givenname' => 'first_name',
+        'mi' => 'middle_initial', 'middleinitial' => 'middle_initial', 'middlename' => 'middle_initial',
+        'no' => '_sequence', 'number' => '_sequence',
         'fullname' => 'full_name', 'name' => 'full_name', 'studentname' => 'full_name',
         'course' => 'course', 'program' => 'course', 'yearlevel' => 'year_level', 'year' => 'year_level',
         'section' => 'section', 'classsection' => 'section', 'academicstatus' => 'academic_status', 'enrollmentstatus' => 'academic_status', 'status' => 'academic_status',
@@ -43,6 +47,44 @@ class ClassListReader
         return array_map(fn ($sheet) => ['name' => $sheet['worksheetName'], 'rows' => $sheet['totalRows'], 'columns' => $sheet['totalColumns']], $sheets);
     }
 
+    public function detectLayout(UploadedFile $file, ?string $worksheet = null): array
+    {
+        $sheets = $this->inspect($file);
+        if ($worksheet !== null && ! collect($sheets)->contains('name', $worksheet)) {
+            $this->fail('Choose a worksheet from the uploaded file.');
+        }
+        $reader = $this->reader($file);
+        $reader->setLoadSheetsOnly($worksheet !== null ? [$worksheet] : array_column($sheets, 'name'));
+        $reader->setReadFilter($this->filter(1, 20, range('A', 'Z')));
+        try {
+            $book = $reader->load($file->getRealPath());
+        } catch (\Throwable) {
+            $this->fail('Unable to detect the class list. Check that the workbook is valid and unencrypted.');
+        }
+        $matches = [];
+        foreach ($book->getWorksheetIterator() as $sheet) {
+            for ($row = 1; $row <= 20; $row++) {
+                $fields = [];
+                for ($column = 1; $column <= 26; $column++) {
+                    $cell = $sheet->getCell([$column, $row]);
+                    if ($cell->getDataType() !== DataType::TYPE_FORMULA) {
+                        $label = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string) $cell->getValue()));
+                        $fields[] = self::ALIASES[$label] ?? null;
+                    }
+                }
+                if (in_array('student_id', $fields, true) && (in_array('full_name', $fields, true) || (in_array('first_name', $fields, true) && in_array('last_name', $fields, true)))) {
+                    $matches[] = ['worksheet' => $sheet->getTitle(), 'header_row' => $row];
+                }
+            }
+        }
+        $book->disconnectWorksheets();
+        if (count($matches) !== 1) {
+            $this->fail($matches ? 'More than one class list was found. Choose a worksheet containing one class list.' : 'Could not find the class-list headers in the first 20 rows. Include Student ID Number and either Full Name or Lastname and Firstname.');
+        }
+
+        return $matches[0];
+    }
+
     public function preview(UploadedFile $file, string $worksheet, int $headerRow): array
     {
         $sheets = $this->inspect($file);
@@ -51,7 +93,7 @@ class ClassListReader
             $this->fail('Choose a worksheet from the uploaded file.');
         }
         if ($info['columns'] > 26) {
-            $this->fail('This worksheet has more than 26 used columns. Use the class-list template or remove unrelated columns.');
+            $this->fail('This worksheet has more than 26 used columns. Remove unrelated columns and upload it again.');
         }
         if ($info['rows'] > $headerRow + self::MAX_ROWS) {
             $this->fail('A worksheet can contain at most 5,000 data rows. Remove unused trailing rows or split the file.');
@@ -79,18 +121,20 @@ class ClassListReader
             $label = trim((string) $raw);
             $field = self::ALIASES[strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $label))] ?? null;
             if (! $field) {
-                $this->fail('Unsupported column "'.$label.'". Use the downloaded template; login and password columns are not accepted.');
+                $this->fail('Unsupported column "'.$label.'". Include class-list fields only; login and password columns are not accepted.');
             }
             if (in_array($field, $mapping, true)) {
                 $this->fail('Duplicate column "'.$label.'". Each field must appear only once.');
             }
             $mapping[Coordinate::stringFromColumnIndex($col)] = $field;
         }
-        foreach (['student_id', 'full_name'] as $required) {
-            if (! in_array($required, $mapping, true)) {
-                $this->fail('The header row must contain Student ID and Full Name. Check the selected header row or use the template.');
-            }
+        if (! in_array('student_id', $mapping, true) || (! in_array('full_name', $mapping, true) && (! in_array('first_name', $mapping, true) || ! in_array('last_name', $mapping, true)))) {
+            $this->fail('Include Student ID Number and either Full Name or both Lastname and Firstname.');
         }
+        if (in_array('full_name', $mapping, true) && (in_array('first_name', $mapping, true) || in_array('last_name', $mapping, true))) {
+            $this->fail('Use either Full Name or separate Lastname and Firstname columns, so names are unambiguous.');
+        }
+        $mapping = array_filter($mapping, fn ($field) => $field !== '_sequence');
         $book->disconnectWorksheets();
         $reader->setReadFilter($this->filter($headerRow + 1, $headerRow + self::MAX_ROWS, array_keys($mapping)));
         try {
@@ -131,7 +175,19 @@ class ClassListReader
             if (! $rowIssues && collect($values)->every(fn ($value) => $value === '')) {
                 continue;
             }
-            foreach ($values as $field => $value) {
+            if (in_array('last_name', $mapping, true)) {
+                foreach (['last_name', 'first_name'] as $part) {
+                    if (($values[$part] ?? '') === '') {
+                        $rowIssues[] = ['row' => $number, 'field' => 'full_name', 'message' => 'Both Lastname and Firstname are required.'];
+                    }
+                }
+                $middle = Str::squish($values['middle_initial'] ?? '');
+                if (preg_match('/^\pL$/u', $middle)) {
+                    $middle .= '.';
+                }
+                $values['full_name'] = trim(($values['last_name'] ?? '').', '.($values['first_name'] ?? '').($middle !== '' ? ' '.$middle : ''));
+            }
+            foreach (array_intersect_key($values, $record) as $field => $value) {
                 if ($value !== '') {
                     $record[$field] = $value;
                 }

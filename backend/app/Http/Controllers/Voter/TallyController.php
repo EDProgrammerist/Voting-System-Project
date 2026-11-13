@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Voter;
 
 use App\Http\Controllers\Controller;
+use App\Models\Partylist;
 use App\Models\Vote;
 use App\Models\VoterBallotId;
 use App\Support\VoterElection;
@@ -21,12 +22,14 @@ class TallyController extends Controller
         $counts = Vote::where('election_id', $election->id)
             ->selectRaw('candidate_student_id, COUNT(*) AS total')
             ->groupBy('candidate_student_id')->pluck('total', 'candidate_student_id');
+        $partylists = Partylist::where('election_id', $election->id)->get()->keyBy('team');
         $positions = $election->positions()->with('candidacies.profile')->get()->map(fn ($position) => [
             'id' => $position->id, 'name' => $position->name,
             'candidates' => $position->candidacies->map(fn ($candidate) => [
                 'student_id' => $candidate->student_id,
                 'full_name' => $candidate->profile->full_name,
                 'team' => $candidate->team,
+                'partylist' => $partylists->get($candidate->team)?->responseData(),
                 'votes' => (int) ($counts[$candidate->student_id] ?? 0),
             ])->sortByDesc('votes')->values(),
         ]);

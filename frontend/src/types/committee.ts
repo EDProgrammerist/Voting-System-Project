@@ -19,6 +19,7 @@ export interface ClassListRow {
   status: "new" | "existing" | "invalid";
 }
 export interface ClassListPreview {
+  layout: { worksheet: string; header_row: number };
   rows: ClassListRow[];
   issues: { row: number; field: string; message: string }[];
   warnings: { row: number; message: string }[];

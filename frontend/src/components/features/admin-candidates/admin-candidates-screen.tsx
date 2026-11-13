@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { MagnifyingGlass, Plus, User, X } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 
-import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import {
   AdminDataState,
   AdminElectionPicker,
@@ -20,6 +19,9 @@ import {
 import { ApiError } from "@/services/api-client";
 import type { CandidateRecord } from "@/types/candidate";
 import type { PositionRecord } from "@/types/position";
+import type { PartylistRecord } from "@/types/partylist";
+import { listAdminPartylists } from "@/services/admin-partylist-service";
+import { partyLabel } from "@/components/features/voter-shared/candidate-utils";
 
 import "../admin-dashboard/admin-dashboard-screen.css";
 import "../admin-dashboard/admin-overview.css";
@@ -38,6 +40,7 @@ export function AdminCandidatesScreen() {
   } = useAdminElectionDashboard("draft");
   const [candidates, setCandidates] = useState<CandidateRecord[]>([]);
   const [positions, setPositions] = useState<PositionRecord[]>([]);
+  const [partylists, setPartylists] = useState<PartylistRecord[]>([]);
   const [query, setQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
   const [selectedCandidate, setSelectedCandidate] =
@@ -61,11 +64,13 @@ export function AdminCandidatesScreen() {
     Promise.all([
       listAdminCandidates(token, dashboard.election.id),
       listAdminPositions(token, dashboard.election.id),
+      listAdminPartylists(token, dashboard.election.id),
     ])
-      .then(([candidateResponse, positionResponse]) => {
+      .then(([candidateResponse, positionResponse, partylistResponse]) => {
         if (!active) return;
         setCandidates(candidateResponse.data);
         setPositions(positionResponse.data);
+        setPartylists(partylistResponse.data);
         setRecordsState("ready");
       })
       .catch((error: unknown) => {
@@ -123,7 +128,7 @@ export function AdminCandidatesScreen() {
           candidate.full_name,
           candidate.student_id,
           candidate.team,
-          candidate.motto ?? "",
+          candidate.partylist?.name ?? "",
         ].some((value) => value.toLowerCase().includes(normalized));
       return matchesPosition && matchesQuery;
     });
@@ -275,20 +280,18 @@ export function AdminCandidatesScreen() {
     }
   }
 
-  if (dataState !== "live") {
+  if (dataState !== "live" || recordsState === "loading") {
     return (
-      <main className="admin-dashboard admin-overview admin-management admin-candidates">
-        <AdminSidebar active="candidates" overview />
+      <>
         <section className="admin-dashboard__content admin-candidates__content">
-          <AdminDataState message={dataNotice} state={dataState} />
+          <AdminDataState message={dataNotice} state={dataState === "live" ? "loading" : dataState} kind="candidates" />
         </section>
-      </main>
+      </>
     );
   }
 
   return (
-    <main className="admin-dashboard admin-overview admin-management admin-candidates">
-      <AdminSidebar active="candidates" overview />
+    <>
 
       <section className="admin-dashboard__content admin-candidates__content">
         <header className="admin-candidates__header">
@@ -308,6 +311,7 @@ export function AdminCandidatesScreen() {
             }}
             selectedElectionId={selectedElectionId}
           />
+          <button type="button" className="admin-candidates__activate" onClick={() => navigate("/admin/partylists")}>Partylists</button>
           <button
             className="admin-candidates__activate"
             disabled={!canActivate || activating}
@@ -394,15 +398,8 @@ export function AdminCandidatesScreen() {
                   </p>
                   <h2>{candidate.full_name}</h2>
                   <p>
-                    {candidate.team === "TEAM_A"
-                      ? "Partylist A"
-                      : candidate.team === "TEAM_B"
-                        ? "Partylist B"
-                        : candidate.team}
+                    {partyLabel(candidate.team, candidate.partylist?.name)}
                   </p>
-                  <small>
-                    {candidate.motto ?? "Platform details to follow."}
-                  </small>
                 </div>
                 <div className="candidate-card__actions">
                   <button
@@ -427,18 +424,14 @@ export function AdminCandidatesScreen() {
             <div className="candidate-grid__empty" role="status">
               <User aria-hidden="true" />
               <h2>
-                {recordsState === "loading"
-                  ? "Loading candidates…"
-                  : recordsState === "error"
+                {recordsState === "error"
                     ? "Candidate records unavailable"
                     : candidates.length === 0
                       ? "No candidates added yet"
                       : "No matching candidates"}
               </h2>
               <p>
-                {recordsState === "loading"
-                  ? "Fetching candidates and available positions."
-                  : recordsState === "error"
+                {recordsState === "error"
                     ? notice
                     : candidates.length === 0
                       ? canEdit
@@ -466,6 +459,7 @@ export function AdminCandidatesScreen() {
           aria-labelledby="candidate-modal-title"
           className="candidate-modal"
           onCancel={(event) => {
+            if (event.target !== event.currentTarget) return;
             event.preventDefault();
             closeModal();
           }}
@@ -494,7 +488,7 @@ export function AdminCandidatesScreen() {
             {selectedCandidate ? "Edit Candidate" : "Add Candidate"}
           </h2>
           <p className="candidate-modal__intro">
-            Enter the candidate’s position, platform, photo, and achievements.
+            Enter the position, partylist, photo, and achievements. Set the shared platform in Partylists.
           </p>
           <form onSubmit={handleSave}>
             <label>
@@ -544,19 +538,9 @@ export function AdminCandidatesScreen() {
                 <option disabled value="">
                   Select a partylist
                 </option>
-                <option value="TEAM_A">Partylist A</option>
-                <option value="TEAM_B">Partylist B</option>
+                <option value="TEAM_A">{partyLabel("TEAM_A", partylists.find(party => party.team === "TEAM_A")?.name)}</option>
+                <option value="TEAM_B">{partyLabel("TEAM_B", partylists.find(party => party.team === "TEAM_B")?.name)}</option>
               </select>
-            </label>
-            <label>
-              Platform
-              <textarea
-                defaultValue={selectedCandidate?.motto ?? ""}
-                maxLength={255}
-                name="motto"
-                placeholder="Candidate platform or motto"
-                rows={3}
-              />
             </label>
             <label>
               Profile photo
@@ -593,7 +577,7 @@ export function AdminCandidatesScreen() {
           </form>
         </dialog>
       )}
-    </main>
+    </>
   );
 }
 

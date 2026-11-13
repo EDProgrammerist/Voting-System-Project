@@ -1,4 +1,5 @@
 export interface CandidateRecord {
+  partylist?: import("./partylist").PartylistRecord | null;
   profile: string | null;
   achievements: string | null;
   student_id: string;

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { ChartBar, Printer, User } from "@phosphor-icons/react";
 import { Link } from "react-router";
 
-import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { AdminDataState } from "@/components/features/admin-dashboard/admin-data-state";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -46,18 +45,16 @@ export function AdminVotesScreen() {
 
   if (dataState !== "live") {
     return (
-      <main className="admin-dashboard admin-overview admin-management admin-votes">
-        <AdminSidebar active="votes" overview />
+      <>
         <section className="admin-dashboard__content admin-votes__content">
           <AdminDataState message={dataNotice} state={dataState} />
         </section>
-      </main>
+      </>
     );
   }
 
   return (
-    <main className="admin-dashboard admin-overview admin-management admin-votes">
-      <AdminSidebar active="votes" overview />
+    <>
 
       <section className="admin-dashboard__content admin-votes__content">
         <header className="admin-votes__header">
@@ -80,11 +77,11 @@ export function AdminVotesScreen() {
           aria-label="Live team totals"
         >
           <article data-team="TEAM_A">
-            <span>Team A selections</span>
+            <span>{dashboard.partylist_names?.TEAM_A ?? "Partylist A"} selections</span>
             <strong>{dashboard.team_totals.TEAM_A.toLocaleString()}</strong>
           </article>
           <article data-team="TEAM_B">
-            <span>Team B selections</span>
+            <span>{dashboard.partylist_names?.TEAM_B ?? "Partylist B"} selections</span>
             <strong>{dashboard.team_totals.TEAM_B.toLocaleString()}</strong>
           </article>
         </section>
@@ -137,7 +134,7 @@ export function AdminVotesScreen() {
           {dataNotice}
         </p>
       </section>
-    </main>
+    </>
   );
 }
 

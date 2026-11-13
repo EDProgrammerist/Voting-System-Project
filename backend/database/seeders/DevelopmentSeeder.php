@@ -25,7 +25,7 @@ class DevelopmentSeeder extends Seeder
 
         Election::updateOrCreate(
             [
-                'name' => 'SSG Election 2026 Presentation',
+                'name' => 'SSG Election 2026',
             ],
             [
                 'status' => 'draft',

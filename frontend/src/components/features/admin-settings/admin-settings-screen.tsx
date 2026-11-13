@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { QrCode } from "@phosphor-icons/react";
-import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getAdminToken } from "@/lib/admin-session";
 import { listAdminElections } from "@/services/admin-dashboard-service";
@@ -9,6 +8,7 @@ import { AdminElectionQr } from "./admin-election-qr";
 import "../admin-dashboard/admin-dashboard-screen.css";
 import "../admin-dashboard/admin-overview.css";
 import "./admin-settings-screen.css";
+import { PageSkeleton } from "@/components/common/page-skeleton";
 
 export function AdminSettingsScreen() {
   const [elections, setElections] = useState<ElectionSummary[]>([]);
@@ -50,9 +50,9 @@ export function AdminSettingsScreen() {
   }, [attempt]);
 
   const election = elections.find((item) => item.id === selectedId);
+  if (loading) return <section className="admin-dashboard__content"><PageSkeleton kind="settings" label="Loading election settings" /></section>;
   return (
-    <main className="admin-dashboard admin-overview admin-settings">
-      <AdminSidebar active="settings" overview />
+    <>
       <section className="admin-dashboard__content">
         <header className="admin-settings__heading">
           <h1>Settings</h1>
@@ -72,9 +72,7 @@ export function AdminSettingsScreen() {
               </p>
             </div>
           </header>
-          {loading ? (
-            <p role="status">Loading elections...</p>
-          ) : error ? (
+          {error ? (
             <div role="alert">
               <p>{error}</p>
               <button
@@ -124,6 +122,6 @@ export function AdminSettingsScreen() {
           )}
         </section>
       </section>
-    </main>
+    </>
   );
 }

@@ -16,6 +16,7 @@ import { BallotSteps, StudentLayout } from "@/components/features/voter-shared/s
 import { ArrowLeft, ArrowRight, CheckCircle, LockSimple } from "@phosphor-icons/react";
 
 import "./voter-review-screen.css";
+import { PageSkeleton } from "@/components/common/page-skeleton";
 
 function displayPosition(name: string): string {
   return name.toLowerCase() === "senator" ? "Senators" : name;
@@ -116,14 +117,14 @@ export function VoterReviewScreen() {
   }
 
   if (loading) {
-    return <main className="student-loading" aria-live="polite">Loading your review…</main>;
+    return <PageSkeleton kind="review" label="Loading your ballot review" />;
   }
 
   if (!ballot) {
     return (
-      <main className="student-loading" aria-live="polite">
+      <section className="student-empty" role="alert">
         {message || "Unable to load your ballot review."}
-      </main>
+      </section>
     );
   }
 

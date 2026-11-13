@@ -12,6 +12,12 @@ const VOTER_DRAFT_KEY = "voter_ballot_draft";
 const VOTER_TALLY_ONLY_KEY = "voter_tally_only";
 const VOTER_PASSWORD_REQUIRED_KEY = "voter_password_change_required";
 const VOTER_QR_ENTRY_KEY = "voter_qr_entry";
+const VOTER_ACCESS_EVENT = "voter-access-change";
+
+export function subscribeVoterAccess(listener: () => void): () => void {
+  window.addEventListener(VOTER_ACCESS_EVENT, listener);
+  return () => window.removeEventListener(VOTER_ACCESS_EVENT, listener);
+}
 
 export function getVoterQrEntry(): VoterQrEntry | null {
   try {
@@ -53,6 +59,7 @@ export function isVoterPasswordRequired(): boolean {
 
 export function setVoterPasswordRequired(value: boolean): void {
   sessionStorage.setItem(VOTER_PASSWORD_REQUIRED_KEY, String(value));
+  window.dispatchEvent(new Event(VOTER_ACCESS_EVENT));
 }
 
 export function syncVoterElection(election: VoterElection): void {
@@ -68,6 +75,7 @@ export function isVoterTallyOnly(): boolean {
 export function setVoterTallyOnly(value: boolean): void {
   sessionStorage.setItem(VOTER_TALLY_ONLY_KEY, String(value));
   if (value) sessionStorage.removeItem(VOTER_DRAFT_KEY);
+  window.dispatchEvent(new Event(VOTER_ACCESS_EVENT));
 }
 
 export function saveVoterSession(

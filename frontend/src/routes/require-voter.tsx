@@ -4,11 +4,13 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import {
   clearVoterSession,
   getVoterToken,
+  isVoterPasswordRequired,
   setVoterTallyOnly,
   setVoterPasswordRequired,
   syncVoterElection,
 } from "@/lib/voter-session";
 import { getVoterSession } from "@/services/voter-auth-service";
+import { AuthLoading, PageSkeleton } from "@/components/common/page-skeleton";
 
 export default function RequireVoter() {
   const token = getVoterToken();
@@ -52,14 +54,23 @@ export default function RequireVoter() {
   }, [key, token]);
   if (!token) return <Navigate to="/voter/login" replace />;
   if (access?.key !== key)
-    return (
-      <main className="student-page" role="status">
-        Verifying voter access…
-      </main>
+    return pathname === "/voter/password" || isVoterPasswordRequired() ? (
+      <AuthLoading />
+    ) : (
+      <PageSkeleton
+        kind={
+          pathname.endsWith("/review")
+            ? "review"
+            : pathname.endsWith("/tally")
+              ? "tally"
+              : "ballot"
+        }
+        label="Verifying voter access"
+      />
     );
   if (access.error)
     return (
-      <main className="student-page">
+      <section className="student-empty">
         <p role="alert">{access.error}</p>
         <button onClick={() => setAttempt((value) => value + 1)}>
           Try again
@@ -67,7 +78,7 @@ export default function RequireVoter() {
         <a href="/voter/login" onClick={clearVoterSession}>
           Return to login
         </a>
-      </main>
+      </section>
     );
   if (access.passwordRequired && pathname !== "/voter/password")
     return <Navigate to="/voter/password" replace />;

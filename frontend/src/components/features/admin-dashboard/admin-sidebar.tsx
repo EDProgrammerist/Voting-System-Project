@@ -25,7 +25,7 @@ import {
 import { logoutCommittee } from "@/services/committee-service";
 
 type AdminSection =
-  "dashboard" | "votes" | "voters" | "candidates" | "settings";
+  "dashboard" | "votes" | "voters" | "candidates" | "partylists" | "settings";
 
 interface AdminSidebarProps {
   active: AdminSection;
@@ -54,6 +54,7 @@ const adminNavigationGroups = [
   {
     label: "Manage",
     items: [
+      { id: "partylists", label: "Partylists", icon: Users, path: "/admin/partylists" },
       {
         id: "candidates",
         label: "Candidates",
@@ -115,7 +116,7 @@ export function AdminSidebar({
     const sidebar = sidebarRef.current;
     const content = sidebar
       ?.closest("main")
-      ?.querySelector<HTMLElement>(".admin-dashboard__content");
+      ?.querySelector<HTMLElement>(".portal-content");
     if (!sidebar || !content) return;
     const previousOverflow = document.body.style.overflow;
     const previousInert = content.inert;

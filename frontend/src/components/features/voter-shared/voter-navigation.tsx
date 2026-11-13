@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { ChartBar, CheckSquareOffset, SignOut } from "@phosphor-icons/react";
 import {
   clearVoterSession,
   getVoterToken,
   isVoterTallyOnly,
+  isVoterPasswordRequired,
+  subscribeVoterAccess,
 } from "@/lib/voter-session";
 import { logoutVoter } from "@/services/voter-auth-service";
 import "./voter-shared.css";
 
 export function VoterNavigation() {
+  const tallyOnly = useSyncExternalStore(
+    subscribeVoterAccess,
+    isVoterTallyOnly,
+  );
+  const passwordRequired = useSyncExternalStore(
+    subscribeVoterAccess,
+    isVoterPasswordRequired,
+  );
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -40,16 +50,18 @@ export function VoterNavigation() {
           </span>
         </span>
         <div className="voter-nav__links">
-          {!isVoterTallyOnly() && (
+          {!tallyOnly && !passwordRequired && (
             <NavLink to="/voter/ballot">
               <CheckSquareOffset aria-hidden="true" weight="light" />
               Voting Ballot
             </NavLink>
           )}
-          <NavLink to="/voter/tally">
-            <ChartBar aria-hidden="true" weight="light" />
-            Live Tally
-          </NavLink>
+          {!passwordRequired && (
+            <NavLink to="/voter/tally">
+              <ChartBar aria-hidden="true" weight="light" />
+              Live Tally
+            </NavLink>
+          )}
         </div>
         <button
           className="voter-nav__logout"

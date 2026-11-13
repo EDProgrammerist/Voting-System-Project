@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
+import { SkulletProvider } from "skullet/react";
+import "skullet/styles.css";
 
 import AppRouter from "@/routes/app-router";
 import "@/styles/global.css";
@@ -14,7 +16,17 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
-      <AppRouter />
+      <SkulletProvider
+        mode="light"
+        theme={{
+          light: { base: "#e5ebf3", highlight: "#f5f7fb" },
+          animation: "shimmer",
+          speed: "slow",
+          radius: "6px",
+        }}
+      >
+        <AppRouter />
+      </SkulletProvider>
     </BrowserRouter>
   </StrictMode>,
 );

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Voter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Election;
+use App\Models\Partylist;
 use App\Models\VoterBallotId;
 use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
@@ -32,14 +33,15 @@ class BallotController extends Controller
             ], 409);
         }
 
+        $partylists = Partylist::where('election_id', $election->id)->get()->keyBy('team');
         $positions = $election->positions
-            ->map(function ($position) {
+            ->map(function ($position) use ($partylists) {
                 return [
                     'id' => $position->id,
                     'name' => $position->name,
                     'max_selections' => $position->max_selections,
                     'candidates' => $position->candidacies
-                        ->map(function ($candidacy) {
+                        ->map(function ($candidacy) use ($partylists) {
                             $profile = $candidacy->profile;
 
                             return [
@@ -49,7 +51,8 @@ class BallotController extends Controller
                                 'profile_photo_url' => $profile->profile_photo
                                     ? url(Storage::url($profile->profile_photo))
                                     : null,
-                                'motto' => $profile->motto,
+                                'motto' => $partylists->get($candidacy->team)?->platform ?? $profile->motto,
+                                'partylist' => $partylists->get($candidacy->team)?->responseData(),
                                 'profile' => $profile->profile,
                                 'achievements' => $profile->achievements,
                             ];

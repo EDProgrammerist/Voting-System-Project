@@ -40,7 +40,7 @@ export function CandidateComparison({
               aria-label={`Candidate ${index + 1}: ${candidate.full_name}`}
             >
               <header className="lineup-party__heading">
-                <h3>{partyLabel(candidate.team)}</h3>
+                <h3>{partyLabel(candidate.team, candidate.partylist?.name)}</h3>
                 <span>Candidate {index + 1}</span>
               </header>
               <LineupCandidateProfile

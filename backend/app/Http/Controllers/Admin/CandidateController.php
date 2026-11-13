@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Candidacy;
 use App\Models\CandidateProfile;
 use App\Models\Election;
+use App\Models\Partylist;
 use App\Models\Position;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class CandidateController extends Controller
             ],
         ]);
 
+        $partylists = Partylist::where('election_id', $validated['election_id'])->get()->keyBy('team');
         $candidates = Candidacy::query()
             ->where('election_id', $validated['election_id'])
             ->with([
@@ -34,7 +36,7 @@ class CandidateController extends Controller
                 'position',
             ])
             ->get()
-            ->map(fn (Candidacy $candidacy): array => $this->candidateData($candidacy));
+            ->map(fn (Candidacy $candidacy): array => $this->candidateData($candidacy, $partylists->get($candidacy->team)));
 
         return response()->json([
             'data' => $candidates,
@@ -181,7 +183,7 @@ class CandidateController extends Controller
 
         return response()->json([
             'message' => 'Candidate saved successfully.',
-            'data' => $this->candidateData($candidacy),
+            'data' => $this->candidateData($candidacy, Partylist::where('election_id', $candidacy->election_id)->where('team', $candidacy->team)->first()),
         ], 201);
     }
 
@@ -217,7 +219,7 @@ class CandidateController extends Controller
         ]);
     }
 
-    private function candidateData(Candidacy $candidacy): array
+    private function candidateData(Candidacy $candidacy, ?Partylist $partylist = null): array
     {
         return [
             'student_id' => $candidacy->student_id,
@@ -225,7 +227,8 @@ class CandidateController extends Controller
             'profile_photo_url' => $candidacy->profile->profile_photo
                 ? url(Storage::url($candidacy->profile->profile_photo))
                 : null,
-            'motto' => $candidacy->profile->motto,
+            'motto' => $partylist?->platform ?? $candidacy->profile->motto,
+            'partylist' => $partylist?->responseData(),
             'profile' => $candidacy->profile->profile,
             'achievements' => $candidacy->profile->achievements,
             'team' => $candidacy->team,

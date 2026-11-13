@@ -7,6 +7,7 @@ import { getVoterTally } from "@/services/voter-auth-service";
 import type { VoterTallyResponse } from "@/types/voter";
 import { CandidateAvatar, StudentLayout } from "./student-layout";
 import { BallotReference } from "./ballot-reference";
+import { PageSkeleton } from "@/components/common/page-skeleton";
 import {
   ChartBar,
   CheckCircle,
@@ -60,6 +61,7 @@ export default function VoterTallyScreen() {
   }, []);
   const isClosed = tally?.election.status === "closed";
   const isPreview = tally?.election.status === "draft";
+  if (!tally && !error) return <PageSkeleton kind="tally" label="Loading live election results" />;
   return (
     <StudentLayout
       title="Live Tally"
@@ -145,11 +147,11 @@ export default function VoterTallyScreen() {
                         <CandidateAvatar name={candidate.full_name} />
                         <div>
                           <strong>{candidate.full_name}</strong>
-                          <small>{partyLabel(candidate.team)}</small>
+                          <small>{partyLabel(candidate.team, candidate.partylist?.name)}</small>
                         </div>
                       </div>
                     </td>
-                    <td>{partyLabel(candidate.team)}</td>
+                    <td>{partyLabel(candidate.team, candidate.partylist?.name)}</td>
                     <td>{candidate.votes.toLocaleString()}</td>
                   </tr>
                 ))}

@@ -1,4 +1,4 @@
-import { apiRequest, apiFileRequest } from "@/services/api-client";
+import { apiRequest } from "@/services/api-client";
 import type { AdminLoginCredentials } from "@/types/admin";
 import type {
   ClassListInspection,
@@ -68,14 +68,12 @@ export function inspectClassList(
 export function previewClassList(
   token: string,
   file: File,
-  worksheet: string,
-  headerRow: number,
+  worksheet?: string,
   signal?: AbortSignal,
 ): Promise<ClassListPreview> {
   const body = new FormData();
   body.set("file", file);
-  body.set("worksheet", worksheet);
-  body.set("header_row", String(headerRow));
+  if (worksheet) body.set("worksheet", worksheet);
   return apiRequest("/committee/class-list/preview", {
     method: "POST",
     headers: auth(token),
@@ -92,10 +90,5 @@ export function commitClassList(
     method: "POST",
     headers: auth(token),
     body: JSON.stringify({ numeric_ids_confirmed: numericIdsConfirmed }),
-  });
-}
-export function downloadClassListTemplate(token: string): Promise<Blob> {
-  return apiFileRequest("/committee/class-list/template", {
-    headers: auth(token),
   });
 }

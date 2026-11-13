@@ -642,17 +642,6 @@
   color: var(--overview-muted);
   margin: 0;
 }
-.overview-skeleton {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 28px;
-}
-.overview-skeleton span {
-  height: 96px;
-  background: #f0f3f7;
-  border-radius: 8px;
-}
 @media (min-width: 1600px) {
   .admin-overview .admin-dashboard__content {
     max-width: 1600px;
@@ -868,9 +857,6 @@
   }
   .overview-table-note {
     padding: 14px 18px;
-  }
-  .overview-skeleton {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (max-width: 359px) {

@@ -56,7 +56,6 @@
 .student-notice--success { background: #e8f5ee; color: #24533b; }
 .student-notice--success strong { color: #24533b; }
 .student-error { color: #9e2637; font-size: 13px; line-height: 1.6; }
-.student-loading { min-height: 70dvh; display: grid; place-content: center; color: #425b7d; background: #f3f6fb; font: 600 15px "Plus Jakarta Sans Variable", sans-serif; }
 .student-empty { display: flex; align-items: center; gap: 18px; padding: 30px; background: #f7f9fc; border-radius: 14px; color: #5b6f88; }
 .student-empty > svg { width: 35px; height: 35px; color: #728aad; }
 .student-empty h3 { margin: 0 0 3px; color: #344c6e; font-size: 14px; font-weight: 700; }

@@ -12,6 +12,7 @@ import "./voter-ballot-screen.css";
 import { BallotSteps, CandidateAvatar, StudentLayout } from "@/components/features/voter-shared/student-layout";
 import { CandidateComparison } from "@/components/features/voter-shared/candidate-comparison";
 import { BallotReference } from "@/components/features/voter-shared/ballot-reference";
+import { PageSkeleton } from "@/components/common/page-skeleton";
 
 type SelectionMap = Record<number, string[]>;
 
@@ -57,14 +58,14 @@ export function VoterBallotScreen() {
   }, [token]);
 
   if (loading) {
-    return <main className="student-loading" aria-live="polite">Loading your ballot…</main>;
+    return <PageSkeleton kind="ballot" label="Loading your ballot" />;
   }
 
   if (!ballot) {
     return (
-      <main className="student-loading" aria-live="polite">
+      <section className="student-empty" role="alert">
         {message || "Unable to load your ballot."}
-      </main>
+      </section>
     );
   }
 
@@ -150,7 +151,7 @@ function PositionGroup({
           const checked = selected.includes(candidate.student_id);
           return <button aria-pressed={checked} className="ballot-option" data-checked={checked} key={candidate.student_id} onClick={() => toggle(position, candidate)} type="button">
             <CandidateAvatar name={candidate.full_name} photo={candidate.profile_photo_url} />
-            <span className="ballot-option__identity"><strong>{candidate.full_name}</strong><small>{partyLabel(candidate.team)}</small></span>
+            <span className="ballot-option__identity"><strong>{candidate.full_name}</strong><small>{partyLabel(candidate.team, candidate.partylist?.name)}</small></span>
             <span aria-hidden="true" className="ballot-option__check">{checked && <Check weight="bold" />}</span>
           </button>;
         })}

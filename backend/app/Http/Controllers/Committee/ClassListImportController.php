@@ -12,11 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ClassListImportController extends Controller
 {
@@ -35,8 +30,11 @@ class ClassListImportController extends Controller
     public function preview(Request $request, ClassListReader $reader): JsonResponse
     {
         $file = $this->upload($request);
-        $data = $request->validate(['worksheet' => ['required', 'string', 'max:255'], 'header_row' => ['required', 'integer', 'between:1,20']]);
-        $result = $reader->preview($file, $data['worksheet'], (int) $data['header_row']);
+        $data = $request->validate(['worksheet' => ['nullable', 'string', 'max:255'], 'header_row' => ['nullable', 'integer', 'between:1,20']]);
+        $layout = isset($data['worksheet'], $data['header_row'])
+            ? ['worksheet' => $data['worksheet'], 'header_row' => (int) $data['header_row']]
+            : $reader->detectLayout($file, $data['worksheet'] ?? null);
+        $result = $reader->preview($file, $layout['worksheet'], $layout['header_row']);
         ClassListImport::where('expires_at', '<', now())->whereNull('committed_at')->delete();
         $draft = null;
         if (! $result['issues'] && $result['summary']['new'] > 0) {
@@ -46,7 +44,7 @@ class ClassListImportController extends Controller
             ]);
         }
 
-        return response()->json([...$result, 'import_id' => $draft?->id, 'expires_at' => $draft?->expires_at])->header('Cache-Control', 'no-store');
+        return response()->json([...$result, 'layout' => $layout, 'import_id' => $draft?->id, 'expires_at' => $draft?->expires_at])->header('Cache-Control', 'no-store');
     }
 
     public function commit(Request $request, string $import): JsonResponse
@@ -88,32 +86,5 @@ class ClassListImportController extends Controller
         }
 
         return response()->json(['message' => $result['already_committed'] ? 'This preview was already imported. No records were added again.' : 'Class-list records imported. No login credentials were created.', ...$result])->header('Cache-Control', 'no-store');
-    }
-
-    public function template(): StreamedResponse
-    {
-        return response()->streamDownload(function (): void {
-            $book = new Spreadsheet;
-            $book->getProperties()->setCreator('CPC Vote')->setTitle('Class list template');
-            $sheet = $book->getActiveSheet();
-            $sheet->setTitle('Class list');
-            foreach (ClassListReader::HEADERS as $index => $header) {
-                $sheet->setCellValueExplicit([$index + 1, 1], $header, DataType::TYPE_STRING);
-            }
-            $sheet->getStyle('A1:F1')->getFont()->setBold(true)->getColor()->setARGB('FFFFFFFF');
-            $sheet->getStyle('A1:F1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF2459B8');
-            $sheet->getStyle('A2:A5001')->getNumberFormat()->setFormatCode('@');
-            foreach (['A' => 22, 'B' => 36, 'C' => 18, 'D' => 16, 'E' => 22, 'F' => 22] as $column => $width) {
-                $sheet->getColumnDimension($column)->setWidth($width);
-            }
-            $sheet->getRowDimension(1)->setRowHeight(26);
-            $sheet->freezePane('A2');
-            $sheet->setAutoFilter('A1:F1');
-            $sheet->getComment('A1')->getText()->createTextRun('Required. Keep Student IDs as text to preserve leading zeros.');
-            $sheet->getComment('B1')->getText()->createTextRun('Required. Use the student’s full name.');
-            $sheet->getComment('F1')->getText()->createTextRun('Optional. enrolled, graduated, stopped, inactive, or withdrawn. Blank values default to enrolled. Existing IDs are skipped.');
-            (new Xlsx($book))->save('php://output');
-            $book->disconnectWorksheets();
-        }, 'class-list-template.xlsx', ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Cache-Control' => 'no-store']);
     }
 }

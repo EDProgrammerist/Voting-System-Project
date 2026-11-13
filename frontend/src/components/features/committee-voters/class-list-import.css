@@ -37,26 +37,13 @@
 .class-import__body {
   padding: 0 20px 24px;
 }
-.class-import__intro {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 16px;
-}
-.class-import__intro > p {
-  flex: 1 1 360px;
-  margin: 0;
-  font-size: 13px;
-  color: #394d68;
-  line-height: 1.8;
-}
 .class-import__hint {
   margin: 16px 0;
   color: #58677c;
   font-size: 12px;
   line-height: 1.8;
 }
-.class-import form {
+.class-import__upload {
   display: grid;
   gap: 16px;
 }
@@ -92,11 +79,6 @@
   color: #2459b8;
   font: inherit;
   cursor: pointer;
-}
-.class-import__options {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px;
-  gap: 16px;
 }
 .class-import__actions,
 .class-import__pagination {
@@ -256,9 +238,6 @@
   outline-offset: 3px;
 }
 @media (max-width: 640px) {
-  .class-import__options {
-    grid-template-columns: 1fr;
-  }
   .class-import__body {
     padding-inline: 16px;
   }

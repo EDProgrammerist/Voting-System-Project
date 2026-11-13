@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
 
-import { AdminSidebar } from "@/components/features/admin-dashboard/admin-sidebar";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getCommitteeToken } from "@/lib/committee-session";
 import {
@@ -17,8 +16,18 @@ import "../admin-dashboard/admin-overview.css";
 import "../admin-dashboard/admin-management.css";
 import "./committee-voters-screen.css";
 import { ClassListImport } from "./class-list-import";
+import { PageSkeleton } from "@/components/common/page-skeleton";
 
 const LIVE_REFRESH_INTERVAL_MS = 2_000;
+
+function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
 
 function formatStatus(value: string): string {
   return value
@@ -40,7 +49,6 @@ export function CommitteeVotersScreen() {
   const [voters, setVoters] = useState<VoterRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [submittedQuery, setSubmittedQuery] = useState("");
   const [status, setStatus] = useState("All Status");
   const [notice, setNotice] = useState("");
   const [elections, setElections] = useState<ElectionSummary[]>([]);
@@ -137,26 +145,26 @@ export function CommitteeVotersScreen() {
     [voters],
   );
   const filteredVoters = useMemo(() => {
-    const search = submittedQuery.trim().toLowerCase();
+    const search = normalizeSearch(query);
+    const nameParts = search.split(/\s+/);
+    const idSearch = search.replaceAll(" ", "");
     return voters.filter((voter) => {
+      const name = normalizeSearch(voter.full_name);
+      const studentId = normalizeSearch(voter.student_id).replaceAll(" ", "");
       const matchesSearch =
         !search ||
-        voter.student_id.toLowerCase().includes(search) ||
-        voter.full_name.toLowerCase().includes(search);
+        studentId.includes(idSearch) ||
+        nameParts.every((part) => name.includes(part));
       const matchesStatus =
         status === "All Status" || voter.academic_status === status;
       return matchesSearch && matchesStatus;
     });
-  }, [status, submittedQuery, voters]);
+  }, [status, query, voters]);
 
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmittedQuery(query);
-  }
+  if (loading) return <section className="admin-dashboard__content admin-voters__content"><PageSkeleton kind="table" label="Loading student records and attendance" /></section>;
 
   return (
-    <main className="admin-dashboard admin-overview admin-management admin-voters">
-      <AdminSidebar active="voters" overview portal="committee" />
+    <>
 
       <section className="admin-dashboard__content admin-voters__content">
         <header className="admin-voters__header">
@@ -168,7 +176,10 @@ export function CommitteeVotersScreen() {
         </header>
         <ClassListImport onImported={() => setRefresh((value) => value + 1)} />
 
-        <form className="voter-filters" onSubmit={handleSearch}>
+        <form
+          className="voter-filters"
+          onSubmit={(event) => event.preventDefault()}
+        >
           {elections.length > 0 && (
             <label className="voter-filters__election">
               <span>Election</span>
@@ -225,7 +236,7 @@ export function CommitteeVotersScreen() {
         <section className="voters-table-card" aria-label="Registered voters">
           <div className="voters-table__heading">
             <h2>Student records</h2>
-            <span>
+            <span aria-live="polite" aria-atomic="true">
               {loading ? "Loading…" : `${filteredVoters.length} shown`}
             </span>
           </div>
@@ -309,20 +320,13 @@ export function CommitteeVotersScreen() {
             </table>
           </div>
 
-          {loading && (
-            <div className="voters-table__empty" role="status">
-              <strong>Loading student records…</strong>
-              <p>Fetching the current voter list.</p>
-            </div>
-          )}
-          {!loading && notice && voters.length === 0 && (
+          {notice && voters.length === 0 && (
             <div className="voters-table__empty" role="status">
               <strong>Voter records unavailable</strong>
               <p>{notice}</p>
             </div>
           )}
-          {!loading &&
-            !(notice && voters.length === 0) &&
+          {!(notice && voters.length === 0) &&
             filteredVoters.length === 0 && (
               <div className="voters-table__empty">
                 <MagnifyingGlass aria-hidden="true" />
@@ -333,9 +337,9 @@ export function CommitteeVotersScreen() {
         </section>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">
-          {loading || voters.length === 0 ? "" : notice}
+          {voters.length === 0 ? "" : notice}
         </p>
       </section>
-    </main>
+    </>
   );
 }

@@ -7,6 +7,7 @@ export interface ElectionSummary {
 }
 
 export interface CandidateResult {
+  partylist?: import("./partylist").PartylistRecord | null;
   student_id: string;
   full_name: string;
   profile_photo_url: string | null;
@@ -25,6 +26,7 @@ interface CourseTurnout {
 }
 
 export interface DashboardData {
+  partylist_names?: { TEAM_A: string; TEAM_B: string };
   election: ElectionSummary;
   turnout: {
     eligible_students: number;

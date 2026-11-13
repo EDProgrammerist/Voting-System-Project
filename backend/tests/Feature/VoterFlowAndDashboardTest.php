@@ -51,7 +51,7 @@ class VoterFlowAndDashboardTest extends TestCase
         ]);
 
         $draftElection = Election::sole();
-        $this->assertSame('SSG Election 2026 Presentation', $draftElection->name);
+        $this->assertSame('SSG Election 2026', $draftElection->name);
         $this->assertSame('draft', $draftElection->status);
         $this->assertDatabaseCount('positions', 3);
         $this->assertDatabaseCount('candidate_profiles', 0);
@@ -166,7 +166,7 @@ class VoterFlowAndDashboardTest extends TestCase
             CandidateProfile::create([
                 'student_id' => $student->student_id,
                 'full_name' => $student->full_name,
-                'motto' => 'Presentation candidate',
+                'motto' => 'Student candidate',
             ]);
             Candidacy::create([
                 'election_id' => $election->id,

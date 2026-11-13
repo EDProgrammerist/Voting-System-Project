@@ -38,6 +38,7 @@ export interface BallotCandidate {
   student_id: string;
   full_name: string;
   team: "TEAM_A" | "TEAM_B" | string;
+  partylist?: import("./partylist").PartylistRecord | null;
   profile_photo_url: string | null;
   motto: string | null;
 }
@@ -91,6 +92,7 @@ export interface VoterTallyResponse {
       student_id: string;
       full_name: string;
       team: string;
+      partylist?: import("./partylist").PartylistRecord | null;
       votes: number;
     }[];
   }[];

@@ -14,7 +14,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Tests\TestCase;
@@ -148,15 +147,43 @@ class CommitteeClassListTest extends TestCase
         $this->assertDatabaseCount('students', 0);
     }
 
-    public function test_template_has_the_expected_headers_and_text_student_id_format(): void
+    public function test_template_download_is_removed(): void
     {
         Sanctum::actingAs($this->member(), ['committee']);
-        $response = $this->get('/api/committee/class-list/template')->assertOk()->assertDownload('class-list-template.xlsx');
-        $path = tempnam(sys_get_temp_dir(), 'template-test-');
-        file_put_contents($path, $response->streamedContent());
-        $book = IOFactory::load($path);
-        $this->assertSame(ClassListReader::HEADERS, $book->getActiveSheet()->rangeToArray('A1:F1')[0]);
-        $this->assertSame('@', $book->getActiveSheet()->getStyle('A2')->getNumberFormat()->getFormatCode());
+        $this->getJson('/api/committee/class-list/template')->assertNotFound();
+    }
+
+    public function test_school_class_list_is_detected_and_names_are_organized_without_creating_accounts(): void
+    {
+        Sanctum::actingAs($this->member(), ['committee']);
+        $book = new Spreadsheet;
+        $sheet = $book->getActiveSheet()->setTitle('Class List');
+        $sheet->setCellValue('A1', 'CLASS LIST')->mergeCells('A1:F1');
+        $sheet->fromArray(['No.', "STUDENT ID\nNUMBER", 'Lastname', 'Firstname', 'M.I.', 'Course'], null, 'A2');
+        $sheet->fromArray([1, '2024-02028', 'Abad', 'Mariel', 'C', 'bsit'], null, 'A3');
+        $sheet->fromArray([2, '000123', 'Dela Cruz', 'Mark', '', 'BSIT'], null, 'A4');
+        $path = tempnam(sys_get_temp_dir(), 'school-list-');
+        (new Xlsx($book))->save($path);
+        $file = new UploadedFile($path, 'school.xlsx', null, null, true);
+        $preview = $this->postJson('/api/committee/class-list/preview', ['file' => $file])->assertOk()
+            ->assertJsonPath('layout.worksheet', 'Class List')->assertJsonPath('layout.header_row', 2)
+            ->assertJsonPath('rows.0.full_name', 'Abad, Mariel C.')->assertJsonPath('rows.0.course', 'BSIT')
+            ->assertJsonPath('rows.1.student_id', '000123')->assertJsonPath('rows.1.full_name', 'Dela Cruz, Mark')
+            ->assertJsonPath('summary.new', 2);
+        $this->assertDatabaseCount('students', 0);
+        $this->postJson('/api/committee/class-list/'.$preview->json('import_id').'/commit')->assertOk()->assertJsonPath('inserted', 2);
+        $this->assertDatabaseHas('students', ['student_id' => '2024-02028', 'full_name' => 'Abad, Mariel C.', 'password' => null]);
+        $this->assertDatabaseCount('users', 1);
+        $this->getJson('/api/committee/students')->assertOk()->assertJsonPath('data.0.full_name', 'Abad, Mariel C.');
+    }
+
+    public function test_autodetection_requires_a_clear_class_list_and_rejects_incomplete_split_names(): void
+    {
+        Sanctum::actingAs($this->member(), ['committee']);
+        $file = $this->file([['000123', 'Abad', '']], 'Xlsx', ['Student ID Number', 'Lastname', 'Firstname']);
+        $this->postJson('/api/committee/class-list/preview', ['file' => $file])->assertOk()->assertJsonPath('import_id', null)->assertJsonPath('summary.invalid', 1);
+        $this->postJson('/api/committee/class-list/preview', ['file' => $this->file([['000123', 'Name']], 'Xlsx', ['Unclear ID', 'Unclear Name'])])->assertUnprocessable();
+        $this->assertDatabaseCount('students', 0);
     }
 
     public function test_numeric_ids_keep_zero_padding_and_warn_before_confirmation(): void

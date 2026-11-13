@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Candidacy;
 use App\Models\Election;
+use App\Models\Partylist;
 use App\Models\Student;
 use App\Models\Vote;
 use App\Models\VoterParticipation;
@@ -109,15 +110,17 @@ class DashboardController extends Controller
             ])
             ->get();
 
+        $partylists = Partylist::where('election_id', $election->id)->get()->keyBy('team');
         $candidateResults = $candidacies->map(
-            function (Candidacy $candidacy) use ($voteCounts): array {
+            function (Candidacy $candidacy) use ($voteCounts, $partylists): array {
                 return [
                     'student_id' => $candidacy->student_id,
                     'full_name' => $candidacy->profile->full_name,
                     'profile_photo_url' => $candidacy->profile->profile_photo
                         ? url(Storage::url($candidacy->profile->profile_photo))
                         : null,
-                    'motto' => $candidacy->profile->motto,
+                    'motto' => $partylists->get($candidacy->team)?->platform ?? $candidacy->profile->motto,
+                    'partylist' => $partylists->get($candidacy->team)?->responseData(),
                     'team' => $candidacy->team,
                     'position' => $candidacy->position->name,
                     'votes' => (int) (
@@ -148,6 +151,7 @@ class DashboardController extends Controller
                 'percentage' => $turnoutPercentage,
                 'by_course' => $turnoutByCourse,
             ],
+            'partylist_names' => ['TEAM_A' => $partylists->get('TEAM_A')?->name ?? 'Partylist A', 'TEAM_B' => $partylists->get('TEAM_B')?->name ?? 'Partylist B'],
             'team_totals' => [
                 'TEAM_A' => (int) (
                     $teamTotals['TEAM_A'] ?? 0

@@ -1,15 +1,8 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
-import { DownloadSimple, UploadSimple } from "@phosphor-icons/react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { UploadSimple } from "@phosphor-icons/react";
 import { getCommitteeToken } from "@/lib/committee-session";
 import {
   commitClassList,
-  downloadClassListTemplate,
   inspectClassList,
   previewClassList,
 } from "@/services/committee-service";
@@ -34,13 +27,11 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
     null,
   );
   const [worksheet, setWorksheet] = useState("");
-  const [headerRow, setHeaderRow] = useState("1");
   const [preview, setPreview] = useState<ClassListPreview | null>(null);
   const [result, setResult] = useState<ClassListResult | null>(null);
   const [busy, setBusy] = useState<"inspect" | "preview" | "commit" | null>(
     null,
   );
-  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
   const [warningsReviewed, setWarningsReviewed] = useState(false);
@@ -49,28 +40,72 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
   useEffect(() => () => request.current?.abort(), []);
 
   function clear() {
-    setWarningsReviewed(false);
     request.current?.abort();
     setFile(null);
     setInspection(null);
     setWorksheet("");
-    setHeaderRow("1");
     setPreview(null);
     setResult(null);
     setError("");
     setBusy(null);
     setPage(0);
+    setWarningsReviewed(false);
     if (fileInput.current) fileInput.current.value = "";
   }
-  async function chooseFile(event: ChangeEvent<HTMLInputElement>) {
-    setWarningsReviewed(false);
-    const selected = event.target.files?.[0];
+
+  async function processFile(selected: File, sheet?: string) {
+    const token = getCommitteeToken();
+    if (!token) return;
+    request.current?.abort();
+    const controller = new AbortController();
+    request.current = controller;
+    setBusy("preview");
+    setError("");
     setPreview(null);
     setResult(null);
+    setPage(0);
+    setWarningsReviewed(false);
+    try {
+      const data = await previewClassList(
+        token,
+        selected,
+        sheet,
+        controller.signal,
+      );
+      if (controller.signal.aborted) return;
+      setWorksheet(data.layout.worksheet);
+      setPreview(data);
+      if (data.import_id && !data.issues.length && !data.warnings.length) {
+        setBusy("commit");
+        const imported = await commitClassList(token, data.import_id);
+        if (controller.signal.aborted) return;
+        setResult(imported);
+        setPreview(null);
+        onImported();
+      }
+    } catch (err) {
+      if (!controller.signal.aborted)
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to import this class list.",
+        );
+    } finally {
+      if (!controller.signal.aborted) setBusy(null);
+    }
+  }
+
+  async function chooseFile(event: ChangeEvent<HTMLInputElement>) {
+    const selected = event.target.files?.[0];
+    request.current?.abort();
     setInspection(null);
     setWorksheet("");
+    setPreview(null);
+    setResult(null);
     setError("");
+    setBusy(null);
     setPage(0);
+    setWarningsReviewed(false);
     if (!selected) {
       setFile(null);
       return;
@@ -86,59 +121,25 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
     const token = getCommitteeToken();
     if (!token) return;
     const controller = new AbortController();
-    request.current?.abort();
     request.current = controller;
     setBusy("inspect");
     try {
       const data = await inspectClassList(token, selected, controller.signal);
-      if (!controller.signal.aborted) {
-        setInspection(data);
-        setWorksheet(
-          data.worksheets.length === 1 ? data.worksheets[0].name : "",
-        );
-      }
+      if (controller.signal.aborted) return;
+      setInspection(data);
+      if (data.worksheets.length === 1)
+        await processFile(selected, data.worksheets[0].name);
     } catch (err) {
       if (!controller.signal.aborted)
         setError(
           err instanceof Error ? err.message : "Unable to read this workbook.",
         );
     } finally {
-      if (!controller.signal.aborted) setBusy(null);
+      if (request.current === controller && !controller.signal.aborted)
+        setBusy(null);
     }
   }
-  async function loadPreview(event: FormEvent<HTMLFormElement>) {
-    setWarningsReviewed(false);
-    event.preventDefault();
-    const token = getCommitteeToken();
-    if (!token || !file || !worksheet || busy) return;
-    const controller = new AbortController();
-    request.current?.abort();
-    request.current = controller;
-    setBusy("preview");
-    setError("");
-    setPreview(null);
-    setResult(null);
-    setPage(0);
-    try {
-      const data = await previewClassList(
-        token,
-        file,
-        worksheet,
-        Number(headerRow),
-        controller.signal,
-      );
-      if (!controller.signal.aborted) setPreview(data);
-    } catch (err) {
-      if (!controller.signal.aborted)
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to preview this class list.",
-        );
-    } finally {
-      if (!controller.signal.aborted) setBusy(null);
-    }
-  }
+
   async function confirm() {
     const token = getCommitteeToken();
     if (!token || !preview?.import_id || busy) return;
@@ -163,27 +164,6 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
       setBusy(null);
     }
   }
-  async function download() {
-    const token = getCommitteeToken();
-    if (!token || downloading) return;
-    setDownloading(true);
-    setError("");
-    try {
-      const blob = await downloadClassListTemplate(token);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "class-list-template.xlsx";
-      link.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to download the template.",
-      );
-    } finally {
-      setDownloading(false);
-    }
-  }
 
   const pageCount = preview ? Math.ceil(preview.rows.length / 20) : 0;
   return (
@@ -192,30 +172,15 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
         <UploadSimple aria-hidden="true" />
         <span>Import class list from Excel</span>
       </summary>
-      <div className="class-import__body">
-        <div className="class-import__intro">
-          <p>
-            Import student records only. Existing IDs are skipped; passwords,
-            ballot IDs, and voting history are preserved. New records receive no
-            password or login access.
-          </p>
-          <button
-            type="button"
-            className="class-import__secondary"
-            disabled={downloading}
-            onClick={download}
-          >
-            <DownloadSimple aria-hidden="true" />
-            {downloading ? "Downloading..." : "Download Excel template"}
-          </button>
-        </div>
+      <div className="class-import__body" aria-busy={Boolean(busy)}>
         <p className="class-import__hint">
-          Required: Student ID and Full Name. Optional: Course, Year Level,
-          Section, Academic Status. Keep IDs as text to preserve leading zeros.
-          Blank academic status defaults to enrolled. Maximum 5 MB and 5,000
-          rows.
+          Choose your class list to import and organize records automatically.
+          Headers and names are detected, including Lastname, Firstname, and
+          M.I. Existing IDs are skipped. New records receive no password or
+          login access. Maximum 5 MB and 5,000 rows. Keep Student IDs as text to
+          preserve leading zeros.
         </p>
-        <form onSubmit={loadPreview}>
+        <div className="class-import__upload">
           <label>
             Excel workbook
             <input
@@ -226,62 +191,39 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
               onChange={chooseFile}
             />
           </label>
-          {inspection && (
-            <div className="class-import__options">
-              <label>
-                Worksheet
-                <select
-                  aria-label="Worksheet"
-                  value={worksheet}
-                  disabled={Boolean(busy)}
-                  onChange={(event) => {
-                    setWorksheet(event.target.value);
-                    setPreview(null);
-                    setResult(null);
-                  }}
-                  required
-                >
-                  <option value="" disabled>
-                    Choose worksheet
+          {inspection && inspection.worksheets.length > 1 && (
+            <label>
+              Choose the class-list worksheet
+              <select
+                aria-label="Class-list worksheet"
+                value={worksheet}
+                disabled={Boolean(busy)}
+                onChange={(event) => {
+                  setWorksheet(event.target.value);
+                  if (file) void processFile(file, event.target.value);
+                }}
+              >
+                <option value="" disabled>
+                  Choose worksheet
+                </option>
+                {inspection.worksheets.map((sheet) => (
+                  <option key={sheet.name} value={sheet.name}>
+                    {sheet.name}
                   </option>
-                  {inspection.worksheets.map((sheet) => (
-                    <option key={sheet.name} value={sheet.name}>
-                      {sheet.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Header row
-                <input
-                  type="number"
-                  min={1}
-                  max={20}
-                  step={1}
-                  value={headerRow}
-                  disabled={Boolean(busy)}
-                  onChange={(event) => {
-                    setHeaderRow(event.target.value);
-                    setPreview(null);
-                    setResult(null);
-                  }}
-                  required
-                />
-              </label>
-            </div>
+                ))}
+              </select>
+            </label>
           )}
-          <div className="class-import__actions">
-            <button
-              type="submit"
-              className="class-import__primary"
-              disabled={Boolean(busy) || !file || !inspection || !worksheet}
-            >
+          {busy && (
+            <p role="status">
               {busy === "inspect"
                 ? "Reading workbook..."
                 : busy === "preview"
-                  ? "Preparing preview..."
-                  : "Preview class list"}
-            </button>
+                  ? "Detecting and checking student records..."
+                  : "Importing student records..."}
+            </p>
+          )}
+          <div className="class-import__actions">
             {file && (
               <button
                 className="class-import__secondary"
@@ -289,11 +231,21 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
                 disabled={busy === "commit"}
                 onClick={clear}
               >
-                Cancel import
+                {result ? "Choose another file" : "Cancel import"}
+              </button>
+            )}
+            {file && error && (
+              <button
+                className="class-import__primary"
+                type="button"
+                disabled={Boolean(busy)}
+                onClick={() => void processFile(file, worksheet || undefined)}
+              >
+                Try upload again
               </button>
             )}
           </div>
-        </form>
+        </div>
         {error && (
           <p className="class-import__error" role="alert">
             {error}

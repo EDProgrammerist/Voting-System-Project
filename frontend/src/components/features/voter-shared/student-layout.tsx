@@ -1,16 +1,13 @@
 import type { ReactNode } from "react";
-import { VoterNavigation } from "./voter-navigation";
 
 export function StudentLayout({ title, description, children, status }: { title: string; description: string; children: ReactNode; status?: ReactNode }) {
-  return <main className="student-page"><div className="student-container">
-    <VoterNavigation />
-    <header className="student-heading" id="student-main" tabIndex={-1}>
+  return <>
+    <header className="student-heading">
       {status && <div className="student-heading__status">{status}</div>}
       <h1>{title}</h1><p>{description}</p>
     </header>
     {children}
-    <footer className="student-footer"><span>CPC Vote</span><p>Your voice. Your vote. Your community.</p><span>Student elections</span></footer>
-  </div></main>;
+  </>;
 }
 
 export function BallotSteps({ review = false }: { review?: boolean }) {

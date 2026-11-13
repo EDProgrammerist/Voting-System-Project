@@ -75,10 +75,3 @@ export async function apiRequest<T>(
   const response = await request(endpoint, init);
   return (await response.json().catch(() => null)) as T;
 }
-export async function apiFileRequest(
-  endpoint: string,
-  init?: RequestInit,
-): Promise<Blob> {
-  const response = await request(endpoint, init);
-  return response.blob();
-}

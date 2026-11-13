@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ElectionController;
+use App\Http\Controllers\Admin\PartylistController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Committee\ClassListImportController;
 use App\Http\Controllers\Committee\CommitteeAuthController;
@@ -57,6 +58,10 @@ Route::prefix('admin')->group(function (): void {
         'admin.only',
     ])->group(function (): void {
         Route::get('/elections/{election}/qr', [ElectionController::class, 'qr']);
+        Route::get('/partylists', [PartylistController::class, 'index']);
+        Route::post('/partylists', [PartylistController::class, 'store']);
+        Route::put('/partylists/{partylist}', [PartylistController::class, 'update']);
+        Route::delete('/partylists/{partylist}', [PartylistController::class, 'destroy']);
         Route::post(
             '/logout',
             [AdminAuthController::class, 'logout'],
@@ -132,7 +137,6 @@ Route::prefix('committee')->group(function (): void {
         Route::get('/students', [StudentController::class, 'index']);
         Route::post('/students', [StudentController::class, 'store']);
         Route::put('/students/{studentId}', [StudentController::class, 'update']);
-        Route::get('/class-list/template', [ClassListImportController::class, 'template']);
         Route::post('/class-list/inspect', [ClassListImportController::class, 'inspect'])->middleware('throttle:10,1');
         Route::post('/class-list/preview', [ClassListImportController::class, 'preview'])->middleware('throttle:10,1');
         Route::post('/class-list/{import}/commit', [ClassListImportController::class, 'commit'])->middleware('throttle:5,1');
