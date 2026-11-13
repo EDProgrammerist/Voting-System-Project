@@ -287,13 +287,14 @@ export function AdminPartylistsScreen() {
                 const party = partylists.find(
                   (item) => item.team === slot.team,
                 );
+                if (!party) return null;
                 return (
                   <article
                     className="partylist-card"
                     key={slot.team}
                     data-team={slot.team}
                   >
-                    {party?.banner_image_url ? (
+                    {party.banner_image_url ? (
                       <img
                         className="partylist-card__banner"
                         src={party.banner_image_url}
@@ -307,11 +308,10 @@ export function AdminPartylistsScreen() {
                     )}
                     <div className="partylist-card__body">
                       <span className="partylist-card__slot">{slot.label}</span>
-                      <h2>{party?.name ?? slot.label}</h2>
+                      <h2>{party.name}</h2>
                       <h3>Platform</h3>
                       <p className="partylist-card__platform">
-                        {party?.platform ??
-                          "Create this partylist to add its shared platform and banner."}
+                        {party.platform}
                       </p>
                       <div className="partylist-card__actions">
                         <button
@@ -320,20 +320,18 @@ export function AdminPartylistsScreen() {
                           disabled={!canEdit || deletingId !== null}
                           onClick={() => open(slot.team, party)}
                         >
-                          {party ? "Edit Partylist" : `Create ${slot.label}`}
+                          Edit Partylist
                         </button>
-                        {party && (
-                          <button
-                            type="button"
-                            className="partylist-button partylist-button--danger"
-                            disabled={!canEdit || deletingId !== null}
-                            onClick={() => void removePartylist(party)}
-                          >
-                            {deletingId === party.id
-                              ? "Deleting..."
-                              : "Delete Partylist"}
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="partylist-button partylist-button--danger"
+                          disabled={!canEdit || deletingId !== null}
+                          onClick={() => void removePartylist(party)}
+                        >
+                          {deletingId === party.id
+                            ? "Deleting..."
+                            : "Delete Partylist"}
+                        </button>
                       </div>
                     </div>
                   </article>

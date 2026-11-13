@@ -87,6 +87,7 @@
 .partylist-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 24px;
 }
 .partylist-card {
@@ -96,24 +97,23 @@
   border-radius: 12px;
   background: #fff;
 }
-.partylist-card__banner,
-.partylist-card__placeholder {
+.partylist-card__banner {
   width: 100%;
   aspect-ratio: 3 / 1;
   object-fit: cover;
 }
 .partylist-card__placeholder {
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
   background: #edf2fa;
   color: #58677c;
   font-size: 12px;
 }
 .partylist-card__placeholder svg {
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
 }
 .partylist-card__body {
   padding: 24px;
@@ -258,6 +258,7 @@
   justify-content: end;
   gap: 12px;
 }
+.partylist-page :is(button, select):focus-visible,
 .partylist-modal :is(button, input, select, textarea):focus-visible {
   outline: 3px solid #2459b8;
   outline-offset: 3px;
