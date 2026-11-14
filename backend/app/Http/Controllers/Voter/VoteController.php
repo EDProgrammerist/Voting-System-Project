@@ -75,16 +75,6 @@ class VoteController extends Controller
             ->orderBy('display_order')
             ->get()
             ->keyBy('id');
-        $selectedPositionIds = $groupedSelections
-            ->keys()
-            ->map(fn ($positionId): int => (int) $positionId);
-        $missingPositions = $positions
-            ->reject(
-                fn (Position $position): bool => $selectedPositionIds
-                    ->contains($position->id),
-            )
-            ->pluck('name');
-
         foreach ($groupedSelections as $positionId => $positionSelections) {
             $position = $positions->get((int) $positionId);
 
@@ -116,12 +106,6 @@ class VoteController extends Controller
                     ]);
                 }
             }
-        }
-
-        if ($missingPositions->isNotEmpty()) {
-            throw ValidationException::withMessages([
-                'selections' => 'Choose at least one candidate for every position. Missing: '.$missingPositions->join(', ').'.',
-            ]);
         }
 
         try {
@@ -166,7 +150,9 @@ class VoteController extends Controller
                     })
                     ->all();
 
-                Vote::insert($rows);
+                if ($rows !== []) {
+                    Vote::insert($rows);
+                }
             }, 3);
         } catch (QueryException $exception) {
             if ((string) $exception->getCode() === '23000') {
@@ -181,7 +167,7 @@ class VoteController extends Controller
         $student->tokens()->where('name', 'voter-session')->update(['abilities' => json_encode(['tally-only', 'election:'.$election->id])]);
 
         return response()->json([
-            'message' => 'Your vote was submitted successfully.',
+            'message' => 'Your ballot was submitted and your attendance recorded.',
             'tally_only' => true,
             'ballot_reference' => VoterBallotId::summary($student, $election),
         ], 201);

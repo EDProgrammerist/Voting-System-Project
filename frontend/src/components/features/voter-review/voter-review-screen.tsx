@@ -70,12 +70,9 @@ export function VoterReviewScreen() {
     [ballot, selections],
   );
 
-  const selectionComplete = ballot !== null
+  const canSubmit = ballot !== null
     && ballot.can_submit_vote
-    && reviewedPositions.length > 0
-    && reviewedPositions.every(
-      (position) => position.candidates.length > 0 && position.selectedCandidates.length > 0,
-    );
+    && reviewedPositions.length > 0;
 
   async function handleConfirm() {
     if (submitting) return;
@@ -83,8 +80,8 @@ export function VoterReviewScreen() {
       setMessage("Add your signature and confirm your on-screen thumbmark before submitting.");
       return;
     }
-    if (!selectionComplete) {
-      setMessage("Your ballot is incomplete. Go back and choose at least one candidate for every position.");
+    if (!canSubmit) {
+      setMessage("This election is not accepting ballots right now.");
       return;
     }
 
@@ -129,20 +126,21 @@ export function VoterReviewScreen() {
   }
 
   return (
-    <StudentLayout title="Review your vote" description="Take a final look at your choices. You cannot change your vote after confirming.">
+    <StudentLayout title="Review your vote" description="Unselected positions count as abstentions. Submitting records your attendance and is final.">
       <BallotSteps review />
       <BallotReference reference={ballot?.ballot_reference} />
+      {selections.length === 0 && <p className="student-notice" role="status">You are submitting a blank ballot. Your attendance will be recorded without voting for any candidate.</p>}
       <div className="review-layout">
         <div><div className="voter-review__positions">{reviewedPositions.map((position) => <ReviewPosition key={position.id} position={position} />)}</div>
           <VoteVerification signature={signature} onSignature={setSignature} thumbmark={thumbmark} onThumbmark={setThumbmark} disabled={submitting} />
         </div>
         <aside className="review-checklist" aria-label="Confirmation checklist"><LockSimple aria-hidden="true" weight="light" /><h2>One last check</h2><p>Make sure your choices reflect your voice.</p><ul>
-          <li><CheckCircle aria-hidden="true" weight={selectionComplete ? "fill" : "light"} /><span>Review your selected candidates</span></li>
+          <li><CheckCircle aria-hidden="true" weight={canSubmit ? "fill" : "light"} /><span>Review your choices and abstentions</span></li>
           <li data-complete={signature.length > 0}><CheckCircle aria-hidden="true" weight={signature.length ? "fill" : "light"} /><span>Add your electronic signature</span></li>
           <li data-complete={thumbmark}><CheckCircle aria-hidden="true" weight={thumbmark ? "fill" : "light"} /><span>Confirm your on-screen thumbmark</span></li>
         </ul><p className="review-checklist__note">Your ballot is submitted only when you press Confirm Vote.</p></aside>
       </div>
-      <div className="voter-review__actions"><button className="student-button student-button--secondary" disabled={submitting} onClick={() => navigate("/voter/ballot")} type="button"><ArrowLeft aria-hidden="true" />Go Back</button><button className="student-button" disabled={submitting || !selectionComplete || !signature.length || !thumbmark} onClick={handleConfirm} type="button">{submitting ? "Confirming..." : "Confirm Vote"}<ArrowRight aria-hidden="true" /></button></div>
+      <div className="voter-review__actions"><button className="student-button student-button--secondary" disabled={submitting} onClick={() => navigate("/voter/ballot")} type="button"><ArrowLeft aria-hidden="true" />Go Back</button><button className="student-button" disabled={submitting || !canSubmit || !signature.length || !thumbmark} onClick={handleConfirm} type="button">{submitting ? "Confirming..." : "Confirm Vote"}<ArrowRight aria-hidden="true" /></button></div>
       <p aria-live="polite" className="student-error" role="status">{message}</p>
     </StudentLayout>
   );
@@ -157,7 +155,7 @@ function ReviewPosition({
   return (
     <section className="review-position">
       <h2>{displayPosition(position.name)}</h2>
-      <div className="review-position__candidates">{position.selectedCandidates.length > 0 ? position.selectedCandidates.map((candidate) => <CandidateProfile candidate={candidate} key={candidate.student_id} />) : <p>No candidate selected</p>}</div>
+      <div className="review-position__candidates">{position.selectedCandidates.length > 0 ? position.selectedCandidates.map((candidate) => <CandidateProfile candidate={candidate} key={candidate.student_id} />) : <p>No candidate selected (abstain)</p>}</div>
     </section>
   );
 }

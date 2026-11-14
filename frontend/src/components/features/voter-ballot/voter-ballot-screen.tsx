@@ -71,7 +71,7 @@ export function VoterBallotScreen() {
 
   const loadedBallot = ballot;
   const completedPositions = loadedBallot.positions.filter((position) => (selections[position.id]?.length ?? 0) > 0).length;
-  const canReview = loadedBallot.can_submit_vote && loadedBallot.positions.length > 0 && completedPositions === loadedBallot.positions.length;
+  const canReview = loadedBallot.can_submit_vote && loadedBallot.positions.length > 0;
   function toggleCandidate(position: BallotPosition, candidate: BallotCandidate) {
     setMessage("");
     setSelections((current) => {
@@ -92,14 +92,6 @@ export function VoterBallotScreen() {
 
   function handleReview() {
     if (!loadedBallot.can_submit_vote) return;
-    const missing = loadedBallot.positions.filter((position) =>
-      position.candidates.length > 0 && (selections[position.id]?.length ?? 0) === 0,
-    );
-    if (missing.length > 0) {
-      setMessage(`Choose at least one candidate for ${missing.map((position) => displayPosition(position.name)).join(", ")}.`);
-      return;
-    }
-
     const draft: VoterSelection[] = Object.entries(selections).flatMap(([positionId, candidates]) =>
       candidates.map((candidateId) => ({
         position_id: Number(positionId),
@@ -122,10 +114,10 @@ export function VoterBallotScreen() {
           <p className="ballot-summary__count"><strong>{completedPositions}</strong> of {loadedBallot.positions.length} positions selected</p>
           <ul>{loadedBallot.positions.map((position) => {
             const chosen = position.candidates.filter((candidate) => selections[position.id]?.includes(candidate.student_id));
-            return <li key={position.id} data-complete={chosen.length > 0}><CheckCircle aria-hidden="true" weight={chosen.length ? "fill" : "light"} /><div><strong>{displayPosition(position.name)}</strong><span>{chosen.length ? chosen.map((candidate) => candidate.full_name).join(", ") : "No selection yet"}</span></div></li>;
+            return <li key={position.id} data-complete={chosen.length > 0}><CheckCircle aria-hidden="true" weight={chosen.length ? "fill" : "light"} /><div><strong>{displayPosition(position.name)}</strong><span>{chosen.length ? chosen.map((candidate) => candidate.full_name).join(", ") : "No selection (abstain)"}</span></div></li>;
           })}</ul>
           <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Review Vote<ArrowRight aria-hidden="true" /></button>
-          <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : canReview ? "You can still make changes on the next screen." : "Select at least one candidate for each position to continue."}</p>
+          <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : "Selections are optional. Submitting a blank or partial ballot still records your attendance."}</p>
           <p aria-live="polite" className="student-error" role="status">{message}</p>
         </aside>
       </div>

@@ -40,9 +40,8 @@ class SubmitVoteRequest extends FormRequest
                 'exists:elections,id',
             ],
             'selections' => [
-                'required',
+                'present',
                 'array',
-                'min:1',
             ],
             'selections.*.position_id' => [
                 'required',

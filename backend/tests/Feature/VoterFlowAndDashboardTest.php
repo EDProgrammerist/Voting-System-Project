@@ -213,13 +213,13 @@ class VoterFlowAndDashboardTest extends TestCase
                 'election_id' => $electionId,
                 'selections' => [[
                     'position_id' => $president['id'],
-                    'candidate_student_id' => $presidentCandidate['student_id'],
+                    'candidate_student_id' => 'INVALID-CANDIDATE',
                 ]],
             ])
             ->assertUnprocessable()
             ->assertJsonPath(
                 'errors.selections.0',
-                'Choose at least one candidate for every position. Missing: Vice President, Senator.',
+                'Candidate INVALID-CANDIDATE is invalid for President.',
             );
 
         $this->assertDatabaseCount('voter_participations', 0);
@@ -244,7 +244,7 @@ class VoterFlowAndDashboardTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonPath('message', 'Your vote was submitted successfully.');
+            ->assertJsonPath('message', 'Your ballot was submitted and your attendance recorded.');
 
         $this->assertDatabaseCount('voter_participations', 1);
         $this->assertDatabaseCount('ballots', 1);

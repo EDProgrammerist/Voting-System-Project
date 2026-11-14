@@ -125,6 +125,66 @@ class QrVotingEntryTest extends TestCase
         $this->assertDatabaseCount('votes', 3);
     }
 
+    public function test_blank_ballot_records_attendance_without_candidate_votes_and_prevents_repeat_submission(): void
+    {
+        $election = $this->election();
+        $student = $this->student();
+        $login = $this->login($student, $election)->assertOk();
+        $token = $login->json('token');
+        $payload = [...$this->vote($election, $login->json('ballot_reference.id')), 'selections' => []];
+
+        $this->token($token)->postJson('/api/voter/vote', $payload)->assertCreated()
+            ->assertJsonPath('tally_only', true)
+            ->assertJsonPath('ballot_reference.attendance_recorded', true);
+        $this->assertDatabaseCount('voter_participations', 1);
+        $this->assertDatabaseHas('voter_participations', ['election_id' => $election->id, 'student_id' => $student->student_id]);
+        $this->assertDatabaseCount('ballots', 1);
+        $this->assertDatabaseCount('votes', 0);
+        $this->token($token)->getJson('/api/voter/tally')->assertOk()
+            ->assertJsonPath('positions.0.candidates.0.votes', 0);
+        $this->token($token)->postJson('/api/voter/vote', $payload)->assertForbidden();
+        $this->login($student, $election)->assertOk()->assertJsonPath('tally_only', true);
+
+        Sanctum::actingAs(User::create(['name' => 'Committee', 'email' => 'blank-committee@example.test', 'password' => 'TestPassword123!', 'role' => 'committee']), ['committee']);
+        $this->getJson('/api/committee/students?election_id='.$election->id)->assertOk()
+            ->assertJsonPath('data.0.attendance_recorded', true);
+        Sanctum::actingAs(User::create(['name' => 'Admin', 'email' => 'blank-admin@example.test', 'password' => 'TestPassword123!']), ['admin']);
+        $dashboard = $this->getJson('/api/admin/dashboard?election_id='.$election->id)->assertOk();
+        $dashboard->assertJsonPath('turnout.already_voted', 1)
+            ->assertJsonPath('turnout.percentage', 100);
+    }
+
+    public function test_partial_ballot_records_only_selected_candidates_and_attendance(): void
+    {
+        $election = $this->election();
+        $login = $this->login($this->student(), $election)->assertOk();
+        $payload = $this->vote($election, $login->json('ballot_reference.id'));
+        $payload['selections'] = array_slice($payload['selections'], 0, 1);
+        $this->token($login->json('token'))->postJson('/api/voter/vote', $payload)->assertCreated();
+        $this->assertDatabaseCount('voter_participations', 1);
+        $this->assertDatabaseCount('ballots', 1);
+        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseHas('votes', $payload['selections'][0]);
+    }
+
+    public function test_blank_ballots_still_require_verification_and_an_explicit_selection_array(): void
+    {
+        $election = $this->election();
+        $login = $this->login($this->student(), $election)->assertOk();
+        $token = $login->json('token');
+        $payload = [...$this->vote($election), 'selections' => []];
+        foreach (['signature', 'thumbmark_confirmed', 'selections'] as $field) {
+            $invalid = $payload;
+            unset($invalid[$field]);
+            $this->token($token)->postJson('/api/voter/vote', $invalid)->assertUnprocessable()->assertJsonValidationErrors($field);
+        }
+        $this->token($token)->postJson('/api/voter/vote', [...$payload, 'selections' => null])->assertUnprocessable()->assertJsonValidationErrors('selections');
+        $this->token($token)->postJson('/api/voter/vote', [...$payload, 'thumbmark_confirmed' => false])->assertUnprocessable();
+        $this->assertDatabaseCount('voter_participations', 0);
+        $this->assertDatabaseCount('ballots', 0);
+        $this->assertDatabaseCount('votes', 0);
+    }
+
     public function test_a_student_cannot_submit_another_students_id_or_vote_in_another_election(): void
     {
         $election = $this->election();
