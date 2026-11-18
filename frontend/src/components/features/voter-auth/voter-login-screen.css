@@ -65,3 +65,98 @@
  .voter-login__help { margin-top: 22px; }
 }
 @media (max-width: 370px) { .voter-login__content { padding-inline: 22px; } .voter-login__visual { min-height: 230px; } .voter-login__motto { font-size: 38px; } }
+
+/* Keep the original campus split; give student sign-in a clear form surface. */
+.voter-login--signin .voter-login__content {
+  padding: 32px clamp(24px, 3.5vw, 56px) 24px;
+}
+.voter-login--signin .voter-login__switch {
+  min-height: 44px;
+  margin-bottom: 20px;
+}
+.voter-login--signin .voter-login__panel {
+  width: min(100%, 500px);
+  padding: 40px;
+  border: 1px solid #d5dfed;
+  border-radius: 20px;
+  background: #fff;
+}
+.voter-login--signin .voter-login__form-icon {
+  float: right;
+  margin: 0 0 16px 16px;
+}
+.voter-login--signin h1 {
+  font-size: clamp(30px, 2.6vw, 40px);
+  letter-spacing: -1px;
+}
+.voter-login--signin .voter-login__intro {
+  margin-bottom: 28px;
+}
+.voter-login--signin .voter-login__panel form {
+  clear: both;
+  gap: 24px;
+}
+.voter-login--signin .voter-login__field input {
+  font-size: 16px;
+}
+.voter-login--signin .voter-login__help {
+  max-width: none;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #d5dfed;
+  font-size: 12px;
+}
+.voter-login--signin .voter-login__footer {
+  margin-top: 28px;
+}
+@media (max-width: 1000px) {
+  .voter-login--signin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .voter-login--signin .voter-login__visual {
+    min-height: 240px;
+    padding: 28px 32px;
+  }
+  .voter-login--signin .voter-login__visual-copy {
+    margin: 24px 0 0;
+    padding: 0;
+  }
+  .voter-login--signin .voter-login__motto {
+    font-size: 44px;
+    letter-spacing: -2px;
+  }
+  .voter-login--signin .voter-login__college,
+  .voter-login--signin .voter-login__visual-copy > p:last-child {
+    display: none;
+  }
+  .voter-login--signin .voter-login__content {
+    padding: 16px 24px 24px;
+  }
+}
+@media (max-width: 600px) {
+  .voter-login--signin .voter-login__visual {
+    min-height: 200px;
+    padding: 24px 28px;
+  }
+  .voter-login--signin .voter-login__visual-copy {
+    margin-top: 20px;
+  }
+  .voter-login--signin .voter-login__content {
+    padding-inline: 20px;
+  }
+  .voter-login--signin .voter-login__panel {
+    padding: 24px;
+  }
+  .voter-login--signin h1 {
+    font-size: 28px;
+  }
+  .voter-login--signin .voter-login__help {
+    padding-top: 16px;
+  }
+  .voter-login--signin .voter-login__intro {
+    margin-bottom: 20px;
+  }
+  .voter-login--signin .voter-login__panel form {
+    gap: 20px;
+  }
+}

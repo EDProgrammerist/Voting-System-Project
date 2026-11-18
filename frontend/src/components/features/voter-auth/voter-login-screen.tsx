@@ -130,7 +130,11 @@ export function VoterLoginScreen({
 
   return (
     <main
-      className={setupPassword ? "voter-login" : "voter-login login-transition"}
+      className={
+        setupPassword
+          ? "voter-login"
+          : "voter-login voter-login--signin login-transition"
+      }
     >
       <section
         className="voter-login__visual"

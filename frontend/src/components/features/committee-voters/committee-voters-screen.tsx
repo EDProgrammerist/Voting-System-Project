@@ -257,11 +257,6 @@ export function CommitteeVotersScreen() {
                   <tr role="row" key={voter.student_id}>
                     <td role="cell" data-label="Student ID">
                       {voter.student_id}
-                      {voter.ballot_id && (
-                        <small className="voter-ballot-code">
-                          Ballot ID: <code>{voter.ballot_id}</code>
-                        </small>
-                      )}
                     </td>
                     <td role="cell" data-label="Name">
                       <strong>{voter.full_name}</strong>

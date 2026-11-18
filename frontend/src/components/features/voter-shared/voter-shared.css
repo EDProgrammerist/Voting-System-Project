@@ -25,7 +25,7 @@
 .voter-nav__brand > svg { width: 36px; height: 36px; color: #164dc4; }
 .voter-nav__brand strong { font-weight: 850; }
 .voter-nav__links { display: flex; align-items: center; gap: 4px; margin: 0 auto; }
-.voter-nav__links a { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 11px; text-decoration: none; color: #5a697d; font-size: 13px; font-weight: 650; transition: background 180ms cubic-bezier(.2,.8,.2,1), color 180ms cubic-bezier(.2,.8,.2,1); }
+.voter-nav__links a { min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 11px; text-decoration: none; color: #5a697d; font-size: 13px; font-weight: 650; transition: background 180ms cubic-bezier(.2,.8,.2,1), color 180ms cubic-bezier(.2,.8,.2,1); }
 .voter-nav__links svg { width: 19px; height: 19px; }
 .voter-nav__links a:hover { color: #164dc4; background: #f5f8ff; }
 .voter-nav__links a.active { color: #164dc4; background: #edf3ff; }
@@ -74,12 +74,6 @@
 .student-candidate h4 { margin: 23px 0 6px; font-size: 12px; color: #203b63; font-weight: 750; }
 .student-candidate p { margin: 0; font-size: 13px; line-height: 1.85; color: #586c86; white-space: pre-wrap; }
 .student-candidate__platform { padding: 18px 0 0; color: #2c4c78 !important; font-weight: 600; }
-.candidate-comparison { margin-top: 18px; border-top: 1px solid #e7edf5; color: #164dc4; }
-.candidate-comparison summary { display: flex; gap: 10px; align-items: center; cursor: pointer; list-style: none; padding: 18px 0 0; font-size: 12px; font-weight: 700; }
-.candidate-comparison summary::-webkit-details-marker { display: none; }
-.candidate-comparison summary svg { width: 18px; height: 18px; }
-.candidate-comparison summary svg:last-child { margin-left: auto; transition: transform 180ms cubic-bezier(.2,.8,.2,1); }
-.candidate-comparison[open] summary svg:last-child { transform: rotate(180deg); }
 .student-tally { background: #fff; padding: 26px 30px; border-radius: 18px; margin: 0 0 20px; }
 .student-tally h2 { font-size: 21px; margin: 0; font-weight: 750; letter-spacing: -.5px; }
 .student-tally__heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 15px; }
@@ -114,13 +108,19 @@
   .voter-nav__brand { font-size: 19px; gap: 6px; }
 }
 @media (max-width: 760px) {
-  .student-page { padding: 14px 16px 0; }
-  .voter-nav { display: grid; grid-template-columns: 1fr auto; padding: 14px 14px 8px; gap: 14px 10px; border-radius: 16px; }
-  .voter-nav__links { grid-row: 2; grid-column: 1 / -1; display: flex; width: 100%; margin: 0; gap: 2px; }
-  .voter-nav__links a { flex: 1; flex-direction: column; gap: 4px; padding: 10px 4px; font-size: 11px; line-height: 1.45; white-space: normal; text-align: center; min-width: 0; min-height: 62px; border-radius: 9px; }
-  .voter-nav__links svg { width: 20px; height: 20px; }
-  .voter-nav__logout { font-size: 12px !important; padding: 8px; }
-  .student-heading { padding: 34px 0 22px; }
+  .student-page { padding: 12px 12px 0; }
+  .student-container, #student-main { min-width: 0; }
+  .voter-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 10px; gap: 8px; border-radius: 12px; }
+  .voter-nav__brand { min-width: 0; font-size: 18px; gap: 8px; letter-spacing: -.4px; }
+  .voter-nav__brand > svg { width: 28px; height: 28px; }
+  .voter-nav__logout { grid-row: 1; grid-column: 2; justify-self: end; align-self: center; width: 44px; height: 44px; min-width: 44px; appearance: none; -webkit-appearance: none; border: 1px solid #e1e8f2; background: #f2f5fa; padding: 0; gap: 0; }
+  .voter-nav__links { grid-row: 2; grid-column: 1 / -1; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; margin: 0; gap: 6px; }
+  .voter-nav__links a { flex-direction: row; gap: 6px; padding: 8px 6px; font-size: 12px; line-height: 1.4; white-space: normal; text-align: center; min-width: 0; min-height: 44px; border-radius: 8px; }
+  .voter-nav__links svg { width: 18px; height: 18px; }
+  .voter-nav__logout-label { display: none; }
+  .voter-nav__logout svg { display: block; width: 20px; height: 20px; }
+  .voter-nav__logout:disabled { cursor: wait; opacity: .65; }
+  .student-heading { padding: 26px 0 20px; overflow-wrap: anywhere; }
   .student-heading h1 { font-size: 32px; letter-spacing: -1px; margin-bottom: 12px; }
   .student-heading > p { font-size: 13px; line-height: 1.85; }
   .student-footer { margin-top: 38px; padding: 24px 0; flex-wrap: wrap; gap: 8px; font-size: 11px; }
@@ -136,6 +136,12 @@
   .student-tally__heading h2 { font-size: 19px; }
   .student-tally__heading > span { font-size: 10px; }
   .student-tally td { font-size: 12px; }
+  .student-tally table { table-layout: fixed; }
+  .student-tally th:last-child, .student-tally td:last-child { width: 72px; text-align: right; }
+  .student-tally td:last-child { font-size: 16px; overflow-wrap: anywhere; }
+  .student-tally th:first-child, .student-tally td:first-child { padding-right: 12px; }
+  .tally-candidate strong { display: block; }
+  .tally-candidate > div { min-width: 0; overflow-wrap: anywhere; }
   .student-tally th:nth-child(2), .student-tally td:nth-child(2) { display: none; }
   .tally-candidate { gap: 10px; }
   .tally-candidate small { display: block; font-size: 11px; margin-top: 2px; color: #536b86; }
@@ -144,6 +150,8 @@
   .signature-pad { padding: 16px; }
   .thumbmark-confirm { padding: 16px; font-size: 12px !important; gap: 12px; }
   .thumbmark-confirm small { font-size: 11px; }
+  .student-notice, .student-empty, .review-position, .review-checklist { overflow-wrap: anywhere; }
+  .review-layout > *, .ballot-layout > * { min-width: 0; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .student-heading { animation: student-enter 400ms cubic-bezier(.2,.8,.2,1) both; }

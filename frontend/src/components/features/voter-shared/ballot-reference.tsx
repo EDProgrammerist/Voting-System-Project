@@ -11,13 +11,9 @@ export function BallotReference({
   return (
     <section
       className="ballot-reference"
-      aria-label="Your ballot ID and attendance"
+      aria-label="Your attendance status"
       data-complete={reference.attendance_recorded}
     >
-      <div>
-        <h2>Ballot ID</h2>
-        <code>{reference.id}</code>
-      </div>
       <div>
         <strong>
           {reference.attendance_recorded

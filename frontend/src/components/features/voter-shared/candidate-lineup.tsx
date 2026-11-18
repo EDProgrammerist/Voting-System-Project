@@ -1,28 +1,34 @@
 import { useState } from "react";
 import { GraduationCap, Medal } from "@phosphor-icons/react";
 import type { BallotCandidate } from "@/types/voter";
+import { voterMediaUrl } from "@/lib/voter-media-url";
 import "./candidate-lineup.css";
 
 export function LineupCandidateProfile({
   candidate,
   position,
-  id,
 }: {
   candidate: BallotCandidate;
   position: string;
-  id?: string;
 }) {
+  const platform =
+    candidate.partylist?.platform?.trim() || candidate.motto?.trim();
   return (
-    <div id={id} className="lineup-party__profile">
+    <div className="lineup-party__profile">
       <div className="lineup-hero">
         <LineupPortrait key={candidate.student_id} candidate={candidate} />
         <div className="lineup-hero__identity">
           <span>{position}</span>
           <h4>{candidate.full_name}</h4>
-          {candidate.motto && <p>{candidate.motto}</p>}
         </div>
       </div>
       <div className="lineup-details">
+        {(platform || candidate.partylist) && (
+          <section className="lineup-party__platform">
+            <h5>Partylist platform</h5>
+            <p>{platform || "No platform has been provided yet."}</p>
+          </section>
+        )}
         {candidate.profile?.trim() && (
           <section>
             <h5>
@@ -47,6 +53,23 @@ export function LineupCandidateProfile({
   );
 }
 
+export function PartylistBanner({ candidate }: { candidate: BallotCandidate }) {
+  const [failed, setFailed] = useState(false);
+  const banner = candidate.partylist?.banner_image_url;
+  if (!banner) return null;
+  if (failed)
+    return <p className="lineup-party__banner-error">Banner unavailable.</p>;
+  return (
+    <img
+      className="lineup-party__banner"
+      src={voterMediaUrl(banner)}
+      alt={`${candidate.partylist?.name || "Partylist"} banner`}
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 function LineupPortrait({ candidate }: { candidate: BallotCandidate }) {
   const [failed, setFailed] = useState(false);
   const initials = candidate.full_name
@@ -59,7 +82,7 @@ function LineupPortrait({ candidate }: { candidate: BallotCandidate }) {
     <div className="lineup-portrait">
       {candidate.profile_photo_url && !failed ? (
         <img
-          src={candidate.profile_photo_url}
+          src={voterMediaUrl(candidate.profile_photo_url)}
           alt={`Portrait of ${candidate.full_name}`}
           loading="lazy"
           onError={() => setFailed(true)}

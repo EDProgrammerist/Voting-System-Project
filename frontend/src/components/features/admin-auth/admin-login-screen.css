@@ -79,6 +79,7 @@
   margin: 0;
   color: #58677c;
   font-size: 13px;
+  line-height: 1.8;
 }
 .admin-login__form {
   display: grid;
@@ -97,14 +98,14 @@
 .admin-login__field input {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
+  min-height: 50px;
   border: 1px solid #cbd6e5;
   border-radius: 7px;
   padding: 12px;
   color: #202e43;
   background: #fff;
   font: inherit;
-  font-size: 13px;
+  font-size: 16px;
 }
 .admin-login__field input::placeholder {
   color: #66758a;
@@ -155,7 +156,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 46px;
+  min-height: 50px;
   border: 0;
   border-radius: 7px;
   padding: 12px;
@@ -180,7 +181,7 @@
 .admin-login__help {
   margin: 24px 0 0;
   color: #58677c;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.7;
 }
 .admin-login__help a {

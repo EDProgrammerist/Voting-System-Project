@@ -65,12 +65,17 @@ export function VoterNavigation() {
         </div>
         <button
           className="voter-nav__logout"
+          aria-label={busy ? "Signing out…" : "Logout"}
+          aria-busy={busy}
+          title={busy ? "Signing out…" : "Logout"}
           disabled={busy}
           onClick={() => void logout()}
           type="button"
         >
           <SignOut aria-hidden="true" weight="light" />
-          {busy ? "Signing out…" : "Logout"}
+          <span className="voter-nav__logout-label">
+            {busy ? "Signing out…" : "Logout"}
+          </span>
         </button>
       </nav>
       {error && <p role="alert">{error}</p>}

@@ -19,9 +19,7 @@
   --lineup-accent: #28529a;
 }
 .lineup-party__heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
   gap: 12px;
   padding: 17px 22px;
   background: var(--lineup-dark);
@@ -36,23 +34,12 @@
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
-.lineup-party__heading > span {
-  font-size: 11px;
-  color: #fff;
-  white-space: nowrap;
-}
 .lineup-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   background: var(--lineup-dark);
   color: #fff;
   min-height: 246px;
-}
-.lineup-party[data-tone="blue"] .lineup-portrait {
-  order: 2;
-}
-.lineup-party[data-tone="blue"] .lineup-hero__identity {
-  order: 1;
 }
 .lineup-portrait {
   position: relative;
@@ -112,14 +99,6 @@
   letter-spacing: -0.8px;
   overflow-wrap: anywhere;
 }
-.lineup-hero__identity > p {
-  margin: 16px 0 0;
-  color: #fff;
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 .lineup-details {
   padding: 24px;
   display: grid;
@@ -146,6 +125,18 @@
   color: #586c86;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+.lineup-party__banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.lineup-party__banner-error {
+  margin: 0;
+  font-size: 12px;
 }
 @supports (grid-template-rows: subgrid) {
   .candidate-lineup {

@@ -1,8 +1,60 @@
 .candidate-comparison {
   container-type: inline-size;
+  position: fixed;
+  inset: 0;
+  width: min(1080px, calc(100% - 48px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0 20px 20px;
+  border: 1px solid #e1e8f2;
+  border-radius: 18px;
+  background: #fff;
+  color: #15273f;
+  font: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+.candidate-comparison::backdrop {
+  background: rgb(15 31 54 / 45%);
+}
+.candidate-comparison__heading {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 12px;
+  border-bottom: 1px solid #e1e8f2;
+  background: #fff;
+}
+.candidate-comparison__heading h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.candidate-comparison__heading button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #edf3ff;
+  color: #164dc4;
+  cursor: pointer;
+}
+.candidate-comparison__heading button svg {
+  width: 22px;
+  height: 22px;
 }
 .candidate-comparison__body {
-  padding-top: 18px;
+  padding-top: 12px;
 }
 .candidate-comparison .lineup-party[data-mirrored="false"] .lineup-portrait {
   order: 0;
@@ -20,16 +72,13 @@
   .lineup-hero__identity {
   order: 1;
 }
-.candidate-comparison .lineup-party[data-mirrored="true"] .lineup-hero {
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-}
 .candidate-comparison__help {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   font-size: 12px;
   line-height: 1.8;
   color: #536b86;
 }
-.candidate-comparison summary:focus-visible {
+.candidate-comparison button:focus-visible {
   outline: 3px solid #164dc4;
   outline-offset: 4px;
 }
@@ -48,8 +97,152 @@
     margin-top: 0;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .candidate-comparison summary svg:last-child {
-    transition: none;
+@media (min-width: 601px) {
+  .candidate-comparison .candidate-lineup {
+    column-gap: 16px;
+  }
+  .candidate-comparison .lineup-party__heading {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+  .candidate-comparison .lineup-party__heading h3 {
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+  .candidate-comparison .lineup-party__banner {
+    max-height: 120px;
+  }
+  .candidate-comparison .lineup-party[data-mirrored] .lineup-hero {
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    min-height: 0;
+    padding: 16px;
+  }
+  .candidate-comparison .lineup-party[data-mirrored="true"] .lineup-hero {
+    grid-template-columns: minmax(0, 1fr) 104px;
+  }
+  .candidate-comparison .lineup-portrait {
+    height: 104px;
+    min-height: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .candidate-comparison .lineup-portrait__fallback {
+    min-height: 0;
+    gap: 6px;
+    padding: 8px;
+  }
+  .candidate-comparison .lineup-portrait__fallback > span {
+    font-size: 36px;
+    letter-spacing: -1px;
+  }
+  .candidate-comparison .lineup-hero__identity {
+    padding: 0;
+  }
+  .candidate-comparison .lineup-hero__identity > span {
+    margin-bottom: 6px;
+  }
+  .candidate-comparison .lineup-hero__identity h4 {
+    font-size: 22px;
+    letter-spacing: -0.4px;
+    line-height: 1.3;
+  }
+  .candidate-comparison .lineup-details {
+    padding: 16px;
+    gap: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .candidate-comparison {
+    width: calc(100% - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 0 16px 16px;
+  }
+  .candidate-comparison__heading h2 {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .candidate-comparison__heading {
+    gap: 12px;
+    padding-block: 10px;
+  }
+  .candidate-comparison__help {
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .candidate-comparison .candidate-lineup {
+    gap: 12px;
+  }
+  .candidate-comparison .lineup-party {
+    border-radius: 12px;
+  }
+  .candidate-comparison .lineup-party__heading {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .candidate-comparison .lineup-party__heading h3 {
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  .candidate-comparison .lineup-party[data-mirrored] .lineup-hero {
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    min-height: 0;
+    padding: 12px;
+  }
+  .candidate-comparison .lineup-party[data-mirrored] .lineup-portrait {
+    order: 0;
+    height: 72px;
+    min-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .candidate-comparison .lineup-portrait__fallback {
+    min-height: 0;
+    padding: 6px 4px;
+    gap: 4px;
+  }
+  .candidate-comparison .lineup-portrait__fallback > span {
+    font-size: 26px;
+    letter-spacing: -1px;
+  }
+  .candidate-comparison .lineup-portrait__fallback > small {
+    font-size: 9px;
+    line-height: 1.2;
+  }
+  .candidate-comparison .lineup-hero__identity {
+    padding: 0;
+  }
+  .candidate-comparison .lineup-hero__identity > span {
+    margin-bottom: 4px;
+  }
+  .candidate-comparison .lineup-hero__identity h4 {
+    font-size: 17px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+  }
+  .candidate-comparison .lineup-details {
+    padding: 12px;
+    gap: 12px;
+  }
+  .candidate-comparison .lineup-details h5 {
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .candidate-comparison .lineup-details h5 svg {
+    width: 16px;
+    height: 16px;
+  }
+  .candidate-comparison .lineup-details p {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .candidate-comparison .lineup-party__banner {
+    max-height: 100px;
   }
 }

@@ -96,8 +96,8 @@ export function AdminLoginScreen({
               <h1 id="admin-login-title">Welcome back</h1>
               <p>
                 {committee
-                  ? "Sign in with your assigned committee account."
-                  : "Sign in with your administrator account."}
+                  ? "Sign in to manage class lists and student attendance."
+                  : "Sign in to monitor and manage the school election."}
               </p>
             </header>
             <form

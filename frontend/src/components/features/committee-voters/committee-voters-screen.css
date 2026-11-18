@@ -24,15 +24,6 @@
 .voter-filters__election select {
   appearance: auto;
 }
-.voter-ballot-code {
-  display: block;
-  max-width: 210px;
-  margin-top: 5px;
-  color: #58677c;
-  font-size: 10px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
 .voter-attendance-time {
   display: block;
   max-width: 180px;

@@ -135,21 +135,22 @@ function PositionGroup({
   selected: string[];
   toggle: (position: BallotPosition, candidate: BallotCandidate) => void;
 }) {
+  const [comparing, setComparing] = useState(false);
   return (
     <section className="ballot-position">
-      <header className="ballot-position__heading"><div><h2>{displayPosition(position.name)}</h2><p>Select up to {position.max_selections} {position.max_selections === 1 ? "candidate" : "candidates"}</p></div><span className="ballot-position__counter" data-complete={selected.length > 0}>{selected.length} / {position.max_selections} selected</span></header>
+      <header className="ballot-position__heading"><div><h2>{displayPosition(position.name)}</h2><p>Select up to {position.max_selections} {position.max_selections === 1 ? "candidate" : "candidates"}. Click a name to compare.</p></div><span className="ballot-position__counter" data-complete={selected.length > 0}>{selected.length} / {position.max_selections} selected</span></header>
       <div className="ballot-position__options">
         {position.candidates.map((candidate) => {
           const checked = selected.includes(candidate.student_id);
-          return <button aria-pressed={checked} className="ballot-option" data-checked={checked} key={candidate.student_id} onClick={() => toggle(position, candidate)} type="button">
+          return <div className="ballot-option" data-checked={checked} key={candidate.student_id}>
             <CandidateAvatar name={candidate.full_name} photo={candidate.profile_photo_url} />
-            <span className="ballot-option__identity"><strong>{candidate.full_name}</strong><small>{partyLabel(candidate.team, candidate.partylist?.name)}</small></span>
-            <span aria-hidden="true" className="ballot-option__check">{checked && <Check weight="bold" />}</span>
-          </button>;
+            <div className="ballot-option__identity"><button className="ballot-option__name" type="button" aria-label={`Compare candidates for ${candidate.full_name}`} aria-haspopup="dialog" onClick={() => setComparing(true)}><strong>{candidate.full_name}</strong></button><small>{partyLabel(candidate.team, candidate.partylist?.name)}</small></div>
+            <button className="ballot-option__select" aria-label={`${checked ? "Deselect" : "Select"} ${candidate.full_name}`} aria-pressed={checked} onClick={() => toggle(position, candidate)} type="button"><span aria-hidden="true" className="ballot-option__check">{checked && <Check weight="bold" />}</span><span>{checked ? "Selected" : "Select"}</span></button>
+          </div>;
         })}
       </div>
       {position.candidates.length === 0 && <div className="student-empty"><UsersThree aria-hidden="true" weight="light" /><div><h3>Candidates coming soon</h3><p>No candidates have been added yet.</p></div></div>}
-      <CandidateComparison position={position} />
+      {comparing && <CandidateComparison position={position} onClose={() => setComparing(false)} />}
     </section>
   );
 }
