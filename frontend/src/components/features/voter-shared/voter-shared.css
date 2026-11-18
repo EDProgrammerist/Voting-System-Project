@@ -89,6 +89,12 @@
 .tally-candidate strong { font-weight: 700; color: #263f60; }
 .tally-candidate small { display: none; }
 .tally-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; font-size: 12px; color: #5b7292; }
+.tally-indicator-help { margin: 0 0 20px; max-width: 78ch; font-size: 12px; line-height: 1.7; color: #536b86; }
+.tally-vote-total { min-height: 80px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.tally-vote-indicator { display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; max-width: 100%; font-size: 11px; font-weight: 650; line-height: 1.5; }
+.tally-vote-indicator svg { width: 13px; height: 13px; }
+.tally-vote-indicator--increase { color: #176440; }
+.tally-vote-indicator--close { color: #a13530; }
 .vote-verification { padding: 30px; background: #fff; border-radius: 18px; margin-top: 24px; }
 .vote-verification h2 { font-size: 22px; font-weight: 750; letter-spacing: -.5px; margin: 0 0 12px; }
 .vote-verification > p { font-size: 13px; color: #5b6d86; line-height: 1.8; max-width: 78ch; margin: 0; }
@@ -139,6 +145,7 @@
   .student-tally table { table-layout: fixed; }
   .student-tally th:last-child, .student-tally td:last-child { width: 72px; text-align: right; }
   .student-tally td:last-child { font-size: 16px; overflow-wrap: anywhere; }
+  .tally-vote-total { min-height: 72px; }
   .student-tally th:first-child, .student-tally td:first-child { padding-right: 12px; }
   .tally-candidate strong { display: block; }
   .tally-candidate > div { min-width: 0; overflow-wrap: anywhere; }

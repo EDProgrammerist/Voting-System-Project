@@ -1,9 +1,15 @@
 import { partyLabel } from "./candidate-utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getVoterToken, setVoterTallyOnly } from "@/lib/voter-session";
 import { getVoterTally } from "@/services/voter-auth-service";
+import {
+  CLOSE_RACE_VOTE_GAP,
+  getCloseChallenger,
+  getVoteIncreases,
+  getStableCandidates,
+} from "@/lib/tally-indicators";
 import type { VoterTallyResponse } from "@/types/voter";
 import { CandidateAvatar, StudentLayout } from "./student-layout";
 import { BallotReference } from "./ballot-reference";
@@ -13,11 +19,15 @@ import {
   CheckCircle,
   Clock,
   LockSimple,
+  ArrowUp,
+  ArrowDown,
 } from "@phosphor-icons/react";
 
 export default function VoterTallyScreen() {
   const [tally, setTally] = useState<VoterTallyResponse | null>(null);
   const [error, setError] = useState("");
+  const [increases, setIncreases] = useState<Record<string, number>>({});
+  const previousTally = useRef<VoterTallyResponse | null>(null);
   const location = useLocation();
   const confirmation = (
     location.state as { confirmationMessage?: string } | null
@@ -34,6 +44,8 @@ export default function VoterTallyScreen() {
       try {
         const data = await getVoterTally(token!, controller.signal);
         if (!controller.signal.aborted) {
+          setIncreases(getVoteIncreases(data, previousTally.current));
+          previousTally.current = data;
           setVoterTallyOnly(data.tally_only);
           setTally(data);
           setError("");
@@ -61,7 +73,8 @@ export default function VoterTallyScreen() {
   }, []);
   const isClosed = tally?.election.status === "closed";
   const isPreview = tally?.election.status === "draft";
-  if (!tally && !error) return <PageSkeleton kind="tally" label="Loading live election results" />;
+  if (!tally && !error)
+    return <PageSkeleton kind="tally" label="Loading live election results" />;
   return (
     <StudentLayout
       title="Live Tally"
@@ -121,6 +134,13 @@ export default function VoterTallyScreen() {
               : "Loading results..."}
         </p>
       </div>
+      {tally?.election.status === "active" && (
+        <p className="tally-indicator-help">
+          Green arrow: votes added since the last successful refresh. Red arrow:
+          another candidate is tied or within {CLOSE_RACE_VOTE_GAP} votes
+          behind.
+        </p>
+      )}
       {tally?.positions.map((position) => (
         <section className="student-tally" key={position.id}>
           <header className="student-tally__heading">
@@ -140,21 +160,67 @@ export default function VoterTallyScreen() {
                 </tr>
               </thead>
               <tbody>
-                {position.candidates.map((candidate) => (
-                  <tr key={candidate.student_id}>
-                    <td>
-                      <div className="tally-candidate">
-                        <CandidateAvatar name={candidate.full_name} />
-                        <div>
-                          <strong>{candidate.full_name}</strong>
-                          <small>{partyLabel(candidate.team, candidate.partylist?.name)}</small>
+                {getStableCandidates(position.candidates).map((candidate) => {
+                  const increase =
+                    increases[`${position.id}:${candidate.student_id}`];
+                  const challenger =
+                    tally.election.status === "active"
+                      ? getCloseChallenger(candidate, position.candidates)
+                      : null;
+                  const warning = challenger
+                    ? challenger.gap === 0
+                      ? `Tied with ${challenger.candidate.full_name}; either candidate can move ahead on the next vote.`
+                      : `${challenger.candidate.full_name} is ${challenger.gap} ${challenger.gap === 1 ? "vote" : "votes"} behind.`
+                    : "";
+                  return (
+                    <tr key={candidate.student_id}>
+                      <td>
+                        <div className="tally-candidate">
+                          <CandidateAvatar name={candidate.full_name} />
+                          <div>
+                            <strong>{candidate.full_name}</strong>
+                            <small>
+                              {partyLabel(
+                                candidate.team,
+                                candidate.partylist?.name,
+                              )}
+                            </small>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>{partyLabel(candidate.team, candidate.partylist?.name)}</td>
-                    <td>{candidate.votes.toLocaleString()}</td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        {partyLabel(candidate.team, candidate.partylist?.name)}
+                      </td>
+                      <td>
+                        <div className="tally-vote-total">
+                          <span>{candidate.votes.toLocaleString()}</span>
+                          {increase > 0 && (
+                            <span
+                              className="tally-vote-indicator tally-vote-indicator--increase"
+                              title={`${increase} new votes since the previous successful refresh`}
+                              aria-label={`${increase} new votes since the previous successful refresh`}
+                            >
+                              <ArrowUp aria-hidden="true" weight="bold" />+
+                              {increase.toLocaleString()}
+                            </span>
+                          )}
+                          {challenger && (
+                            <span
+                              className="tally-vote-indicator tally-vote-indicator--close"
+                              title={warning}
+                              aria-label={`Close race: ${warning}`}
+                            >
+                              <ArrowDown aria-hidden="true" weight="bold" />
+                              {challenger.gap === 0
+                                ? "Tied"
+                                : `${challenger.gap} ahead`}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           ) : (
