@@ -98,6 +98,40 @@ class CommitteeStudentManagementTest extends TestCase
         ]);
     }
 
+    public function test_class_details_can_be_updated_and_cleared_without_changing_access_or_attendance(): void
+    {
+        $election = Election::create(['name' => 'Class details test', 'status' => 'active']);
+        $student = Student::create([
+            'student_id' => 'CLASS001', 'full_name' => 'Class Test Student',
+            'course' => 'BSIT', 'academic_status' => 'enrolled',
+            'year_level' => '1', 'section' => '1D',
+            'password' => 'PersonalPassword123!', 'password_change_required' => false,
+        ]);
+        $password = $student->getRawOriginal('password');
+        $student->createToken('voter-session', ['voter']);
+        $participation = VoterParticipation::create([
+            'election_id' => $election->id, 'student_id' => $student->student_id, 'voted_at' => now(),
+        ]);
+
+        $this->putJson('/api/committee/students/CLASS001', ['year_level' => '3', 'section' => '3D'])
+            ->assertOk()->assertJsonPath('data.year_level', '3')->assertJsonPath('data.section', '3D');
+        $this->getJson('/api/committee/students?election_id='.$election->id)
+            ->assertOk()->assertJsonPath('data.0.year_level', '3')->assertJsonPath('data.0.section', '3D')
+            ->assertJsonPath('data.0.attendance_recorded', true)->assertJsonPath('data.0.voting_status', 'voted');
+        $this->assertSame($password, $student->fresh()->getRawOriginal('password'));
+        $this->assertFalse($student->fresh()->password_change_required);
+        $this->assertSame(1, $student->tokens()->count());
+        $this->assertSame($participation->voted_at->toIso8601String(), $participation->fresh()->voted_at->toIso8601String());
+        $this->assertDatabaseHas('students', ['student_id' => 'CLASS001', 'full_name' => 'Class Test Student', 'course' => 'BSIT', 'academic_status' => 'enrolled']);
+
+        $this->putJson('/api/committee/students/CLASS001', ['year_level' => null, 'section' => null])
+            ->assertOk()->assertJsonPath('data.year_level', null)->assertJsonPath('data.section', null);
+        $this->putJson('/api/committee/students/CLASS001', ['section' => str_repeat('D', 101)])
+            ->assertUnprocessable()->assertJsonValidationErrors('section');
+        $this->assertDatabaseCount('students', 1);
+        $this->assertDatabaseCount('voter_participations', 1);
+    }
+
     public function test_enrolled_filter_hides_graduated_and_stopped_students_from_the_voter_list(): void
     {
         Student::create([

@@ -10,6 +10,8 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
+import committeeProfile from "@/assets/committee-profile.png";
+import adminProfile from "@/assets/admin-profile.png";
 
 import {
   clearAdminSession,
@@ -54,7 +56,12 @@ const adminNavigationGroups = [
   {
     label: "Manage",
     items: [
-      { id: "partylists", label: "Partylists", icon: Users, path: "/admin/partylists" },
+      {
+        id: "partylists",
+        label: "Partylists",
+        icon: Users,
+        path: "/admin/partylists",
+      },
       {
         id: "candidates",
         label: "Candidates",
@@ -84,14 +91,6 @@ const committeeNavigationGroups = [
     ],
   },
 ];
-
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part.charAt(0))
-    .join("");
-}
 
 export function AdminSidebar({
   active,
@@ -246,12 +245,20 @@ export function AdminSidebar({
         </nav>
         <div className="admin-dashboard__account">
           <div>
-            <span>{admin ? initials(admin.name) : "AD"}</span>
-            <p>
-              <strong>{admin?.name ?? "CPC Admin"}</strong>
-              <small>
-                {committee ? "Election committee" : "Administrator"}
-              </small>
+            <span>
+              <img
+                className="admin-dashboard__account-photo"
+                src={committee ? committeeProfile : adminProfile}
+                alt=""
+                width={36}
+                height={36}
+              />
+            </span>
+            <p title={admin?.name}>
+              <strong>
+                {committee ? "Committee" : (admin?.name ?? "CPC Admin")}
+              </strong>
+              <small>{committee ? "Class records" : "Administrator"}</small>
             </p>
           </div>
           <button aria-label="Log out" onClick={handleLogout} type="button">

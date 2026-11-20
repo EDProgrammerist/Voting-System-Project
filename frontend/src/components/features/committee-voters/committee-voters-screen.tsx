@@ -161,11 +161,18 @@ export function CommitteeVotersScreen() {
     });
   }, [status, query, voters]);
 
-  if (loading) return <section className="admin-dashboard__content admin-voters__content"><PageSkeleton kind="table" label="Loading student records and attendance" /></section>;
+  if (loading)
+    return (
+      <section className="admin-dashboard__content admin-voters__content">
+        <PageSkeleton
+          kind="table"
+          label="Loading student records and attendance"
+        />
+      </section>
+    );
 
   return (
     <>
-
       <section className="admin-dashboard__content admin-voters__content">
         <header className="admin-voters__header">
           <h1>Voters</h1>
@@ -247,6 +254,8 @@ export function CommitteeVotersScreen() {
                   <th scope="col">Student ID</th>
                   <th scope="col">Name</th>
                   <th scope="col">Course</th>
+                  <th scope="col">Year level</th>
+                  <th scope="col">Section</th>
                   <th scope="col">Academic Status</th>
                   <th scope="col">Voting Status</th>
                   <th scope="col">Attendance</th>
@@ -263,16 +272,12 @@ export function CommitteeVotersScreen() {
                     </td>
                     <td role="cell" data-label="Course">
                       {formatCourse(voter.course)}
-                      {(voter.year_level || voter.section) && (
-                        <small className="voter-attendance-time">
-                          {[
-                            voter.year_level ? `Year ${voter.year_level}` : "",
-                            voter.section,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </small>
-                      )}
+                    </td>
+                    <td role="cell" data-label="Year level">
+                      {voter.year_level || "Not specified"}
+                    </td>
+                    <td role="cell" data-label="Section">
+                      {voter.section || "Not specified"}
                     </td>
                     <td role="cell" data-label="Academic status">
                       <span
@@ -321,14 +326,13 @@ export function CommitteeVotersScreen() {
               <p>{notice}</p>
             </div>
           )}
-          {!(notice && voters.length === 0) &&
-            filteredVoters.length === 0 && (
-              <div className="voters-table__empty">
-                <MagnifyingGlass aria-hidden="true" />
-                <strong>No voters found</strong>
-                <p>Try changing the search or filters.</p>
-              </div>
-            )}
+          {!(notice && voters.length === 0) && filteredVoters.length === 0 && (
+            <div className="voters-table__empty">
+              <MagnifyingGlass aria-hidden="true" />
+              <strong>No voters found</strong>
+              <p>Try changing the search or filters.</p>
+            </div>
+          )}
         </section>
 
         <p aria-live="polite" className="admin-dashboard__notice" role="status">
