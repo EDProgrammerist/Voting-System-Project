@@ -1,0 +1,260 @@
+.admin-login--reference {
+  --admin-login-unit: 1vw;
+  position: relative;
+  display: block;
+  padding: clamp(180px, 29.8vh, 280px) 0 clamp(40px, 11vh, 104px);
+  background: #f7fbff url("@/assets/admin-login-background.webp") center / 100%
+    100% no-repeat;
+  color: #13264c;
+}
+
+.admin-login--reference .admin-login__container {
+  width: min(74%, 1228px, calc(var(--admin-login-unit) * 74));
+}
+
+.admin-login--reference .admin-login__switch {
+  position: absolute;
+  top: clamp(20px, 3.4vh, 32px);
+  left: 5.25%;
+  gap: 12px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(16px, calc(var(--admin-login-unit) * 1.2), 20px);
+  font-weight: 700;
+}
+
+.admin-login--reference .admin-login__switch:focus-visible {
+  outline-color: #fff;
+}
+
+.admin-login--reference .admin-login__switch svg {
+  width: 24px;
+  height: 24px;
+}
+
+.admin-login--reference .admin-login__workspace {
+  grid-template-columns: 46% minmax(0, 1fr);
+  min-height: clamp(360px, calc(var(--admin-login-unit) * 33.3), 556px);
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.admin-login--reference .admin-login__context {
+  padding: 24px clamp(32px, calc(var(--admin-login-unit) * 4.8), 80px) 48px 0;
+  border-right: 1px solid #cedcf1;
+  background: transparent;
+}
+
+.admin-login--reference .admin-login__college-logo {
+  width: min(100%, 480px);
+  border-radius: 50%;
+}
+
+.admin-login--reference .admin-login__panel {
+  min-width: 0;
+  padding: 8px 0 8px clamp(32px, calc(var(--admin-login-unit) * 4.3), 72px);
+  align-self: start;
+}
+
+.admin-login--reference .admin-login__section-label {
+  color: #536788;
+  font-size: clamp(15px, calc(var(--admin-login-unit) * 1.2), 20px);
+  line-height: 1.5;
+}
+
+.admin-login--reference .admin-login__panel h1 {
+  margin: 6px 0;
+  color: #12244b;
+  font-size: clamp(32px, calc(var(--admin-login-unit) * 2.87), 48px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.admin-login--reference .admin-login__panel header p {
+  color: #536788;
+  font-size: clamp(15px, calc(var(--admin-login-unit) * 1.2), 20px);
+  line-height: 1.5;
+}
+
+.admin-login--reference .admin-login__form {
+  gap: clamp(20px, calc(var(--admin-login-unit) * 1.67), 28px);
+  margin-top: clamp(28px, calc(var(--admin-login-unit) * 2), 34px);
+}
+
+.admin-login--reference .admin-login__field label {
+  color: #13264c;
+  font-size: clamp(14px, calc(var(--admin-login-unit) * 0.96), 16px);
+  font-weight: 700;
+}
+
+.admin-login--reference .admin-login__field input {
+  min-height: clamp(50px, calc(var(--admin-login-unit) * 3.7), 62px);
+  padding: 14px 16px;
+  border-color: #cddbf0;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 72%);
+  color: #13264c;
+  font-size: clamp(16px, calc(var(--admin-login-unit) * 1.2), 20px);
+}
+
+.admin-login--reference .admin-login__field input::placeholder {
+  color: #5a6d8b;
+}
+
+.admin-login--reference .admin-login__password {
+  border-color: #cddbf0;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.admin-login--reference .admin-login__password input {
+  background: transparent;
+}
+
+.admin-login--reference .admin-login__password button {
+  width: clamp(44px, calc(var(--admin-login-unit) * 3.6), 60px);
+  border-radius: 10px;
+  color: #5a6d8b;
+}
+
+.admin-login--reference .admin-login__password svg {
+  width: 24px;
+  height: 24px;
+}
+
+.admin-login--reference .admin-login__submit {
+  min-height: clamp(52px, calc(var(--admin-login-unit) * 3.83), 64px);
+  border-radius: 9px;
+  background: #1049bd;
+  font-size: clamp(16px, calc(var(--admin-login-unit) * 1.2), 20px);
+  font-weight: 700;
+}
+
+.admin-login--reference .admin-login__submit:hover:not(:disabled) {
+  background: #0b3da4;
+}
+
+.admin-login--reference .admin-login__submit svg {
+  width: 26px;
+  height: 26px;
+}
+
+.admin-login--reference .admin-login__help {
+  margin-top: clamp(24px, calc(var(--admin-login-unit) * 1.67), 28px);
+  color: #536788;
+  font-size: clamp(13px, calc(var(--admin-login-unit) * 1.08), 18px);
+  line-height: 1.7;
+}
+
+.admin-login--reference .admin-login__help a {
+  color: #0044c6;
+}
+
+.admin-login--reference .admin-login__status {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1001px) {
+  .admin-login--reference {
+    /* Keep the reference proportions within wide, short laptop viewports. */
+    --admin-login-unit: min(1vw, 1.777vh);
+  }
+
+  .admin-login--reference .admin-login__context {
+    padding-top: clamp(16px, 2.55vh, 24px);
+    padding-bottom: clamp(24px, 5.1vh, 48px);
+  }
+
+  .admin-login--reference .admin-login__field input {
+    padding-block: clamp(10px, 1.49vh, 14px);
+  }
+}
+
+@media (min-width: 1001px) and (max-height: 940px) {
+  .admin-login--reference {
+    padding-bottom: 32px;
+  }
+}
+
+@media (min-width: 1001px) and (max-height: 700px) {
+  .admin-login--reference {
+    padding-top: 26vh;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .admin-login--reference {
+    padding: 176px 32px 64px;
+    background-size: auto 100%;
+  }
+
+  .admin-login--reference .admin-login__container {
+    width: min(100%, 600px);
+  }
+
+  .admin-login--reference .admin-login__switch {
+    top: 24px;
+    left: 32px;
+  }
+
+  .admin-login--reference .admin-login__workspace {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    min-height: 0;
+  }
+
+  .admin-login--reference .admin-login__context {
+    padding: 0;
+    border: 0;
+  }
+
+  .admin-login--reference .admin-login__college-logo {
+    width: 168px;
+  }
+
+  .admin-login--reference .admin-login__panel {
+    padding: 0;
+  }
+
+  .admin-login--reference .admin-login__panel h1 {
+    font-size: 36px;
+  }
+
+  .admin-login--reference .admin-login__panel header p,
+  .admin-login--reference .admin-login__section-label {
+    font-size: 16px;
+  }
+
+  .admin-login--reference .admin-login__help {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-login--reference {
+    padding: 144px 24px 48px;
+    background-position: 65% top;
+  }
+
+  .admin-login--reference .admin-login__switch {
+    top: 16px;
+    left: 24px;
+  }
+
+  .admin-login--reference .admin-login__workspace {
+    gap: 24px;
+  }
+
+  .admin-login--reference .admin-login__college-logo {
+    width: 112px;
+  }
+
+  .admin-login--reference .admin-login__panel h1 {
+    font-size: 30px;
+  }
+}

@@ -2,6 +2,13 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { MagnifyingGlass, Plus, User, X } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 
+import presidentLogo from "@/assets/positions/president.webp";
+import vicePresidentLogo from "@/assets/positions/vice-president.webp";
+import senatorLogo from "@/assets/positions/senator.webp";
+import secretaryLogo from "@/assets/positions/secretary.webp";
+import treasurerLogo from "@/assets/positions/treasurer.webp";
+import auditorLogo from "@/assets/positions/auditor.webp";
+import pioLogo from "@/assets/positions/pio.webp";
 import {
   AdminDataState,
   AdminElectionPicker,
@@ -27,6 +34,16 @@ import "../admin-dashboard/admin-dashboard-screen.css";
 import "../admin-dashboard/admin-overview.css";
 import "../admin-dashboard/admin-management.css";
 import "./admin-candidates-screen.css";
+
+const positionLogos: Partial<Record<string, string>> = {
+  President: presidentLogo,
+  "Vice President": vicePresidentLogo,
+  Senator: senatorLogo,
+  Secretary: secretaryLogo,
+  Treasurer: treasurerLogo,
+  Auditor: auditorLogo,
+  PIO: pioLogo,
+};
 
 export function AdminCandidatesScreen() {
   const navigate = useNavigate();
@@ -348,6 +365,7 @@ export function AdminCandidatesScreen() {
             <SummaryCard
               key={position.id}
               label={position.name}
+              logo={positionLogos[position.name]}
               value={countsByPosition.get(position.id) ?? 0}
             />
           ))}
@@ -590,11 +608,31 @@ export function AdminCandidatesScreen() {
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: number }) {
+function SummaryCard({
+  label,
+  value,
+  logo,
+}: {
+  label: string;
+  value: number;
+  logo?: string;
+}) {
   return (
     <article>
-      <p>{label}</p>
-      <strong>{value}</strong>
+      <div className="candidate-summary__details">
+        <p>{label}</p>
+        <strong>{value}</strong>
+      </div>
+      {logo && (
+        <img
+          alt=""
+          className="candidate-summary__logo"
+          decoding="async"
+          height={64}
+          src={logo}
+          width={64}
+        />
+      )}
     </article>
   );
 }

@@ -1,5 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckSquare,
+  Eye,
+  EyeSlash,
+} from "@phosphor-icons/react";
 import { Link, useNavigate } from "react-router";
 import collegeLogo from "@/assets/cordova-public-college-logo.jpg";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -9,6 +15,8 @@ import { loginAdmin } from "@/services/admin-auth-service";
 import { loginCommittee } from "@/services/committee-service";
 import { saveCommitteeSession } from "@/lib/committee-session";
 import "./admin-login-screen.css";
+import "./admin-login-reference.css";
+import "./committee-login-reference.css";
 import "@/components/features/shared/login-transition.css";
 
 type SubmissionStatus = "idle" | "submitting" | "success" | "error";
@@ -63,7 +71,9 @@ export function AdminLoginScreen({
 
   const isSubmitting = status === "submitting";
   return (
-    <main className="admin-login login-transition">
+    <main
+      className={`admin-login login-transition ${committee ? "committee-login--reference" : "admin-login--reference"}`}
+    >
       <div className="admin-login__container">
         <Link className="admin-login__switch" to="/voter/login">
           <ArrowLeft aria-hidden="true" />
@@ -72,7 +82,11 @@ export function AdminLoginScreen({
         <div className="admin-login__workspace">
           <section
             className="admin-login__context"
-            aria-label="CPC Vote administration"
+            aria-label={
+              committee
+                ? "CPC Vote election committee"
+                : "CPC Vote administration"
+            }
           >
             <img
               className="admin-login__college-logo"
@@ -88,15 +102,29 @@ export function AdminLoginScreen({
             aria-labelledby="admin-login-title"
           >
             <header>
-              <span className="admin-login__section-label">
-                {committee
-                  ? "Election committee access"
-                  : "Administrator access"}
-              </span>
-              <h1 id="admin-login-title">Welcome back</h1>
+              {!committee && (
+                <span className="admin-login__section-label">
+                  Administrator access
+                </span>
+              )}
+              <h1 id="admin-login-title">
+                {committee ? "Committee Login" : "Welcome back"}
+              </h1>
+              {committee && (
+                <>
+                  <div className="committee-login__divider" aria-hidden="true">
+                    <span />
+                    <CheckSquare />
+                    <span />
+                  </div>
+                  <span className="admin-login__section-label">
+                    Election committee access
+                  </span>
+                </>
+              )}
               <p>
                 {committee
-                  ? "Sign in to manage class lists and student attendance."
+                  ? "Sign in to manage class list and student attendance."
                   : "Sign in to monitor and manage the school election."}
               </p>
             </header>
@@ -179,7 +207,7 @@ export function AdminLoginScreen({
             <p className="admin-login__help">
               {committee ? (
                 <>
-                  Manage class-list records and voting attendance.{" "}
+                  Manage class list records and voting attendance.{" "}
                   <Link to="/admin/login">Admin Login</Link>.
                 </>
               ) : (

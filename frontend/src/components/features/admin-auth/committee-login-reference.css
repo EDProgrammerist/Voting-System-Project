@@ -1,0 +1,224 @@
+.committee-login--reference {
+  --committee-login-unit: min(1vw, 1.777vh);
+  position: relative;
+  display: block;
+  padding: clamp(24px, 3.93vh, 37px) 24px clamp(24px, 5.95vh, 56px);
+  background: #f5f9ff url("@/assets/committee-login-background.webp") center /
+    100% 100% no-repeat;
+  color: #13264c;
+}
+
+.committee-login--reference .admin-login__container {
+  width: min(
+    100%,
+    clamp(420px, calc(var(--committee-login-unit) * 34.7), 580px)
+  );
+}
+
+.committee-login--reference .admin-login__switch {
+  position: absolute;
+  top: 20px;
+  right: 32px;
+  gap: 8px;
+  margin: 0;
+  color: #174a9b;
+  font-size: 14px;
+}
+
+.committee-login--reference .admin-login__workspace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.committee-login--reference .admin-login__context {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.committee-login--reference .admin-login__college-logo {
+  width: clamp(120px, calc(var(--committee-login-unit) * 16.75), 280px);
+  border-radius: 50%;
+}
+
+.committee-login--reference .admin-login__panel {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.committee-login--reference .admin-login__panel h1 {
+  margin: clamp(6px, calc(var(--committee-login-unit) * 0.478), 8px) 0
+    clamp(4px, calc(var(--committee-login-unit) * 0.359), 6px);
+  color: #081b42;
+  font-size: clamp(32px, calc(var(--committee-login-unit) * 3.59), 60px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.committee-login__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, calc(var(--committee-login-unit) * 1.435), 24px);
+  width: 83.3%;
+  margin: 0 auto clamp(6px, calc(var(--committee-login-unit) * 0.478), 8px);
+  color: #0451e5;
+}
+
+.committee-login__divider span {
+  flex: 1;
+  height: 3px;
+  background: currentColor;
+}
+
+.committee-login__divider svg {
+  flex-shrink: 0;
+  width: clamp(32px, calc(var(--committee-login-unit) * 2.87), 48px);
+  height: clamp(32px, calc(var(--committee-login-unit) * 2.87), 48px);
+}
+
+.committee-login--reference .admin-login__section-label {
+  display: block;
+  color: #2c456b;
+  font-size: clamp(18px, calc(var(--committee-login-unit) * 1.435), 24px);
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.committee-login--reference .admin-login__panel header p {
+  margin: 0;
+  color: #2c456b;
+  font-size: clamp(14px, calc(var(--committee-login-unit) * 1.08), 18px);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.committee-login--reference .admin-login__form {
+  gap: clamp(16px, calc(var(--committee-login-unit) * 1.08), 18px);
+  margin-top: clamp(20px, calc(var(--committee-login-unit) * 1.435), 24px);
+  text-align: left;
+}
+
+.committee-login--reference .admin-login__field {
+  gap: 4px;
+}
+
+.committee-login--reference .admin-login__field label {
+  color: #142e56;
+  font-size: clamp(14px, calc(var(--committee-login-unit) * 1.08), 18px);
+  font-weight: 700;
+}
+
+.committee-login--reference .admin-login__field input {
+  min-height: clamp(48px, calc(var(--committee-login-unit) * 3.47), 58px);
+  padding: 10px clamp(14px, calc(var(--committee-login-unit) * 1.2), 20px);
+  border-color: #ccdbef;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 80%);
+  color: #13264c;
+  font-size: clamp(16px, calc(var(--committee-login-unit) * 1.2), 20px);
+}
+
+.committee-login--reference .admin-login__field input::placeholder {
+  color: #435e88;
+}
+
+.committee-login--reference .admin-login__password {
+  border-color: #ccdbef;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 80%);
+}
+
+.committee-login--reference .admin-login__password input {
+  background: transparent;
+}
+
+.committee-login--reference .admin-login__password button {
+  width: clamp(44px, calc(var(--committee-login-unit) * 3.6), 60px);
+  border-radius: 10px;
+  color: #435e88;
+}
+
+.committee-login--reference .admin-login__password svg {
+  width: 24px;
+  height: 24px;
+}
+
+.committee-login--reference .admin-login__submit {
+  min-height: clamp(50px, calc(var(--committee-login-unit) * 3.59), 60px);
+  margin-top: clamp(4px, calc(var(--committee-login-unit) * 0.478), 8px);
+  border-radius: 10px;
+  background: #0048cf;
+  font-size: clamp(16px, calc(var(--committee-login-unit) * 1.435), 24px);
+  font-weight: 700;
+}
+
+.committee-login--reference .admin-login__submit:hover:not(:disabled) {
+  background: #003ba9;
+}
+
+.committee-login--reference .admin-login__submit svg {
+  width: 28px;
+  height: 28px;
+}
+
+.committee-login--reference .admin-login__help {
+  margin-top: clamp(20px, calc(var(--committee-login-unit) * 1.675), 28px);
+  color: #2c456b;
+  font-size: clamp(13px, calc(var(--committee-login-unit) * 1.08), 18px);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.committee-login--reference .admin-login__help a {
+  color: #0044c6;
+  font-weight: 650;
+}
+
+.committee-login--reference .admin-login__status {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1001px) and (max-height: 900px) {
+  .committee-login--reference {
+    padding-bottom: 24px;
+  }
+}
+
+@media (min-width: 1001px) and (max-height: 800px) {
+  .committee-login--reference {
+    --committee-login-unit: min(1vw, 1.6vh);
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .committee-login--reference {
+    background-size: auto 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .committee-login--reference {
+    padding: 76px 24px 32px;
+  }
+
+  .committee-login--reference .admin-login__switch {
+    top: 16px;
+    right: 24px;
+  }
+
+  .committee-login--reference .admin-login__panel h1 {
+    font-size: 30px;
+  }
+}

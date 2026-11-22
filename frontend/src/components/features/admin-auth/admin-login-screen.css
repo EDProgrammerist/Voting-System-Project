@@ -1,11 +1,6 @@
 @import "@fontsource-variable/plus-jakarta-sans";
 .admin-login {
   min-height: 100dvh;
-  display: grid;
-  align-items: center;
-  padding: 40px 24px;
-  background: #f4f6f9;
-  color: #202e43;
   font-family: "Plus Jakarta Sans Variable", "Segoe UI", sans-serif;
   line-height: 1.5;
 }
@@ -17,7 +12,6 @@
   outline-offset: 4px;
 }
 .admin-login__container {
-  width: min(100%, 980px);
   margin: 0 auto;
 }
 .admin-login__switch {
@@ -25,9 +19,6 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  margin-bottom: 16px;
-  color: #395375;
-  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
 }
@@ -40,80 +31,40 @@
 }
 .admin-login__workspace {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid #e0e6ef;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #fff;
 }
 .admin-login__context {
   display: grid;
   place-items: center;
   min-width: 0;
-  padding: 40px;
-  background: #fff;
-  border-right: 1px solid #e0e6ef;
 }
 .admin-login__college-logo {
   display: block;
-  width: min(100%, 360px);
+  max-width: 100%;
   height: auto;
   object-fit: contain;
 }
 .admin-login__panel {
-  padding: 56px 40px 40px;
   align-self: center;
-}
-.admin-login__section-label {
-  color: #58677c;
-  font-size: 12px;
-}
-.admin-login__panel h1 {
-  margin: 8px 0;
-  font-size: 27px;
-  font-weight: 750;
-  letter-spacing: -0.8px;
-  line-height: 1.3;
 }
 .admin-login__panel header p {
   margin: 0;
-  color: #58677c;
-  font-size: 13px;
-  line-height: 1.8;
 }
 .admin-login__form {
   display: grid;
-  gap: 20px;
-  margin-top: 32px;
 }
 .admin-login__field {
   display: grid;
   gap: 8px;
 }
-.admin-login__field label {
-  font-size: 12px;
-  font-weight: 650;
-  color: #394d68;
-}
 .admin-login__field input {
   width: 100%;
   min-width: 0;
-  min-height: 50px;
   border: 1px solid #cbd6e5;
-  border-radius: 7px;
-  padding: 12px;
-  color: #202e43;
-  background: #fff;
   font: inherit;
-  font-size: 16px;
-}
-.admin-login__field input::placeholder {
-  color: #66758a;
 }
 .admin-login__password {
   display: flex;
   border: 1px solid #cbd6e5;
-  border-radius: 7px;
 }
 .admin-login__password input {
   border: 0;
@@ -121,22 +72,14 @@
 .admin-login__password button {
   display: grid;
   place-items: center;
-  width: 44px;
   min-height: 44px;
   flex-shrink: 0;
   border: 0;
-  border-radius: 7px;
   background: transparent;
-  color: #58677c;
   cursor: pointer;
-}
-.admin-login__password svg {
-  width: 20px;
-  height: 20px;
 }
 .admin-login__status {
   margin: 0;
-  font-size: 12px;
   color: #a13530;
 }
 .admin-login__status:empty {
@@ -156,75 +99,22 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 50px;
   border: 0;
-  border-radius: 7px;
   padding: 12px;
-  background: #2459b8;
   color: #fff;
   font: inherit;
-  font-size: 13px;
-  font-weight: 650;
   cursor: pointer;
-}
-.admin-login__submit:hover:not(:disabled) {
-  background: #1b4896;
-}
-.admin-login__submit svg {
-  width: 18px;
-  height: 18px;
 }
 .admin-login button:disabled {
   opacity: 0.65;
   cursor: wait;
 }
 .admin-login__help {
-  margin: 24px 0 0;
-  color: #58677c;
-  font-size: 12px;
-  line-height: 1.7;
+  margin: 0;
 }
 .admin-login__help a {
-  color: #2459b8;
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-@media (max-width: 800px) {
-  .admin-login__context {
-    padding: 32px 24px;
-  }
-  .admin-login__panel {
-    padding: 40px 28px;
-  }
-}
-@media (max-width: 640px) {
-  .admin-login {
-    padding: 20px 16px;
-    align-items: start;
-  }
-  .admin-login__workspace {
-    grid-template-columns: 1fr;
-  }
-  .admin-login__context {
-    padding: 24px;
-  }
-  .admin-login__context {
-    border-right: 0;
-    border-bottom: 1px solid #e0e6ef;
-  }
-  .admin-login__college-logo {
-    width: 160px;
-    max-width: 100%;
-  }
-  .admin-login__panel {
-    padding: 28px 24px;
-  }
-  .admin-login__panel h1 {
-    font-size: 24px;
-  }
-  .admin-login__form {
-    margin-top: 24px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .admin-login * {
