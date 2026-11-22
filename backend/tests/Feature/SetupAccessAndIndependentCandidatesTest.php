@@ -27,7 +27,7 @@ class SetupAccessAndIndependentCandidatesTest extends TestCase
         ])->assertOk()->json('token');
         $this->app['auth']->forgetGuards();
         $this->withToken($token)->getJson('/api/voter/tally')->assertOk()->assertJsonPath('tally_only', false);
-        $this->withToken($token)->getJson('/api/voter/ballot')->assertOk()->assertJsonPath('can_submit_vote', false)->assertJsonCount(3, 'positions');
+        $this->withToken($token)->getJson('/api/voter/ballot')->assertOk()->assertJsonPath('can_submit_vote', false)->assertJsonCount(7, 'positions');
         CandidateProfile::create(['student_id' => 'C-TEST', 'full_name' => 'Independent Candidate']);
         Candidacy::create(['student_id' => 'C-TEST', 'election_id' => $election->id, 'position_id' => $election->positions->first()->id, 'team' => 'TEAM_A']);
         $this->withToken($token)->postJson('/api/voter/vote', [

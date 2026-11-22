@@ -282,17 +282,18 @@ export function AdminCandidatesScreen() {
 
   if (dataState !== "live" || recordsState === "loading") {
     return (
-      <>
-        <section className="admin-dashboard__content admin-candidates__content">
-          <AdminDataState message={dataNotice} state={dataState === "live" ? "loading" : dataState} kind="candidates" />
-        </section>
-      </>
+      <section className="admin-dashboard__content admin-candidates__content">
+        <AdminDataState
+          message={dataNotice}
+          state={dataState === "live" ? "loading" : dataState}
+          kind="candidates"
+        />
+      </section>
     );
   }
 
   return (
     <>
-
       <section className="admin-dashboard__content admin-candidates__content">
         <header className="admin-candidates__header">
           <div>
@@ -311,7 +312,6 @@ export function AdminCandidatesScreen() {
             }}
             selectedElectionId={selectedElectionId}
           />
-          <button type="button" className="admin-candidates__activate" onClick={() => navigate("/admin/partylists")}>Partylists</button>
           <button
             className="admin-candidates__activate"
             disabled={!canActivate || activating}
@@ -397,9 +397,7 @@ export function AdminCandidatesScreen() {
                     {candidate.position.name}
                   </p>
                   <h2>{candidate.full_name}</h2>
-                  <p>
-                    {partyLabel(candidate.team, candidate.partylist?.name)}
-                  </p>
+                  <p>{partyLabel(candidate.team, candidate.partylist?.name)}</p>
                 </div>
                 <div className="candidate-card__actions">
                   <button
@@ -425,19 +423,19 @@ export function AdminCandidatesScreen() {
               <User aria-hidden="true" />
               <h2>
                 {recordsState === "error"
-                    ? "Candidate records unavailable"
-                    : candidates.length === 0
-                      ? "No candidates added yet"
-                      : "No matching candidates"}
+                  ? "Candidate records unavailable"
+                  : candidates.length === 0
+                    ? "No candidates added yet"
+                    : "No matching candidates"}
               </h2>
               <p>
                 {recordsState === "error"
-                    ? notice
-                    : candidates.length === 0
-                      ? canEdit
-                        ? "Choose Add Candidate to create the first profile for this election."
-                        : "No candidates are registered for this election."
-                      : "Try a different name or position filter."}
+                  ? notice
+                  : candidates.length === 0
+                    ? canEdit
+                      ? "Choose Add Candidate to create the first profile for this election."
+                      : "No candidates are registered for this election."
+                    : "Try a different name or position filter."}
               </p>
             </div>
           )}
@@ -488,7 +486,8 @@ export function AdminCandidatesScreen() {
             {selectedCandidate ? "Edit Candidate" : "Add Candidate"}
           </h2>
           <p className="candidate-modal__intro">
-            Enter the position, partylist, photo, and achievements. Set the shared platform in Partylists.
+            Enter the position, partylist, photo, and achievements. Set the
+            shared platform in Partylists.
           </p>
           <form onSubmit={handleSave}>
             <label>
@@ -538,8 +537,18 @@ export function AdminCandidatesScreen() {
                 <option disabled value="">
                   Select a partylist
                 </option>
-                <option value="TEAM_A">{partyLabel("TEAM_A", partylists.find(party => party.team === "TEAM_A")?.name)}</option>
-                <option value="TEAM_B">{partyLabel("TEAM_B", partylists.find(party => party.team === "TEAM_B")?.name)}</option>
+                <option value="TEAM_A">
+                  {partyLabel(
+                    "TEAM_A",
+                    partylists.find((party) => party.team === "TEAM_A")?.name,
+                  )}
+                </option>
+                <option value="TEAM_B">
+                  {partyLabel(
+                    "TEAM_B",
+                    partylists.find((party) => party.team === "TEAM_B")?.name,
+                  )}
+                </option>
               </select>
             </label>
             <label>

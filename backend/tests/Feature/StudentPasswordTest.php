@@ -156,7 +156,7 @@ class StudentPasswordTest extends TestCase
         $this->assertSame($before, DB::table('voter_participations')->get()->toJson());
         $this->assertSame('draft', $election->fresh()->status);
         $this->assertDatabaseCount('students', 2);
-        $this->assertDatabaseCount('positions', 3);
+        $this->assertDatabaseCount('positions', 7);
         $this->assertDatabaseCount('votes', 0);
     }
 }

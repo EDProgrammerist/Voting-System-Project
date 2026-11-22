@@ -123,9 +123,10 @@
     grid-template-columns: minmax(0, 1fr) 104px;
   }
   .candidate-comparison .lineup-portrait {
+    width: 104px;
     height: 104px;
     min-height: 0;
-    border-radius: 10px;
+    border-radius: 50%;
     overflow: hidden;
   }
   .candidate-comparison .lineup-portrait__fallback {
@@ -196,9 +197,10 @@
   }
   .candidate-comparison .lineup-party[data-mirrored] .lineup-portrait {
     order: 0;
+    width: 72px;
     height: 72px;
     min-height: 0;
-    border-radius: 8px;
+    border-radius: 50%;
     overflow: hidden;
   }
   .candidate-comparison .lineup-portrait__fallback {

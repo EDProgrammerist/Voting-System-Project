@@ -15,7 +15,7 @@ class Election extends Model
             $election->qr_entry_code = (string) Str::uuid();
         });
         static::created(function (Election $election): void {
-            foreach (['President', 'Vice President', 'Senator'] as $index => $name) {
+            foreach (['President', 'Vice President', 'Senator', 'Secretary', 'Treasurer', 'Auditor', 'PIO'] as $index => $name) {
                 $election->positions()->create([
                     'name' => $name, 'max_selections' => 1, 'display_order' => $index + 1,
                 ]);

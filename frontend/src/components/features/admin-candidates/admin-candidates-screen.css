@@ -1,3 +1,18 @@
+.admin-management .admin-candidates__header > div:first-child {
+  flex-basis: 100%;
+}
+
+@media (min-width: 641px) {
+  .admin-management .admin-candidates__header {
+    align-items: flex-end;
+  }
+
+  .admin-management .admin-candidates__header > .admin-election-picker {
+    min-width: 260px;
+    margin-right: auto;
+  }
+}
+
 .candidate-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

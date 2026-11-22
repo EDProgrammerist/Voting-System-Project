@@ -53,7 +53,7 @@ class VoterFlowAndDashboardTest extends TestCase
         $draftElection = Election::sole();
         $this->assertSame('SSG Election 2026', $draftElection->name);
         $this->assertSame('draft', $draftElection->status);
-        $this->assertDatabaseCount('positions', 3);
+        $this->assertDatabaseCount('positions', 7);
         $this->assertDatabaseCount('candidate_profiles', 0);
         $this->assertDatabaseCount('candidacies', 0);
         $this->assertDatabaseCount('voter_participations', 0);
@@ -160,6 +160,12 @@ class VoterFlowAndDashboardTest extends TestCase
             ['student_id' => '20240102', 'position_id' => $vicePresident->id, 'team' => 'TEAM_A'],
             ['student_id' => '20240103', 'position_id' => $senator->id, 'team' => 'TEAM_B'],
         ];
+
+        foreach ($election->positions()->whereNotIn('id', [$president->id, $vicePresident->id, $senator->id])->get() as $position) {
+            $id = 'C-'.$position->id;
+            CandidateProfile::create(['student_id' => $id, 'full_name' => $position->name.' Candidate']);
+            Candidacy::create(['election_id' => $election->id, 'position_id' => $position->id, 'student_id' => $id, 'team' => 'TEAM_A']);
+        }
 
         foreach ($candidateData as $candidate) {
             $student = Student::findOrFail($candidate['student_id']);

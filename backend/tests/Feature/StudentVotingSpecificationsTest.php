@@ -31,7 +31,7 @@ class StudentVotingSpecificationsTest extends TestCase
     public function test_default_positions_exist_and_cannot_be_added_renamed_or_deleted(): void
     {
         $election = Election::create(['name' => 'Election', 'status' => 'draft']);
-        $this->assertSame(['President', 'Vice President', 'Senator'], $election->positions->pluck('name')->all());
+        $this->assertSame(['President', 'Vice President', 'Senator', 'Secretary', 'Treasurer', 'Auditor', 'PIO'], $election->positions->pluck('name')->all());
         Sanctum::actingAs(User::create(['name' => 'Admin', 'email' => 'spec@example.test', 'password' => 'Password123!']), ['admin']);
         $this->postJson('/api/admin/positions', ['election_id' => $election->id, 'name' => 'Extra', 'max_selections' => 1, 'display_order' => 4])->assertStatus(405);
         $position = $election->positions->first();
@@ -120,6 +120,6 @@ class StudentVotingSpecificationsTest extends TestCase
         $election->update(['status' => 'closed']);
         $this->login()->assertOk()->assertJsonPath('tally_only', true);
         $this->assertDatabaseCount('ballots', 1);
-        $this->assertDatabaseCount('votes', 3);
+        $this->assertDatabaseCount('votes', 7);
     }
 }

@@ -31,7 +31,7 @@ class AdminPositionManagementTest extends TestCase
         $this->postJson('/api/admin/positions', ['election_id' => $election->id, 'name' => 'Auditor'])->assertStatus(405);
         $this->putJson("/api/admin/positions/{$position->id}", ['max_selections' => 6])->assertOk()->assertJsonPath('data.max_selections', 6);
         $this->deleteJson("/api/admin/positions/{$position->id}")->assertStatus(405);
-        $this->assertDatabaseCount('positions', 3);
+        $this->assertDatabaseCount('positions', 7);
     }
 
     public function test_all_positions_are_reordered_in_one_transaction(): void
@@ -43,6 +43,7 @@ class AdminPositionManagementTest extends TestCase
         $first = $this->position($election, 'President', 1);
         $second = $this->position($election, 'Vice President', 2);
         $third = $this->position($election, 'Senator', 3);
+        $remaining = $election->positions()->whereNotIn('id', [$first->id, $second->id, $third->id])->get();
 
         $this->putJson('/api/admin/positions/reorder', [
             'election_id' => $election->id,
@@ -50,6 +51,7 @@ class AdminPositionManagementTest extends TestCase
                 ['id' => $third->id, 'display_order' => 1],
                 ['id' => $first->id, 'display_order' => 2],
                 ['id' => $second->id, 'display_order' => 3],
+                ...$remaining->map(fn (Position $position) => ['id' => $position->id, 'display_order' => $position->display_order])->all(),
             ],
         ])
             ->assertOk()

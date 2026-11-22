@@ -122,7 +122,7 @@ class QrVotingEntryTest extends TestCase
         $this->token($token)->getJson('/api/voter/tally')->assertOk()->assertJsonPath('ballot_reference.attendance_recorded', true);
         $this->token($token)->postJson('/api/voter/vote', $this->vote($election, $id))->assertForbidden();
         $this->login($student, $election)->assertOk()->assertJsonPath('tally_only', true)->assertJsonPath('ballot_reference.id', $id);
-        $this->assertDatabaseCount('votes', 3);
+        $this->assertDatabaseCount('votes', 7);
     }
 
     public function test_blank_ballot_records_attendance_without_candidate_votes_and_prevents_repeat_submission(): void
@@ -223,8 +223,8 @@ class QrVotingEntryTest extends TestCase
         $this->assertNotSame($code, $election->fresh()->qr_entry_code);
         $this->assertSame('closed', $election->fresh()->status);
         $this->assertDatabaseCount('elections', 1);
-        $this->assertDatabaseCount('positions', 3);
-        $this->assertDatabaseCount('candidacies', 3);
+        $this->assertDatabaseCount('positions', 7);
+        $this->assertDatabaseCount('candidacies', 7);
         $this->assertDatabaseCount('voter_ballot_ids', 0);
         $this->assertDatabaseCount('ballots', 0);
     }
