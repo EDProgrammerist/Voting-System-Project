@@ -50,7 +50,12 @@ export function AdminSettingsScreen() {
   }, [attempt]);
 
   const election = elections.find((item) => item.id === selectedId);
-  if (loading) return <section className="admin-dashboard__content"><PageSkeleton kind="settings" label="Loading election settings" /></section>;
+  if (loading)
+    return (
+      <section className="admin-dashboard__content">
+        <PageSkeleton kind="settings" label="Loading election settings" />
+      </section>
+    );
   return (
     <>
       <section className="admin-dashboard__content">
@@ -68,7 +73,8 @@ export function AdminSettingsScreen() {
             <div>
               <h2 id="settings-voting-qr-title">Voting QR code</h2>
               <p>
-                Create the shared QR poster students scan to open student login.
+                Students can scan this code directly from the screen to open
+                student login.
               </p>
             </div>
           </header>
