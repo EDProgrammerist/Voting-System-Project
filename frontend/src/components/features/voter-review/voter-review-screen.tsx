@@ -107,7 +107,7 @@ export function VoterReviewScreen() {
   }
 
   return (
-    <StudentLayout title="Review your vote" description="Unselected positions count as abstentions. Submitting records your attendance and is final.">
+    <StudentLayout title="Review Vote" description="Unselected positions count as abstentions. Confirm Vote records your attendance and makes your ballot final.">
       <BallotSteps review />
       <BallotReference reference={ballot?.ballot_reference} />
       {selections.length === 0 && <p className="student-notice" role="status">You are submitting a blank ballot. Your attendance will be recorded without voting for any candidate.</p>}

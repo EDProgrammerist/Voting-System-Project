@@ -13,7 +13,7 @@ export function StudentLayout({ title, description, children, status }: { title:
 export function BallotSteps({ review = false }: { review?: boolean }) {
   return <ol aria-label="Voting progress" className="ballot-steps">
     <li data-state={review ? "complete" : "current"} aria-current={review ? undefined : "step"}><span>1</span>Choose candidates</li>
-    <li data-state={review ? "current" : "next"} aria-current={review ? "step" : undefined}><span>2</span>Review &amp; confirm</li>
+    <li data-state={review ? "current" : "next"} aria-current={review ? "step" : undefined}><span>2</span>Review Vote</li>
     <li data-state="next"><span>3</span>View Live Tally</li>
   </ol>;
 }

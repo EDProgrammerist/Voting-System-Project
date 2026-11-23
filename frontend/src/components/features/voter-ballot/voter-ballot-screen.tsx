@@ -102,7 +102,7 @@ export function VoterBallotScreen() {
             const chosen = position.candidates.filter((candidate) => selections[position.id]?.includes(candidate.student_id));
             return <li key={position.id} data-complete={chosen.length > 0}><CheckCircle aria-hidden="true" weight={chosen.length ? "fill" : "light"} /><div><strong>{displayPosition(position.name)}</strong><span>{chosen.length ? chosen.map((candidate) => candidate.full_name).join(", ") : "No selection (abstain)"}</span></div></li>;
           })}</ul>
-          <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Review Vote<ArrowRight aria-hidden="true" /></button>
+          <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Submit<ArrowRight aria-hidden="true" /></button>
           <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : "Selections are optional. Submitting a blank or partial ballot still records your attendance."}</p>
           <p aria-live="polite" className="student-error" role="status">{message || ballotError}</p>
         </aside>
