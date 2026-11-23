@@ -57,7 +57,7 @@ export function VoterBallotScreen() {
 
   const loadedBallot = ballot;
   const completedPositions = loadedBallot.positions.filter((position) => (selections[position.id]?.length ?? 0) > 0).length;
-  const canReview = loadedBallot.can_submit_vote && !ballotError && loadedBallot.positions.length > 0;
+  const canReview = !ballotError && loadedBallot.positions.length > 0;
   function toggleCandidate(position: BallotPosition, candidate: BallotCandidate) {
     setMessage("");
     setSelections((current) => {
@@ -92,7 +92,7 @@ export function VoterBallotScreen() {
     <StudentLayout title="Voting Ballot" description="Choose your representatives with confidence. Compare their profiles, make your selections, then review your ballot.">
       <BallotSteps />
       <BallotReference reference={loadedBallot.ballot_reference} />
-      {!loadedBallot.can_submit_vote && <div className="student-notice" role="status"><Clock aria-hidden="true" weight="light" /><div><strong>Take a look around</strong><p>You can browse the ballot and candidate profiles now. Vote submission becomes available when the election opens and candidates are ready.</p></div></div>}
+      {!loadedBallot.can_submit_vote && <div className="student-notice" role="status"><Clock aria-hidden="true" weight="light" /><div><strong>Take a look around</strong><p>You can review your choices now. Confirm Vote becomes available when the election opens and candidates are ready.</p></div></div>}
       <div className="ballot-layout">
         <div className="ballot-offices">{loadedBallot.positions.map((position) => <PositionGroup key={position.id} position={position} selected={selections[position.id] ?? []} toggle={toggleCandidate} />)}</div>
         <aside className="ballot-summary" aria-label="Your ballot summary">
@@ -103,7 +103,7 @@ export function VoterBallotScreen() {
             return <li key={position.id} data-complete={chosen.length > 0}><CheckCircle aria-hidden="true" weight={chosen.length ? "fill" : "light"} /><div><strong>{displayPosition(position.name)}</strong><span>{chosen.length ? chosen.map((candidate) => candidate.full_name).join(", ") : "No selection (abstain)"}</span></div></li>;
           })}</ul>
           <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Submit<ArrowRight aria-hidden="true" /></button>
-          <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : "Selections are optional. Submitting a blank or partial ballot still records your attendance."}</p>
+          <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can review your ballot while the election is being prepared." : "Selections are optional. Confirm Vote records your attendance, including a blank or partial ballot."}</p>
           <p aria-live="polite" className="student-error" role="status">{message || ballotError}</p>
         </aside>
       </div>
