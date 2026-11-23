@@ -83,17 +83,13 @@ class StudentController extends Controller
 
                     $query->where(
                         function ($query) use ($search): void {
-                            $query
-                                ->where(
-                                    'student_id',
-                                    'like',
-                                    "%{$search}%",
-                                )
-                                ->orWhere(
-                                    'full_name',
-                                    'like',
-                                    "%{$search}%",
-                                );
+                            $query->whereLike('student_id', "%{$search}%")
+                                ->orWhereLike('full_name', "%{$search}%");
+
+                            $numericId = str_replace('-', '', $search);
+                            if (ctype_digit($numericId)) {
+                                $query->orWhereRaw("REPLACE(student_id, '-', '') LIKE ?", ["%{$numericId}%"]);
+                            }
                         },
                     );
                 },

@@ -16,6 +16,34 @@ class CommitteeStudentManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_student_search_matches_names_without_case_and_ids_without_dashes(): void
+    {
+        $election = Election::create(['name' => 'Search election', 'status' => 'draft', 'uses_voter_roster' => true]);
+        $student = Student::createDataRecord(['student_id' => '2024-0100', 'full_name' => 'Ian Kurt Ardena', 'academic_status' => 'enrolled']);
+        $election->voters()->attach($student->student_id);
+
+        foreach (['ian kurt', 'IAN KURT', '2024-0100', '20240100', '240100'] as $search) {
+            $this->getJson('/api/committee/students?'.http_build_query(['election_id' => $election->id, 'search' => $search]))
+                ->assertOk()->assertJsonPath('total', 1)->assertJsonPath('data.0.student_id', $student->student_id);
+        }
+    }
+
+    public function test_student_search_preserves_election_roster_and_academic_status_filters(): void
+    {
+        $election = Election::create(['name' => 'Current search election', 'status' => 'draft', 'uses_voter_roster' => true]);
+        $future = Election::create(['name' => 'Future search election', 'status' => 'draft', 'uses_voter_roster' => true]);
+        foreach (['2024-0100' => 'enrolled', '2024-0101' => 'stopped', '2024-0102' => 'enrolled'] as $id => $status) {
+            Student::createDataRecord(['student_id' => $id, 'full_name' => 'Matching Student '.$id, 'academic_status' => $status]);
+        }
+        $election->voters()->attach(['2024-0100', '2024-0101']);
+        $future->voters()->attach('2024-0102');
+
+        foreach (['matching', '202401'] as $search) {
+            $this->getJson('/api/committee/students?'.http_build_query(['election_id' => $election->id, 'search' => $search, 'status' => 'enrolled']))
+                ->assertOk()->assertJsonPath('total', 1)->assertJsonPath('data.0.student_id', '2024-0100');
+        }
+    }
+
     public function test_student_rename_does_not_rewrite_an_opened_candidate_profile(): void
     {
         $student = Student::create(['student_id' => 'LEGACY-CANDIDATE', 'full_name' => 'Original Name', 'academic_status' => 'enrolled']);

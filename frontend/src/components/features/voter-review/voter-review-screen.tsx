@@ -55,6 +55,16 @@ export function VoterReviewScreen() {
     && ballot.can_submit_vote
     && reviewedPositions.length > 0;
 
+  const confirmationHint = ballotError
+    ? "Waiting for ballot information to refresh. Your choices and verification are kept."
+    : !ballot?.can_submit_vote
+      ? "Voting is unavailable. The election must be active, within its voting period, and have candidates in every position."
+      : reviewedPositions.length === 0
+        ? "No ballot positions are available. Please contact the election administrator."
+        : !signature.length || !thumbmark
+          ? "Complete your electronic signature and on-screen thumbmark confirmation to enable Confirm Vote."
+          : "Your ballot is submitted only when you press Confirm Vote.";
+
   async function handleConfirm() {
     if (submitting) return;
     if (signature.length === 0 || !thumbmark) {
@@ -119,9 +129,9 @@ export function VoterReviewScreen() {
           <li><CheckCircle aria-hidden="true" weight={canSubmit ? "fill" : "light"} /><span>Review your choices and abstentions</span></li>
           <li data-complete={signature.length > 0}><CheckCircle aria-hidden="true" weight={signature.length ? "fill" : "light"} /><span>Add your electronic signature</span></li>
           <li data-complete={thumbmark}><CheckCircle aria-hidden="true" weight={thumbmark ? "fill" : "light"} /><span>Confirm your on-screen thumbmark</span></li>
-        </ul><p className="review-checklist__note">Your ballot is submitted only when you press Confirm Vote.</p></aside>
+        </ul><p className="review-checklist__note" id="review-confirmation-help" role="status">{confirmationHint}</p></aside>
       </div>
-      <div className="voter-review__actions"><button className="student-button student-button--secondary" disabled={submitting} onClick={() => navigate("/voter/ballot")} type="button"><ArrowLeft aria-hidden="true" />Go Back</button><button className="student-button" disabled={submitting || !canSubmit || !signature.length || !thumbmark} onClick={handleConfirm} type="button">{submitting ? "Confirming..." : "Confirm Vote"}<ArrowRight aria-hidden="true" /></button></div>
+      <div className="voter-review__actions"><button className="student-button student-button--secondary" disabled={submitting} onClick={() => navigate("/voter/ballot")} type="button"><ArrowLeft aria-hidden="true" />Go Back</button><button aria-describedby="review-confirmation-help" className="student-button" disabled={submitting || !canSubmit || !signature.length || !thumbmark} onClick={handleConfirm} type="button">{submitting ? "Confirming..." : "Confirm Vote"}<ArrowRight aria-hidden="true" /></button></div>
       <p aria-live="polite" className="student-error" role="status">{message || ballotError}</p>
     </StudentLayout>
   );
