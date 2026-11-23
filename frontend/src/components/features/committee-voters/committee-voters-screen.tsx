@@ -177,8 +177,8 @@ export function CommitteeVotersScreen() {
         <header className="admin-voters__header">
           <h1>Voters</h1>
           <p>
-            Manage class-list records and review voting attendance. Attendance
-            is recorded only after a successful vote.
+            Manage class-list records and review voting attendance. Statuses
+            update automatically after a ballot is submitted.
           </p>
         </header>
         <ClassListImport onImported={() => setRefresh((value) => value + 1)} />
@@ -292,9 +292,15 @@ export function CommitteeVotersScreen() {
                     <td role="cell" data-label="Voting status">
                       <span
                         className="voter-status"
-                        data-status={voter.voting_status.replaceAll("_", "-")}
+                        data-status={
+                          voter.has_voted
+                            ? "voted"
+                            : voter.voting_status.replaceAll("_", "-")
+                        }
                       >
-                        {formatStatus(voter.voting_status)}
+                        {voter.has_voted
+                          ? "Already Voted"
+                          : formatStatus(voter.voting_status)}
                       </span>
                     </td>
                     <td role="cell" data-label="Attendance">

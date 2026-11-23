@@ -34,6 +34,10 @@ class VoterAuthController extends Controller
 
         return DB::transaction(function () use ($validated): JsonResponse {
             $student = Student::whereKey($validated['student_id'])->lockForUpdate()->first();
+            if (! $student && preg_match('/^[0-9]{8,50}$/D', $validated['student_id'])) {
+                $formattedId = substr($validated['student_id'], 0, 4).'-'.substr($validated['student_id'], 4);
+                $student = Student::whereKey($formattedId)->lockForUpdate()->first();
+            }
 
             if (
                 ! $student ||

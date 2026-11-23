@@ -12,12 +12,12 @@ class StudentAccountsSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['2024-0100', '20240100', 'Ian Kurt Ardena', 'BSIT', 'enrolled'],
-            ['2024-0101', '20240101', 'Bryan Amoin', 'BSHM', 'enrolled'],
-            ['2024-0102', '20240102', 'Janvenedict Emeliano', 'BEED', 'enrolled'],
-            ['2024-0103', '20240103', 'Demi Arnold', 'BSED', 'enrolled'],
-            ['2020-9999', '20209999', 'Sheehan Voila', 'BSIT', 'graduated'],
-            ['2023-8888', '20238888', 'John Doe', 'BSHM', 'stopped'],
+            ['20240100', '2024-0100', 'Ian Kurt Ardena', 'BSIT', 'enrolled'],
+            ['20240101', '2024-0101', 'Bryan Amoin', 'BSHM', 'enrolled'],
+            ['20240102', '2024-0102', 'Janvenedict Emeliano', 'BEED', 'enrolled'],
+            ['20240103', '2024-0103', 'Demi Arnold', 'BSED', 'enrolled'],
+            ['20209999', '2020-9999', 'Sheehan Voila', 'BSIT', 'graduated'],
+            ['20238888', '2023-8888', 'John Doe', 'BSHM', 'stopped'],
         ];
 
         DB::transaction(function () use ($accounts): void {

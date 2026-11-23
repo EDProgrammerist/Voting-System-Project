@@ -20,14 +20,14 @@ class StudentPasswordTest extends TestCase
     {
         Election::create(['name' => 'Password test election', 'status' => 'draft']);
 
-        return Student::create(['student_id' => '20240100', 'full_name' => 'Ian Kurt Ardena', 'academic_status' => 'enrolled']);
+        return Student::create(['student_id' => '2024-0100', 'full_name' => 'Ian Kurt Ardena', 'academic_status' => 'enrolled']);
     }
 
     private function login(string $password = '123456')
     {
         $this->app['auth']->forgetGuards();
 
-        return $this->postJson('/api/voter/login', ['student_id' => '20240100', 'password' => $password]);
+        return $this->postJson('/api/voter/login', ['student_id' => '2024-0100', 'password' => $password]);
     }
 
     private function token(string $token): self
@@ -37,6 +37,39 @@ class StudentPasswordTest extends TestCase
         return $this->withToken($token);
     }
 
+    public function test_digits_only_login_resolves_formatted_ids_without_changing_records_or_eligibility(): void
+    {
+        $election = Election::create(['name' => 'Demo election', 'status' => 'draft']);
+        $this->seed(StudentAccountsSeeder::class);
+
+        foreach (['20240100' => '2024-0100', '20240101' => '2024-0101', '20240102' => '2024-0102', '20240103' => '2024-0103'] as $loginId => $recordId) {
+            $this->postJson('/api/voter/login', ['student_id' => (string) $loginId, 'password' => '123456', 'entry_code' => $election->qr_entry_code])
+                ->assertOk()->assertJsonPath('student.student_id', $recordId)
+                ->assertJsonPath('password_change_required', true)->assertJsonPath('election.id', $election->id);
+            $this->assertDatabaseMissing('students', ['student_id' => (string) $loginId]);
+        }
+        foreach (['20209999' => 'graduated', '20238888' => 'stopped'] as $loginId => $status) {
+            $this->postJson('/api/voter/login', ['student_id' => (string) $loginId, 'password' => '123456'])
+                ->assertForbidden()->assertJsonPath('academic_status', $status);
+        }
+        $this->postJson('/api/voter/login', ['student_id' => '20240100', 'password' => 'WrongPassword123!'])->assertUnauthorized();
+        $this->assertDatabaseCount('students', 6);
+        $this->assertDatabaseCount('voter_participations', 0);
+    }
+
+    public function test_exact_student_ids_take_priority_over_a_formatted_id_alias(): void
+    {
+        Election::create(['name' => 'Election', 'status' => 'draft']);
+        Student::create(['student_id' => '20240100', 'full_name' => 'Exact ID Student', 'academic_status' => 'enrolled', 'password' => 'ExactPassword123!', 'password_change_required' => false]);
+        Student::create(['student_id' => '2024-0100', 'full_name' => 'Formatted ID Student', 'academic_status' => 'enrolled', 'password' => 'OtherPassword123!', 'password_change_required' => false]);
+
+        $this->postJson('/api/voter/login', ['student_id' => '20240100', 'password' => 'ExactPassword123!'])
+            ->assertOk()->assertJsonPath('student.student_id', '20240100');
+        $this->postJson('/api/voter/login', ['student_id' => '20240100', 'password' => 'OtherPassword123!'])->assertUnauthorized();
+        $this->postJson('/api/voter/login', ['student_id' => '2024-0100', 'password' => 'OtherPassword123!'])
+            ->assertOk()->assertJsonPath('student.student_id', '2024-0100');
+    }
+
     public function test_default_password_is_hashed_and_old_name_id_login_is_rejected(): void
     {
         $student = $this->student();
@@ -44,8 +77,8 @@ class StudentPasswordTest extends TestCase
         $this->assertNotSame('123456', $student->password);
         $this->assertArrayNotHasKey('password', $student->toArray());
         $this->login()->assertOk()->assertJsonPath('password_change_required', true)->assertJsonMissingPath('student.password');
-        $this->login('20240100')->assertUnauthorized();
-        $this->postJson('/api/voter/login', ['student_id' => '20240100', 'full_name' => 'Ian Kurt Ardena'])->assertUnprocessable();
+        $this->login('2024-0100')->assertUnauthorized();
+        $this->postJson('/api/voter/login', ['student_id' => '2024-0100', 'full_name' => 'Ian Kurt Ardena'])->assertUnprocessable();
         $this->postJson('/api/voter/login', ['student_id' => 'missing', 'password' => '123456'])->assertUnauthorized();
     }
 
@@ -135,7 +168,7 @@ class StudentPasswordTest extends TestCase
         $this->seed(StudentAccountsSeeder::class);
         $this->assertTrue(Hash::check('PersonalPassword123!', $student->fresh()->password));
         $this->assertFalse($student->fresh()->password_change_required);
-        $this->assertSame('20240100', $student->fresh()->student_id);
+        $this->assertSame('2024-0100', $student->fresh()->student_id);
     }
 
     public function test_migration_initializes_existing_students_without_changing_election_records(): void

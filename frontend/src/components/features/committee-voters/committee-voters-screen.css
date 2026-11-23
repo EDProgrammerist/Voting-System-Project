@@ -138,6 +138,7 @@
   white-space: nowrap;
 }
 .voters-table td {
+  vertical-align: top;
   padding: 17px 20px;
   color: #58677c;
   font-size: 12px;
@@ -242,6 +243,10 @@
     content: attr(data-label);
     color: #58677c;
     font-size: 11px;
+  }
+  .voter-attendance-time {
+    grid-column: 2;
+    margin-top: 0;
   }
   .voters-table__heading {
     padding: 18px;

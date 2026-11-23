@@ -26,25 +26,25 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $this->assertDatabaseCount('students', 6);
         $this->assertDatabaseHas('students', [
-            'student_id' => '20240100',
+            'student_id' => '2024-0100',
             'full_name' => 'Ian Kurt Ardena',
             'course' => 'BSIT',
             'academic_status' => 'enrolled',
         ]);
         $this->assertDatabaseHas('students', [
-            'student_id' => '20240101',
+            'student_id' => '2024-0101',
             'full_name' => 'Bryan Amoin',
             'course' => 'BSHM',
             'academic_status' => 'enrolled',
         ]);
         $this->assertDatabaseHas('students', [
-            'student_id' => '20240102',
+            'student_id' => '2024-0102',
             'full_name' => 'Janvenedict Emeliano',
             'course' => 'BEED',
             'academic_status' => 'enrolled',
         ]);
         $this->assertDatabaseHas('students', [
-            'student_id' => '20240103',
+            'student_id' => '2024-0103',
             'full_name' => 'Demi Arnold',
             'course' => 'BSED',
             'academic_status' => 'enrolled',
@@ -84,7 +84,7 @@ class VoterFlowAndDashboardTest extends TestCase
         ]);
 
         $this->postJson('/api/voter/login', [
-            'student_id' => '20209999',
+            'student_id' => '2020-9999',
             'password' => '123456',
         ])
             ->assertForbidden()
@@ -92,7 +92,7 @@ class VoterFlowAndDashboardTest extends TestCase
             ->assertJsonPath('academic_status', 'graduated');
 
         $this->postJson('/api/voter/login', [
-            'student_id' => '20238888',
+            'student_id' => '2023-8888',
             'password' => '123456',
         ])
             ->assertForbidden()
@@ -119,10 +119,10 @@ class VoterFlowAndDashboardTest extends TestCase
         $this->seed(DevelopmentSeeder::class);
         Election::sole()->update(['status' => 'active']);
         foreach ([
-            ['20240100', 'Ian Kurt Ardena'],
-            ['20240101', 'Bryan Amoin'],
-            ['20240102', 'Janvenedict Emeliano'],
-            ['20240103', 'Demi Arnold'],
+            ['2024-0100', 'Ian Kurt Ardena'],
+            ['2024-0101', 'Bryan Amoin'],
+            ['2024-0102', 'Janvenedict Emeliano'],
+            ['2024-0103', 'Demi Arnold'],
         ] as [$id, $name]) {
             $this->postJson('/api/voter/login', ['student_id' => $id, 'password' => '123456'])
                 ->assertOk()->assertJsonPath('student.full_name', $name)->assertJsonPath('student.student_id', $id);
@@ -155,10 +155,10 @@ class VoterFlowAndDashboardTest extends TestCase
 
         $senator = $election->positions()->where('name', 'Senator')->sole();
         $candidateData = [
-            ['student_id' => '20240100', 'position_id' => $president->id, 'team' => 'TEAM_A'],
-            ['student_id' => '20240101', 'position_id' => $president->id, 'team' => 'TEAM_B'],
-            ['student_id' => '20240102', 'position_id' => $vicePresident->id, 'team' => 'TEAM_A'],
-            ['student_id' => '20240103', 'position_id' => $senator->id, 'team' => 'TEAM_B'],
+            ['student_id' => '2024-0100', 'position_id' => $president->id, 'team' => 'TEAM_A'],
+            ['student_id' => '2024-0101', 'position_id' => $president->id, 'team' => 'TEAM_B'],
+            ['student_id' => '2024-0102', 'position_id' => $vicePresident->id, 'team' => 'TEAM_A'],
+            ['student_id' => '2024-0103', 'position_id' => $senator->id, 'team' => 'TEAM_B'],
         ];
 
         foreach ($election->positions()->whereNotIn('id', [$president->id, $vicePresident->id, $senator->id])->get() as $position) {
@@ -186,7 +186,7 @@ class VoterFlowAndDashboardTest extends TestCase
             ->assertJsonPath('data.status', 'active');
 
         $voterLogin = $this->postJson('/api/voter/login', [
-            'student_id' => '20240100',
+            'student_id' => '2024-0100',
             'password' => '123456',
         ])->assertOk();
 
@@ -246,7 +246,7 @@ class VoterFlowAndDashboardTest extends TestCase
                         'position_id' => $vicePresident['id'],
                         'candidate_student_id' => $vicePresidentCandidate['student_id'],
                     ],
-                    ['position_id' => $senator->id, 'candidate_student_id' => '20240103'],
+                    ['position_id' => $senator->id, 'candidate_student_id' => '2024-0103'],
                 ],
             ])
             ->assertCreated()
@@ -255,7 +255,7 @@ class VoterFlowAndDashboardTest extends TestCase
         $this->assertDatabaseCount('voter_participations', 1);
         $this->assertDatabaseCount('ballots', 1);
         $this->assertDatabaseCount('votes', 3);
-        $this->assertSame(1, VoterParticipation::where('student_id', '20240100')->count());
+        $this->assertSame(1, VoterParticipation::where('student_id', '2024-0100')->count());
         $this->assertSame(1, Ballot::count());
         $this->assertSame(3, Vote::count());
         $this->assertNotContains('student_id', Schema::getColumnListing('votes'));
@@ -300,11 +300,11 @@ class VoterFlowAndDashboardTest extends TestCase
         );
 
         $this->postJson('/api/voter/login', [
-            'student_id' => '20240100',
+            'student_id' => '2024-0100',
             'password' => 'PersonalPassword123!',
         ])->assertOk()->assertJsonPath('tally_only', true);
 
-        $student = Student::findOrFail('20240100');
+        $student = Student::findOrFail('2024-0100');
         $this->assertSame(1, $student->tokens()->count());
         $this->assertSame(1, User::where('email', 'admin@ssg.local')->count());
     }
