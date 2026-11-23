@@ -1,4 +1,5 @@
 import { PageSkeleton } from "@/components/common/page-skeleton";
+import { AdminElectionPicker } from "./admin-data-state";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -20,7 +21,7 @@ import "./admin-overview.css";
 const formatNumber = (value: number) =>
   new Intl.NumberFormat("en-US").format(value);
 const formatDate = (value: string | null) =>
-  value
+  value && Number.isFinite(Date.parse(value))
     ? new Intl.DateTimeFormat("en-PH", {
         dateStyle: "medium",
         timeStyle: "short",
@@ -29,47 +30,100 @@ const formatDate = (value: string | null) =>
 
 function useCountdown(target: string | null) {
   const [now, setNow] = useState(() => Date.now());
+  const targetTime = target ? Date.parse(target) : Number.NaN;
+
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  if (!target || new Date(target).getTime() <= now) return null;
-  const difference = new Date(target).getTime() - now;
-  return `${Math.floor(difference / 86_400_000)}d ${Math.floor((difference % 86_400_000) / 3_600_000)}h ${Math.floor((difference % 3_600_000) / 60_000)}m`;
+    if (!Number.isFinite(targetTime)) return;
+
+    const refresh = () => {
+      const currentTime = Date.now();
+      setNow(currentTime);
+      if (currentTime >= targetTime) window.clearInterval(timer);
+    };
+    const refreshWhenVisible = () => {
+      if (!document.hidden) refresh();
+    };
+    const timer = window.setInterval(refresh, 1_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [targetTime]);
+
+  if (!Number.isFinite(targetTime) || targetTime <= now) return null;
+  const seconds = Math.ceil((targetTime - now) / 1_000);
+  return `${Math.floor(seconds / 86_400)}d ${Math.floor((seconds % 86_400) / 3_600)}h ${Math.floor((seconds % 3_600) / 60)}m ${seconds % 60}s`;
+}
+
+function ElectionCountdown({ target }: { target: string | null }) {
+  const countdown = useCountdown(target);
+  if (!countdown) return null;
+
+  return (
+    <div>
+      <dt>Starts in</dt>
+      <dd
+        role="timer"
+        aria-live="off"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {countdown}
+      </dd>
+    </div>
+  );
 }
 
 export function AdminDashboardScreen() {
-  const { dashboard, dataState, dataNotice } = useAdminElectionDashboard();
-  const countdown = useCountdown(dashboard.election.starts_at);
+  const {
+    dashboard,
+    dataState,
+    dataNotice,
+    elections,
+    selectedElectionId,
+    selectElection,
+  } = useAdminElectionDashboard();
   useDocumentTitle("Admin Dashboard | CPC Vote");
-
-  if (dataState === "loading") return <section className="admin-dashboard__content"><PageSkeleton kind="dashboard" label="Loading election overview" /></section>;
 
   return (
     <>
-      <section
-        className="admin-dashboard__content"
-      >
+      <section className="admin-dashboard__content">
         <header className="overview-heading">
           <div>
             <p>Administration / Dashboard</p>
             <h1>Election overview</h1>
           </div>
-          <span className="overview-updates">
-            <i
-              data-state={
-                dataState === "live" && !dataNotice ? "connected" : "waiting"
-              }
-            />
-            {dataState === "live"
-              ? dataNotice
-                ? "Updates interrupted"
-                : "Auto-updates every 2s"
-              : "Connection unavailable"}
-          </span>
+          <div className="overview-heading__tools">
+            {elections.length > 0 && (
+              <AdminElectionPicker
+                elections={elections}
+                selectedElectionId={selectedElectionId}
+                onChange={selectElection}
+              />
+            )}
+            <span className="overview-updates">
+              <i
+                data-state={
+                  dataState === "live" && !dataNotice ? "connected" : "waiting"
+                }
+              />
+              {dataState === "loading"
+                ? "Loading election…"
+                : dataState === "live"
+                  ? dataNotice
+                    ? "Updates interrupted"
+                    : "Auto-updates every 2s"
+                  : "Connection unavailable"}
+            </span>
+          </div>
         </header>
 
-        {dataState !== "live" ? (
+        {dataState === "loading" ? (
+          <PageSkeleton kind="dashboard" label="Loading election overview" />
+        ) : dataState !== "live" ? (
           <section
             className="overview-state overview-panel"
             aria-live="polite"
@@ -117,11 +171,8 @@ export function AdminDashboardScreen() {
                   <dt>Closes</dt>
                   <dd>{formatDate(dashboard.election.ends_at)}</dd>
                 </div>
-                {countdown && dashboard.election.status === "draft" && (
-                  <div>
-                    <dt>Starts in</dt>
-                    <dd>{countdown}</dd>
-                  </div>
+                {["draft", "active"].includes(dashboard.election.status) && (
+                  <ElectionCountdown target={dashboard.election.starts_at} />
                 )}
               </dl>
             </section>

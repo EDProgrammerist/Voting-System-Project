@@ -19,6 +19,7 @@ function authHeaders(token: string): HeadersInit {
 export function listAdminElections(token: string): Promise<ElectionsResponse> {
   return apiRequest<ElectionsResponse>("/admin/elections", {
     headers: authHeaders(token),
+    cache: "no-store",
   });
 }
 

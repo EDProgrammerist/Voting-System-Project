@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
 
 import { getAdminToken } from "@/lib/admin-session";
-import { getAdminDashboard, listAdminElections } from "@/services/admin-dashboard-service";
-import type { DashboardData, ElectionSummary } from "@/types/dashboard";
+import { getAdminDashboard } from "@/services/admin-dashboard-service";
+import type { DashboardData } from "@/types/dashboard";
+import { useAdminElection } from "@/hooks/use-admin-election";
 
 export type DashboardDataState = "loading" | "live" | "error";
-export type PreferredElectionStatus = "active" | "draft";
 
 const EMPTY_DASHBOARD: DashboardData = {
-  election: { id: 0, name: "", status: "draft", starts_at: null, ends_at: null },
-  turnout: { eligible_students: 0, already_voted: 0, not_yet_voted: 0, percentage: 0, by_course: [] },
+  election: {
+    id: 0,
+    name: "",
+    status: "draft",
+    starts_at: null,
+    ends_at: null,
+  },
+  turnout: {
+    eligible_students: 0,
+    already_voted: 0,
+    not_yet_voted: 0,
+    percentage: 0,
+    by_course: [],
+  },
   team_totals: { TEAM_A: 0, TEAM_B: 0 },
   candidate_results: [],
   results_by_position: {},
@@ -17,45 +29,23 @@ const EMPTY_DASHBOARD: DashboardData = {
 
 const LIVE_REFRESH_INTERVAL_MS = 2_000;
 
-export function useAdminElectionDashboard(preferredStatus: PreferredElectionStatus = "active") {
+export function useAdminElectionDashboard() {
+  const selection = useAdminElection();
+  const { selectedElectionId } = selection;
   const [dashboard, setDashboard] = useState<DashboardData>(EMPTY_DASHBOARD);
-  const [elections, setElections] = useState<ElectionSummary[]>([]);
-  const [selectedElectionId, setSelectedElectionId] = useState<number | null>(null);
+  const [loadedElectionId, setLoadedElectionId] = useState<number | null>(null);
   const [dataState, setDataState] = useState<DashboardDataState>("loading");
   const [dataNotice, setDataNotice] = useState("");
 
   useEffect(() => {
     const token = getAdminToken();
-    if (!token) return;
-
-    let active = true;
-    listAdminElections(token).then(({ data }) => {
-      if (!active) return;
-      const election = data.find((item) => item.status === preferredStatus)
-        ?? data.find((item) => item.status === "active")
-        ?? data[0];
-      setElections(data);
-      if (!election) {
-        setDataState("error");
-        setDataNotice("No election is available yet.");
-        return;
-      }
-      setSelectedElectionId(election.id);
-    }).catch((error: unknown) => {
-      if (active) {
-        setDataState("error");
-        setDataNotice(error instanceof Error ? error.message : "Unable to load elections.");
-      }
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [preferredStatus]);
-
-  useEffect(() => {
-    const token = getAdminToken();
-    if (!token || selectedElectionId === null) return;
+    if (
+      !token ||
+      selectedElectionId === null ||
+      selection.state !== "ready" ||
+      !selection.election
+    )
+      return;
     const adminToken = token;
     const electionId = selectedElectionId;
 
@@ -79,16 +69,24 @@ export function useAdminElectionDashboard(preferredStatus: PreferredElectionStat
 
         if (!active) return;
         setDashboard(data);
+        setLoadedElectionId(electionId);
         setDataState("live");
         setDataNotice("");
       } catch (error) {
         if (!active || requestController.signal.aborted) return;
 
         if (initialLoad) {
+          setLoadedElectionId(electionId);
           setDataState("error");
-          setDataNotice(error instanceof Error ? error.message : "Unable to load election data.");
+          setDataNotice(
+            error instanceof Error
+              ? error.message
+              : "Unable to load election data.",
+          );
         } else {
-          setDataNotice("Live updates are temporarily unavailable. Retrying automatically…");
+          setDataNotice(
+            "Live updates are temporarily unavailable. Retrying automatically…",
+          );
         }
       } finally {
         requestInFlight = false;
@@ -114,20 +112,31 @@ export function useAdminElectionDashboard(preferredStatus: PreferredElectionStat
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [selectedElectionId]);
+  }, [selectedElectionId, selection.state, selection.election]);
 
-  function selectElection(electionId: number) {
-    setDataState("loading");
-    setDataNotice("");
-    setSelectedElectionId(electionId);
+  let visibleState: DashboardDataState = dataState;
+  if (
+    selection.state === "error" ||
+    (selection.state === "ready" && !selection.election)
+  ) {
+    visibleState = "error";
+  } else if (
+    selection.state === "loading" ||
+    loadedElectionId !== selectedElectionId
+  ) {
+    visibleState = "loading";
   }
 
   return {
     dashboard,
-    dataState,
-    dataNotice,
-    elections,
+    dataState: visibleState,
+    dataNotice:
+      selection.error ||
+      (selection.state === "ready" && !selection.election
+        ? "No election is available yet."
+        : dataNotice),
+    elections: selection.elections,
     selectedElectionId,
-    selectElection,
+    selectElection: selection.selectElection,
   };
 }

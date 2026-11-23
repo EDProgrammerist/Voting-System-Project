@@ -3,13 +3,12 @@ import { Image, Plus, X } from "@phosphor-icons/react";
 import { PageSkeleton } from "@/components/common/page-skeleton";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getAdminToken } from "@/lib/admin-session";
-import { listAdminElections } from "@/services/admin-dashboard-service";
+import { useAdminElection } from "@/hooks/use-admin-election";
 import {
   listAdminPartylists,
   saveAdminPartylist,
   deleteAdminPartylist,
 } from "@/services/admin-partylist-service";
-import type { ElectionSummary } from "@/types/dashboard";
 import type { PartylistRecord } from "@/types/partylist";
 import "./admin-partylists-screen.css";
 
@@ -19,11 +18,10 @@ const SLOTS = [
 ] as const;
 
 export function AdminPartylistsScreen() {
-  const [elections, setElections] = useState<ElectionSummary[]>([]);
-  const [electionId, setElectionId] = useState<number | null>(null);
   const [partylists, setPartylists] = useState<PartylistRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [recordsLoading, setLoading] = useState(true);
+  const [recordError, setError] = useState("");
+  const [loadedElectionId, setLoadedElectionId] = useState<number | null>(null);
   const [notice, setNotice] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [modal, setModal] = useState<{
@@ -40,43 +38,17 @@ export function AdminPartylistsScreen() {
   const bannerInput = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   useDocumentTitle("Partylists | CPC Vote Admin");
-  const election = elections.find((item) => item.id === electionId);
+  const selection = useAdminElection(attempt);
+  const { election } = selection;
+  const electionId = election?.id ?? null;
+  const loading =
+    selection.state === "loading" ||
+    (!!election && (recordsLoading || loadedElectionId !== electionId));
+  const error = selection.error || recordError;
   const canEdit = election?.status === "draft" && !loading && !error;
   const available = SLOTS.filter(
     (slot) => !partylists.some((party) => party.team === slot.team),
   );
-
-  useEffect(() => {
-    const token = getAdminToken();
-    if (!token) return;
-    let active = true;
-    listAdminElections(token)
-      .then(({ data }) => {
-        if (!active) return;
-        setElections(data);
-        setElectionId((current) =>
-          current !== null && data.some((item) => item.id === current)
-            ? current
-            : ((
-                data.find((item) => item.status === "draft") ??
-                data.find((item) => item.status === "active") ??
-                data[0]
-              )?.id ?? null),
-        );
-        if (!data.length) setLoading(false);
-      })
-      .catch((err) => {
-        if (active) {
-          setError(
-            err instanceof Error ? err.message : "Unable to load elections.",
-          );
-          setLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
 
   useEffect(() => {
     const token = getAdminToken();
@@ -86,12 +58,14 @@ export function AdminPartylistsScreen() {
       .then(({ data }) => {
         if (!controller.signal.aborted) {
           setPartylists(data);
+          setLoadedElectionId(electionId);
           setError("");
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
+          setLoadedElectionId(electionId);
           setError(
             err instanceof Error ? err.message : "Unable to load partylists.",
           );
@@ -217,32 +191,11 @@ export function AdminPartylistsScreen() {
         <header className="partylist-page__heading">
           <div>
             <h1>Partylists</h1>
-            <p>Set the shared platform and banner for each partylist.</p>
+            <p>
+              {election?.name} · Set the shared platform and banner for each
+              partylist.
+            </p>
           </div>
-          {!!elections.length && (
-            <label>
-              Election
-              <select
-                aria-label="Election for partylists"
-                disabled={deletingId !== null}
-                value={electionId ?? ""}
-                onChange={(event) => {
-                  setLoading(true);
-                  setPartylists([]);
-                  setError("");
-                  setNotice("");
-                  setActionError("");
-                  setElectionId(Number(event.target.value));
-                }}
-              >
-                {elections.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} ({item.status})
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
           <button
             type="button"
             className="partylist-button"

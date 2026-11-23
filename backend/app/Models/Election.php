@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Election extends Model
 {
+    protected $hidden = ['demo_batch_exists', 'uses_voter_roster'];
+
     protected static function booted(): void
     {
         static::creating(function (Election $election): void {
@@ -28,6 +32,7 @@ class Election extends Model
         'starts_at',
         'ends_at',
         'status',
+        'uses_voter_roster',
     ];
 
     protected function casts(): array
@@ -35,6 +40,7 @@ class Election extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'uses_voter_roster' => 'boolean',
         ];
     }
 
@@ -61,5 +67,15 @@ class Election extends Model
     public function candidacies(): HasMany
     {
         return $this->hasMany(Candidacy::class);
+    }
+
+    public function demoBatch(): HasOne
+    {
+        return $this->hasOne(ElectionDemoBatch::class);
+    }
+
+    public function voters(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'election_student', 'election_id', 'student_id');
     }
 }

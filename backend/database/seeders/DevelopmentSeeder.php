@@ -23,7 +23,7 @@ class DevelopmentSeeder extends Seeder
 
         $this->call(StudentAccountsSeeder::class);
 
-        Election::updateOrCreate(
+        Election::firstOrCreate(
             [
                 'name' => 'SSG Election 2026',
             ],

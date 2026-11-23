@@ -70,10 +70,12 @@ export function previewClassList(
   file: File,
   worksheet?: string,
   signal?: AbortSignal,
+  electionId?: number,
 ): Promise<ClassListPreview> {
   const body = new FormData();
   body.set("file", file);
   if (worksheet) body.set("worksheet", worksheet);
+  if (electionId !== undefined) body.set("election_id", String(electionId));
   return apiRequest("/committee/class-list/preview", {
     method: "POST",
     headers: auth(token),

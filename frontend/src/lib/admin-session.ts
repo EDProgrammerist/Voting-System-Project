@@ -1,9 +1,11 @@
 import type { AdminUser } from "@/types/admin";
+import { clearAdminElection } from "@/lib/admin-election";
 
 const ADMIN_TOKEN_KEY = "admin_access_token";
 const ADMIN_USER_KEY = "admin_user";
 
 export function saveAdminSession(token: string, admin: AdminUser): void {
+  clearAdminElection();
   sessionStorage.setItem(ADMIN_TOKEN_KEY, token);
   sessionStorage.setItem(ADMIN_USER_KEY, JSON.stringify(admin));
 }
@@ -27,6 +29,7 @@ export function getAdminUser(): AdminUser | null {
 }
 
 export function clearAdminSession(): void {
+  clearAdminElection();
   sessionStorage.removeItem(ADMIN_TOKEN_KEY);
   sessionStorage.removeItem(ADMIN_USER_KEY);
 }

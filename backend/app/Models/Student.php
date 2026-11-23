@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -70,5 +72,23 @@ class Student extends Authenticatable
     public function ballotIds(): HasMany
     {
         return $this->hasMany(VoterBallotId::class, 'student_id', 'student_id');
+    }
+
+    public function elections(): BelongsToMany
+    {
+        return $this->belongsToMany(Election::class, 'election_student', 'student_id', 'election_id');
+    }
+
+    public function scopeForElection(Builder $query, ?Election $election): Builder
+    {
+        // Preserve legacy fixtures/integrations until an election adopts an explicit roster.
+        return $election?->uses_voter_roster
+            ? $query->whereHas('elections', fn ($query) => $query->where('elections.id', $election->id))
+            : $query;
+    }
+
+    public function isRegisteredFor(Election $election): bool
+    {
+        return ! $election->uses_voter_roster || $this->elections()->where('elections.id', $election->id)->exists();
     }
 }

@@ -33,6 +33,9 @@ class VoterOnly
         }
 
         $election = VoterElection::forStudent($user);
+        if ($election && ! $user->isRegisteredFor($election) && ! $request->is('api/voter/logout')) {
+            return response()->json(['message' => 'You are not registered for this election. Please contact the election committee.'], 403);
+        }
         if ($election && VoterElection::tallyOnly($user, $election) && ! $request->is('api/voter/tally', 'api/voter/logout', 'api/voter/password', 'api/voter/session')) {
             return response()->json(['message' => 'Your access is restricted to Live Tally.', 'tally_only' => true], 403);
         }

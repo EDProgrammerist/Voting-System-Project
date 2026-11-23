@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { QrCode } from "@phosphor-icons/react";
 import { useDocumentTitle } from "@/hooks/use-document-title";
-import { getAdminToken } from "@/lib/admin-session";
-import { listAdminElections } from "@/services/admin-dashboard-service";
-import type { ElectionSummary } from "@/types/dashboard";
+import { useAdminElection } from "@/hooks/use-admin-election";
 import { AdminElectionQr } from "./admin-election-qr";
 import "../admin-dashboard/admin-dashboard-screen.css";
 import "../admin-dashboard/admin-overview.css";
@@ -11,45 +9,11 @@ import "./admin-settings-screen.css";
 import { PageSkeleton } from "@/components/common/page-skeleton";
 
 export function AdminSettingsScreen() {
-  const [elections, setElections] = useState<ElectionSummary[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const { election, state, error } = useAdminElection(attempt);
+  const loading = state === "loading";
   useDocumentTitle("Settings | CPC Vote Admin");
 
-  useEffect(() => {
-    const token = getAdminToken();
-    if (!token) return;
-    let active = true;
-    listAdminElections(token)
-      .then(({ data }) => {
-        if (!active) return;
-        setElections(data);
-        const preferred =
-          data.find((item) => item.status === "active") ??
-          data.find((item) => item.status === "draft") ??
-          data[0];
-        setSelectedId(preferred?.id ?? null);
-        setError("");
-      })
-      .catch((err: unknown) => {
-        if (active)
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Unable to load election settings.",
-          );
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
-
-  const election = elections.find((item) => item.id === selectedId);
   if (loading)
     return (
       <section className="admin-dashboard__content">
@@ -85,8 +49,6 @@ export function AdminSettingsScreen() {
                 type="button"
                 className="admin-settings__retry"
                 onClick={() => {
-                  setLoading(true);
-                  setError("");
                   setAttempt((value) => value + 1);
                 }}
               >
@@ -95,21 +57,7 @@ export function AdminSettingsScreen() {
             </div>
           ) : election ? (
             <>
-              <label className="admin-settings__election">
-                Election
-                <select
-                  value={election.id}
-                  onChange={(event) =>
-                    setSelectedId(Number(event.target.value))
-                  }
-                >
-                  {elections.map((item) => (
-                    <option value={item.id} key={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <p className="admin-settings__election">{election.name}</p>
               <p className="admin-settings__status">
                 {election.status === "closed"
                   ? "This election is closed. Its QR code no longer accepts new voters."

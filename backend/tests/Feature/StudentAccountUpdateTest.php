@@ -29,6 +29,8 @@ class StudentAccountUpdateTest extends TestCase
         $passwordHash = $student->getRawOriginal('password');
         CandidateProfile::create(['student_id' => $student->student_id, 'full_name' => $student->full_name, 'achievements' => 'Existing award']);
         $election = Election::create(['name' => 'Existing election', 'status' => 'active']);
+        $election->update(['uses_voter_roster' => true]);
+        $election->voters()->attach($student->student_id);
         $reference = VoterBallotId::issue($student, $election);
         $position = $election->positions->first();
         Candidacy::create(['election_id' => $election->id, 'position_id' => $position->id, 'student_id' => $student->student_id, 'team' => 'TEAM_A']);
@@ -48,6 +50,7 @@ class StudentAccountUpdateTest extends TestCase
         $this->assertSame('2D', $updated->section);
         $this->assertDatabaseCount('students', 6);
         $this->assertDatabaseMissing('students', ['student_id' => '20240100']);
+        $this->assertDatabaseHas('election_student', ['election_id' => $election->id, 'student_id' => '2024-0100']);
         $this->assertDatabaseHas('candidate_profiles', ['student_id' => '2024-0100', 'full_name' => 'Ian Kurt Ardena', 'achievements' => 'Existing award']);
         $this->assertDatabaseHas('candidacies', ['student_id' => '2024-0100']);
         $this->assertDatabaseHas('votes', ['candidate_student_id' => '2024-0100']);
@@ -90,5 +93,30 @@ class StudentAccountUpdateTest extends TestCase
         $this->assertDatabaseCount('ballots', 1);
         $this->assertDatabaseCount('votes', 0);
         $this->assertSame('draft', $election->fresh()->status);
+
+        foreach ([
+            ['2024-0100', '1st Year', '1D'],
+            ['2024-0101', '2nd Year', '2D'],
+            ['2024-0102', '3rd Year', '3D'],
+            ['2024-0103', '4th Year', '4D'],
+            ['2020-9999', '4th Year', '4D'],
+            ['2023-8888', '3rd Year', '3D'],
+        ] as [$id, $year, $section]) {
+            $this->assertDatabaseHas('students', ['student_id' => $id, 'year_level' => $year, 'section' => $section]);
+        }
+    }
+
+    public function test_legacy_account_receives_only_missing_class_details(): void
+    {
+        Student::create([
+            'student_id' => '20240100', 'full_name' => 'Ian Kurt Ardena',
+            'academic_status' => 'enrolled', 'year_level' => ' ', 'section' => 'Custom section',
+        ]);
+
+        $this->seed(StudentAccountsSeeder::class);
+
+        $this->assertDatabaseHas('students', [
+            'student_id' => '2024-0100', 'year_level' => '1st Year', 'section' => 'Custom section',
+        ]);
     }
 }

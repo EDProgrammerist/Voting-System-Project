@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Election;
+use App\Support\DemoElectionBallots;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ElectionController extends Controller
@@ -23,6 +25,8 @@ class ElectionController extends Controller
     {
         return response()->json([
             'data' => Election::query()
+                ->withExists('demoBatch')
+                ->orderByDesc('demo_batch_exists')
                 ->latest('id')
                 ->get(),
         ]);
@@ -50,6 +54,7 @@ class ElectionController extends Controller
         $election = Election::create([
             ...$validated,
             'status' => 'draft',
+            'uses_voter_roster' => true,
         ]);
 
         return response()->json([
@@ -110,46 +115,51 @@ class ElectionController extends Controller
 
     public function activate(Election $election): JsonResponse
     {
-        if ($election->status !== 'draft') {
+        return DB::transaction(function () use ($election): JsonResponse {
+            $election = Election::whereKey($election->id)->lockForUpdate()->firstOrFail();
+            if ($election->status !== 'draft') {
+                return response()->json([
+                    'message' => 'Only a draft election can be activated.',
+                ], 409);
+            }
+
+            if (
+                ! $election->positions()->exists() ||
+                ! $election->candidacies()->exists()
+            ) {
+                return response()->json([
+                    'message' => 'Add at least one candidate to every default position before activating the election.',
+                ], 422);
+            }
+
+            if ($election->positions()->whereDoesntHave('candidacies')->exists()) {
+                return response()->json([
+                    'message' => 'Add at least one candidate to every position before activating the election.',
+                ], 422);
+            }
+
+            $anotherActiveElection = Election::currentlyActive()
+                ->where('id', '!=', $election->id)
+                ->exists();
+
+            if ($anotherActiveElection) {
+                return response()->json([
+                    'message' => 'Another election is already active.',
+                ], 409);
+            }
+
+            app(DemoElectionBallots::class)->populate($election);
+
+            $election->update([
+                'status' => 'active',
+                'starts_at' => $election->starts_at ?? now(),
+            ]);
+
             return response()->json([
-                'message' => 'Only a draft election can be activated.',
-            ], 409);
-        }
-
-        if (
-            ! $election->positions()->exists() ||
-            ! $election->candidacies()->exists()
-        ) {
-            return response()->json([
-                'message' => 'Add at least one candidate to every default position before activating the election.',
-            ], 422);
-        }
-
-        if ($election->positions()->whereDoesntHave('candidacies')->exists()) {
-            return response()->json([
-                'message' => 'Add at least one candidate to every position before activating the election.',
-            ], 422);
-        }
-
-        $anotherActiveElection = Election::currentlyActive()
-            ->where('id', '!=', $election->id)
-            ->exists();
-
-        if ($anotherActiveElection) {
-            return response()->json([
-                'message' => 'Another election is already active.',
-            ], 409);
-        }
-
-        $election->update([
-            'status' => 'active',
-            'starts_at' => $election->starts_at ?? now(),
-        ]);
-
-        return response()->json([
-            'message' => 'Election activated successfully.',
-            'data' => $election->fresh(),
-        ]);
+                'message' => 'Election activated successfully.',
+                'data' => $election->fresh(),
+            ]);
+        }, 3);
     }
 
     public function close(Election $election): JsonResponse

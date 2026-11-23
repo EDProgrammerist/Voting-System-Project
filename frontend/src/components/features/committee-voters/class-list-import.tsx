@@ -21,7 +21,15 @@ const fieldLabels: Record<string, string> = {
   section: "Section",
   academic_status: "Academic status",
 };
-export function ClassListImport({ onImported }: { onImported: () => void }) {
+export function ClassListImport({
+  onImported,
+  electionId,
+  electionName,
+}: {
+  onImported: () => void;
+  electionId?: number;
+  electionName?: string;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [inspection, setInspection] = useState<ClassListInspection | null>(
     null,
@@ -71,6 +79,7 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
         selected,
         sheet,
         controller.signal,
+        electionId,
       );
       if (controller.signal.aborted) return;
       setWorksheet(data.layout.worksheet);
@@ -173,12 +182,16 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
         <span>Import class list from Excel</span>
       </summary>
       <div className="class-import__body" aria-busy={Boolean(busy)}>
+        {electionName && (
+          <p className="class-import__hint">Import into {electionName}.</p>
+        )}
         <p className="class-import__hint">
           Choose your class list to import and organize records automatically.
           Headers and names are detected, including Lastname, Firstname, and
-          M.I. Existing IDs are skipped. New records receive no password or
-          login access. Maximum 5 MB and 5,000 rows. Keep Student IDs as text to
-          preserve leading zeros.
+          M.I. Students already in this election are skipped. Existing accounts
+          are preserved when added to another year's roster. New records receive
+          no password or login access. Maximum 5 MB and 5,000 rows. Keep Student
+          IDs as text to preserve leading zeros.
         </p>
         <div className="class-import__upload">
           <label>
@@ -255,8 +268,8 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
           <div className="class-import__success" role="status">
             <strong>{result.message}</strong>
             <p>
-              {result.inserted} new records added. {result.skipped} existing IDs
-              skipped.
+              {result.inserted} students added to this election.{" "}
+              {result.skipped} already registered students skipped.
             </p>
           </div>
         )}
@@ -267,8 +280,8 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
           >
             <h2>Review before importing</h2>
             <p>
-              {preview.summary.total} rows · {preview.summary.new} new ·{" "}
-              {preview.summary.existing} existing IDs to skip ·{" "}
+              {preview.summary.total} rows · {preview.summary.new} to add ·{" "}
+              {preview.summary.existing} already registered ·{" "}
               {preview.summary.invalid} invalid rows
             </p>
             {preview.issues.length > 0 && (
@@ -352,7 +365,7 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
                           {row.status === "new"
                             ? "Add record only"
                             : row.status === "existing"
-                              ? "Skip existing ID"
+                              ? "Already registered"
                               : "Fix errors"}
                         </span>
                       </td>
@@ -400,7 +413,7 @@ export function ClassListImport({ onImported }: { onImported: () => void }) {
               >
                 {busy === "commit"
                   ? "Importing..."
-                  : `Confirm import (${preview.summary.new} new records)`}
+                  : `Confirm import (${preview.summary.new} students)`}
               </button>
             ) : (
               preview.issues.length === 0 && (

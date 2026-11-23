@@ -9,10 +9,7 @@ import secretaryLogo from "@/assets/positions/secretary.webp";
 import treasurerLogo from "@/assets/positions/treasurer.webp";
 import auditorLogo from "@/assets/positions/auditor.webp";
 import pioLogo from "@/assets/positions/pio.webp";
-import {
-  AdminDataState,
-  AdminElectionPicker,
-} from "@/components/features/admin-dashboard/admin-data-state";
+import { AdminDataState } from "@/components/features/admin-dashboard/admin-data-state";
 import { useAdminElectionDashboard } from "@/hooks/use-admin-election-dashboard";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getAdminToken } from "@/lib/admin-session";
@@ -47,14 +44,7 @@ const positionLogos: Partial<Record<string, string>> = {
 
 export function AdminCandidatesScreen() {
   const navigate = useNavigate();
-  const {
-    dashboard,
-    dataState,
-    dataNotice,
-    elections,
-    selectedElectionId,
-    selectElection,
-  } = useAdminElectionDashboard("draft");
+  const { dashboard, dataState, dataNotice } = useAdminElectionDashboard();
   const [candidates, setCandidates] = useState<CandidateRecord[]>([]);
   const [positions, setPositions] = useState<PositionRecord[]>([]);
   const [partylists, setPartylists] = useState<PartylistRecord[]>([]);
@@ -319,16 +309,6 @@ export function AdminCandidatesScreen() {
               Manage the candidates running in the {dashboard.election.name}.
             </p>
           </div>
-          <AdminElectionPicker
-            elections={elections}
-            onChange={(id) => {
-              setCandidates([]);
-              setPositions([]);
-              setRecordsState("loading");
-              selectElection(id);
-            }}
-            selectedElectionId={selectedElectionId}
-          />
           <button
             className="admin-candidates__activate"
             disabled={!canActivate || activating}

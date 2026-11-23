@@ -169,6 +169,13 @@ class StudentPasswordTest extends TestCase
         $this->assertTrue(Hash::check('PersonalPassword123!', $student->fresh()->password));
         $this->assertFalse($student->fresh()->password_change_required);
         $this->assertSame('2024-0100', $student->fresh()->student_id);
+        $this->assertSame('1st Year', $student->fresh()->year_level);
+        $this->assertSame('1D', $student->fresh()->section);
+
+        $student->update(['year_level' => 'Custom year', 'section' => 'Custom section']);
+        $this->seed(StudentAccountsSeeder::class);
+        $this->assertSame('Custom year', $student->fresh()->year_level);
+        $this->assertSame('Custom section', $student->fresh()->section);
     }
 
     public function test_migration_initializes_existing_students_without_changing_election_records(): void

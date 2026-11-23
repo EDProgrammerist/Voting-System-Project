@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Committee;
 
 use App\Http\Controllers\Controller;
+use App\Models\Election;
 use App\Models\Student;
 use App\Support\VoterElection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
@@ -49,8 +51,10 @@ class StudentController extends Controller
 
         $electionId = $validated['election_id']
             ?? VoterElection::current()?->id;
+        $election = $electionId ? Election::findOrFail($electionId) : null;
 
         $students = Student::query()
+            ->forElection($election)
             ->when(
                 $electionId,
                 function ($query, int $electionId): void {
@@ -124,6 +128,7 @@ class StudentController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'election_id' => ['sometimes', 'integer', 'exists:elections,id'],
             'student_id' => [
                 'required',
                 'string',
@@ -154,7 +159,16 @@ class StudentController extends Controller
             ],
         ]);
 
-        $student = Student::createDataRecord($validated);
+        $election = isset($validated['election_id']) ? Election::findOrFail($validated['election_id']) : VoterElection::current();
+        unset($validated['election_id']);
+        $student = DB::transaction(function () use ($validated, $election): Student {
+            $student = Student::createDataRecord($validated);
+            if ($election?->uses_voter_roster) {
+                $election->voters()->syncWithoutDetaching([$student->student_id]);
+            }
+
+            return $student;
+        });
 
         return response()->json([
             'message' => 'Student created successfully.',

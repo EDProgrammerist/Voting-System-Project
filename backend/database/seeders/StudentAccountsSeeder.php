@@ -12,16 +12,16 @@ class StudentAccountsSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['20240100', '2024-0100', 'Ian Kurt Ardena', 'BSIT', 'enrolled'],
-            ['20240101', '2024-0101', 'Bryan Amoin', 'BSHM', 'enrolled'],
-            ['20240102', '2024-0102', 'Janvenedict Emeliano', 'BEED', 'enrolled'],
-            ['20240103', '2024-0103', 'Demi Arnold', 'BSED', 'enrolled'],
-            ['20209999', '2020-9999', 'Sheehan Voila', 'BSIT', 'graduated'],
-            ['20238888', '2023-8888', 'John Doe', 'BSHM', 'stopped'],
+            ['20240100', '2024-0100', 'Ian Kurt Ardena', 'BSIT', 'enrolled', '1st Year', '1D'],
+            ['20240101', '2024-0101', 'Bryan Amoin', 'BSHM', 'enrolled', '2nd Year', '2D'],
+            ['20240102', '2024-0102', 'Janvenedict Emeliano', 'BEED', 'enrolled', '3rd Year', '3D'],
+            ['20240103', '2024-0103', 'Demi Arnold', 'BSED', 'enrolled', '4th Year', '4D'],
+            ['20209999', '2020-9999', 'Sheehan Voila', 'BSIT', 'graduated', '4th Year', '4D'],
+            ['20238888', '2023-8888', 'John Doe', 'BSHM', 'stopped', '3rd Year', '3D'],
         ];
 
         DB::transaction(function () use ($accounts): void {
-            foreach ($accounts as [$oldId, $newId, $name, $course, $status]) {
+            foreach ($accounts as [$oldId, $newId, $name, $course, $status, $year, $section]) {
                 $old = Student::whereKey($oldId)->lockForUpdate()->first();
                 $current = Student::whereKey($newId)->lockForUpdate()->first();
 
@@ -29,9 +29,16 @@ class StudentAccountsSeeder extends Seeder
                     throw new RuntimeException("Both {$oldId} and {$newId} exist. Resolve these duplicate student records before updating accounts.");
                 }
 
+                // Supply demo class details only when the existing fields are blank.
+                $student = $old ?? $current;
+                $classDetails = [
+                    'year_level' => filled($student?->year_level) ? $student->year_level : $year,
+                    'section' => filled($student?->section) ? $student->section : $section,
+                ];
+
                 if ($old) {
                     // Copy parents first, move references, then remove the obsolete keys.
-                    DB::table('students')->insert(array_merge($old->getAttributes(), [
+                    DB::table('students')->insert(array_merge($old->getAttributes(), $classDetails, [
                         'student_id' => $newId, 'full_name' => $name,
                         'academic_status' => $status, 'updated_at' => now(),
                     ]));
@@ -46,17 +53,18 @@ class StudentAccountsSeeder extends Seeder
                     }
                     DB::table('voter_participations')->where('student_id', $oldId)->update(['student_id' => $newId]);
                     DB::table('voter_ballot_ids')->where('student_id', $oldId)->update(['student_id' => $newId]);
+                    DB::table('election_student')->where('student_id', $oldId)->update(['student_id' => $newId]);
                     $old->tokens()->delete();
                     $old->delete();
                 } elseif ($current) {
                     $changed = $current->full_name !== $name || $current->academic_status !== $status;
-                    $current->update(['full_name' => $name, 'academic_status' => $status]);
+                    $current->update(array_merge($classDetails, ['full_name' => $name, 'academic_status' => $status]));
                     if ($changed) {
                         $current->tokens()->delete();
                     }
                     DB::table('candidate_profiles')->where('student_id', $newId)->update(['full_name' => $name]);
                 } else {
-                    Student::create(['student_id' => $newId, 'full_name' => $name, 'course' => $course, 'academic_status' => $status]);
+                    Student::create(array_merge($classDetails, ['student_id' => $newId, 'full_name' => $name, 'course' => $course, 'academic_status' => $status]));
                 }
             }
         }, 3);

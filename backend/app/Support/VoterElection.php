@@ -11,6 +11,7 @@ class VoterElection
     public static function current(): ?Election
     {
         return Election::currentlyActive()->latest('id')->first()
+            ?? Election::where('status', 'draft')->whereHas('demoBatch')->first()
             ?? Election::where('status', 'draft')->latest('id')->first()
             ?? Election::whereIn('status', ['active', 'closed'])->latest('id')->first();
     }

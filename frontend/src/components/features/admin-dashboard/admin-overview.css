@@ -168,6 +168,34 @@
   color: var(--overview-muted);
   font-size: 12px;
 }
+.overview-heading__tools {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  max-width: 100%;
+}
+.overview-heading__tools .admin-election-picker {
+  min-width: 0;
+  width: 260px;
+  max-width: 100%;
+}
+.overview-heading__tools .admin-election-picker select {
+  width: 100%;
+  max-width: none;
+}
+.overview-heading__tools .admin-election-picker select:focus-visible {
+  outline: 3px solid #2459b8;
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .overview-heading__tools,
+  .overview-heading__tools .admin-election-picker {
+    width: 100%;
+  }
+  .overview-heading__tools {
+    justify-items: start;
+  }
+}
 .overview-updates i {
   width: 7px;
   height: 7px;

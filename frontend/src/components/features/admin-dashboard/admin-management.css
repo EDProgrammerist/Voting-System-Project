@@ -86,23 +86,6 @@
   > .admin-candidates__activate:hover:not(:disabled) {
   background: #edf2fa;
 }
-.admin-management .admin-election-picker {
-  display: grid;
-  gap: 5px;
-  margin: 0;
-  font-size: 11px;
-  color: #58677c;
-}
-.admin-management .admin-election-picker select {
-  max-width: 260px;
-  min-height: 44px;
-  padding: 10px 30px 10px 12px;
-  border: 1px solid #d5deea;
-  border-radius: 7px;
-  background: #fff;
-  color: #202e43;
-  font-size: 12px;
-}
 .admin-management .admin-dashboard__notice {
   position: static;
   max-width: none;
@@ -176,13 +159,6 @@
     :is(.admin-votes__header, .admin-candidates__header)
     > div:first-child {
     flex-basis: 100%;
-  }
-  .admin-management .admin-election-picker {
-    width: 100%;
-  }
-  .admin-management .admin-election-picker select {
-    max-width: none;
-    width: 100%;
   }
 }
 @media print {

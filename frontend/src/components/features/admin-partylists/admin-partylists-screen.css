@@ -19,7 +19,6 @@
   color: #58677c;
   font-size: 13px;
 }
-.partylist-page__heading label,
 .partylist-modal label {
   display: grid;
   gap: 8px;
@@ -27,7 +26,6 @@
   font-weight: 650;
   color: #394d68;
 }
-.partylist-page select,
 .partylist-modal :is(input, select, textarea) {
   width: 100%;
   min-width: 0;
@@ -38,9 +36,6 @@
   color: #203b63;
   background: #fff;
   font: inherit;
-}
-.partylist-page__heading select {
-  max-width: 300px;
 }
 .partylist-button {
   display: inline-flex;
@@ -258,7 +253,7 @@
   justify-content: end;
   gap: 12px;
 }
-.partylist-page :is(button, select):focus-visible,
+.partylist-page button:focus-visible,
 .partylist-modal :is(button, input, select, textarea):focus-visible {
   outline: 3px solid #2459b8;
   outline-offset: 3px;
@@ -271,12 +266,6 @@
 @media (max-width: 600px) {
   .partylist-page__heading {
     align-items: stretch;
-  }
-  .partylist-page__heading label {
-    width: 100%;
-  }
-  .partylist-page__heading select {
-    max-width: 100%;
   }
   .partylist-modal {
     padding: 24px 18px;

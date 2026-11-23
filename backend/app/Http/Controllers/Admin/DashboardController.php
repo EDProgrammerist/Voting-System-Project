@@ -29,6 +29,7 @@ class DashboardController extends Controller
         $election = Election::findOrFail($validated['election_id']);
 
         $eligibleStudents = Student::query()
+            ->forElection($election)
             ->where('academic_status', 'enrolled')
             ->count();
 
@@ -46,6 +47,7 @@ class DashboardController extends Controller
             : 0;
 
         $eligibleByCourse = Student::query()
+            ->forElection($election)
             ->selectRaw("COALESCE(NULLIF(course, ''), 'Unspecified') AS course")
             ->selectRaw('COUNT(*) AS total')
             ->where('academic_status', 'enrolled')

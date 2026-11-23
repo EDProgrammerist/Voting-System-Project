@@ -48,24 +48,10 @@
   margin: 8px 0 0;
 }
 .admin-settings__election {
-  display: grid;
-  gap: 8px;
   max-width: 520px;
   color: #394d68;
   font-size: 12px;
   font-weight: 650;
-}
-.admin-settings__election select {
-  width: 100%;
-  min-width: 0;
-  min-height: 46px;
-  padding: 10px 12px;
-  border: 1px solid #cbd6e5;
-  border-radius: 7px;
-  background: #fff;
-  color: #202e43;
-  font: inherit;
-  font-size: 13px;
 }
 .admin-settings__status {
   max-width: 64ch;
@@ -81,7 +67,7 @@
   background: #fff;
   cursor: pointer;
 }
-.admin-settings :is(select, button):focus-visible {
+.admin-settings button:focus-visible {
   outline: 3px solid #2459b8;
   outline-offset: 3px;
 }

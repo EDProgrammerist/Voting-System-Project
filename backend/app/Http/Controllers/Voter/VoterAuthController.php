@@ -62,6 +62,9 @@ class VoterAuthController extends Controller
             }
 
             $election = isset($validated['entry_code']) ? Election::where('qr_entry_code', $validated['entry_code'])->firstOrFail() : VoterElection::current();
+            if ($election && ! $student->isRegisteredFor($election)) {
+                return response()->json(['message' => 'You are not registered for this election. Please contact the election committee.'], 403);
+            }
             if (isset($validated['entry_code']) && (! in_array($election->status, ['draft', 'active'], true) || ($election->ends_at && $election->ends_at->isPast()))) {
                 return response()->json(['message' => 'This election is closed. Its QR code no longer accepts voters.'], 409);
             }

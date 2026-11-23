@@ -181,7 +181,12 @@ export function CommitteeVotersScreen() {
             update automatically after a ballot is submitted.
           </p>
         </header>
-        <ClassListImport onImported={() => setRefresh((value) => value + 1)} />
+        <ClassListImport
+          key={electionId}
+          electionId={electionId ?? undefined}
+          electionName={elections.find((item) => item.id === electionId)?.name}
+          onImported={() => setRefresh((value) => value + 1)}
+        />
 
         <form
           className="voter-filters"

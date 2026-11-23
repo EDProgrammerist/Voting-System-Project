@@ -6,11 +6,6 @@
   .admin-management .admin-candidates__header {
     align-items: flex-end;
   }
-
-  .admin-management .admin-candidates__header > .admin-election-picker {
-    min-width: 260px;
-    margin-right: auto;
-  }
 }
 
 .candidate-summary {

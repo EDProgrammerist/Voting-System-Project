@@ -50,6 +50,28 @@ class CommitteeClassListTest extends TestCase
         return $this->postJson('/api/committee/class-list/preview', ['file' => $file, 'worksheet' => 'Class list', 'header_row' => 1]);
     }
 
+    public function test_existing_student_can_be_imported_into_an_empty_future_roster_without_overwriting_the_account(): void
+    {
+        Sanctum::actingAs($this->member(), ['committee']);
+        $current = Election::create(['name' => 'Current election', 'status' => 'draft', 'uses_voter_roster' => true]);
+        $future = Election::create(['name' => 'Future election', 'status' => 'draft', 'uses_voter_roster' => true]);
+        $student = Student::create(['student_id' => 'EXISTING', 'full_name' => 'Original Name', 'academic_status' => 'enrolled', 'password' => 'PersonalPassword123!', 'password_change_required' => false]);
+        $before = $student->fresh()->getAttributes();
+        $preview = $this->postJson('/api/committee/class-list/preview', [
+            'file' => $this->file([['EXISTING', 'Do not overwrite', 'BSIT', '2', 'D', 'enrolled']]),
+            'election_id' => $future->id, 'worksheet' => 'Class list', 'header_row' => 1,
+        ])->assertOk()->assertJsonPath('summary.new', 1)->assertJsonPath('summary.existing', 0);
+
+        $this->postJson('/api/committee/class-list/'.$preview->json('import_id').'/commit', ['election_id' => $current->id])
+            ->assertOk()->assertJsonPath('inserted', 1)->assertJsonPath('skipped', 0);
+
+        $this->assertSame($before, $student->fresh()->getAttributes());
+        $this->assertSame(0, $current->voters()->count());
+        $this->assertSame(1, $future->voters()->count());
+        $this->assertDatabaseCount('students', 1);
+        $this->assertDatabaseCount('voter_participations', 0);
+    }
+
     public function test_committee_login_is_separate_and_role_checks_prevent_privilege_escalation(): void
     {
         $member = $this->member();
