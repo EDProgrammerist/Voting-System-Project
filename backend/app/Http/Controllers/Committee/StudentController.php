@@ -214,7 +214,8 @@ class StudentController extends Controller
 
         if (
             isset($validated['full_name']) &&
-            $student->candidateProfile
+            $student->candidateProfile &&
+            ! $student->candidateProfile->candidacies()->whereHas('election', fn ($query) => $query->whereIn('status', ['active', 'closed']))->exists()
         ) {
             $student->candidateProfile->update([
                 'full_name' => $student->full_name,

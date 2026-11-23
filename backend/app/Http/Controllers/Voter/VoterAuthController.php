@@ -136,7 +136,7 @@ class VoterAuthController extends Controller
             ->where('student_id', $student->student_id)
             ->exists();
 
-        $tallyOnly = $alreadyVoted || ($election->status !== 'draft' && ! Election::currentlyActive()->whereKey($election->id)->exists());
+        $tallyOnly = $alreadyVoted || VoterElection::hasEnded($election);
 
         if (! $student->password_change_required) {
             VoterBallotId::issue($student, $election);

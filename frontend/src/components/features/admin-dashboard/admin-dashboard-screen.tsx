@@ -189,7 +189,7 @@ export function AdminDashboardScreen() {
                 {
                   label: "Eligible voters",
                   value: dashboard.turnout.eligible_students,
-                  detail: "Enrolled students",
+                  detail: "Includes students who already voted",
                 },
                 {
                   label: "Ballots cast",

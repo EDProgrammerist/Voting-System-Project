@@ -24,6 +24,26 @@ class ElectionRosterTest extends TestCase
         return $user;
     }
 
+    public function test_turnout_retains_recorded_voters_when_their_academic_status_changes(): void
+    {
+        $this->staff();
+        $election = Election::create(['name' => 'Election with recorded ballots', 'status' => 'active', 'uses_voter_roster' => true]);
+        foreach (['FIRST', 'SECOND'] as $id) {
+            Student::create(['student_id' => $id, 'full_name' => $id, 'academic_status' => 'enrolled', 'course' => 'BSIT']);
+            $election->voters()->attach($id);
+            VoterParticipation::create(['student_id' => $id, 'election_id' => $election->id, 'voted_at' => now()]);
+        }
+        Student::findOrFail('SECOND')->update(['academic_status' => 'graduated']);
+
+        $this->getJson('/api/admin/dashboard?election_id='.$election->id)->assertOk()
+            ->assertJsonPath('turnout.eligible_students', 2)
+            ->assertJsonPath('turnout.already_voted', 2)
+            ->assertJsonPath('turnout.not_yet_voted', 0)
+            ->assertJsonPath('turnout.percentage', 100)
+            ->assertJsonPath('turnout.by_course.0.eligible_students', 2)
+            ->assertJsonPath('turnout.by_course.0.percentage', 100);
+    }
+
     public function test_empty_future_dashboard_does_not_inherit_the_current_student_roster(): void
     {
         $this->staff();

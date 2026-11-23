@@ -70,9 +70,14 @@ export function loginVoter(
   });
 }
 
-export function getVoterBallot(token: string): Promise<VoterBallotResponse> {
+export function getVoterBallot(
+  token: string,
+  signal?: AbortSignal,
+): Promise<VoterBallotResponse> {
   return apiRequest<VoterBallotResponse>("/voter/ballot", {
     headers: { Authorization: `Bearer ${token}` },
+    signal,
+    cache: "no-store",
   });
 }
 

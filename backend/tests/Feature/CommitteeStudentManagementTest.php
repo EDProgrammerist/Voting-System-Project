@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Candidacy;
+use App\Models\CandidateProfile;
 use App\Models\Election;
 use App\Models\Student;
 use App\Models\User;
@@ -13,6 +15,19 @@ use Tests\TestCase;
 class CommitteeStudentManagementTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_student_rename_does_not_rewrite_an_opened_candidate_profile(): void
+    {
+        $student = Student::create(['student_id' => 'LEGACY-CANDIDATE', 'full_name' => 'Original Name', 'academic_status' => 'enrolled']);
+        $profile = CandidateProfile::create(['student_id' => $student->student_id, 'full_name' => 'Original Name']);
+        $election = Election::create(['name' => 'Opened election', 'status' => 'active']);
+        Candidacy::create(['student_id' => $student->student_id, 'election_id' => $election->id, 'position_id' => $election->positions->first()->id, 'team' => 'TEAM_A']);
+
+        $this->putJson('/api/committee/students/'.$student->student_id, ['full_name' => 'Corrected Student Name'])->assertOk();
+
+        $this->assertSame('Corrected Student Name', $student->fresh()->full_name);
+        $this->assertSame('Original Name', $profile->fresh()->full_name);
+    }
 
     protected function setUp(): void
     {

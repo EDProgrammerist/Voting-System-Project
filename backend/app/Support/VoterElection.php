@@ -11,7 +11,10 @@ class VoterElection
     public static function current(): ?Election
     {
         return Election::currentlyActive()->latest('id')->first()
-            ?? Election::where('status', 'draft')->whereHas('demoBatch')->first()
+            ?? Election::where('status', 'active')->where('starts_at', '>', now())
+                ->where(fn ($query) => $query->whereNull('ends_at')->orWhere('ends_at', '>=', now()))
+                ->orderBy('starts_at')->first()
+            ?? Election::whereHas('demoBatch')->latest('id')->first()
             ?? Election::where('status', 'draft')->latest('id')->first()
             ?? Election::whereIn('status', ['active', 'closed'])->latest('id')->first();
     }
@@ -19,8 +22,14 @@ class VoterElection
     public static function tallyOnly(Student $student, Election $election): bool
     {
         return $student->tokenCan('tally-only')
-            || ($election->status !== 'draft' && ! Election::currentlyActive()->whereKey($election->id)->exists())
+            || static::hasEnded($election)
             || VoterParticipation::where('election_id', $election->id)->where('student_id', $student->student_id)->exists();
+    }
+
+    public static function hasEnded(Election $election): bool
+    {
+        return $election->status === 'closed'
+            || ($election->status === 'active' && $election->ends_at?->isPast());
     }
 
     public static function forStudent(Student $student): ?Election

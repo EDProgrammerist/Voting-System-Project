@@ -5,8 +5,8 @@ import { useNavigate } from "react-router";
 
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { getVoterDraft, getVoterToken, saveVoterDraft } from "@/lib/voter-session";
-import { getVoterBallot } from "@/services/voter-auth-service";
-import type { BallotCandidate, BallotPosition, VoterBallotResponse, VoterSelection } from "@/types/voter";
+import { useVoterBallot } from "@/hooks/use-voter-ballot";
+import type { BallotCandidate, BallotPosition, VoterSelection } from "@/types/voter";
 
 import "./voter-ballot-screen.css";
 import { BallotSteps, CandidateAvatar, StudentLayout } from "@/components/features/voter-shared/student-layout";
@@ -25,7 +25,7 @@ function displayPosition(name: string): string {
 export function VoterBallotScreen() {
   const navigate = useNavigate();
   const token = getVoterToken();
-  const [ballot, setBallot] = useState<VoterBallotResponse | null>(null);
+  const { ballot, loading, error: ballotError } = useVoterBallot(token);
   const [selections, setSelections] = useState<SelectionMap>(() =>
     getVoterDraft().reduce<SelectionMap>((current, selection) => {
       current[selection.position_id] = [
@@ -35,7 +35,6 @@ export function VoterBallotScreen() {
       return current;
     }, {}),
   );
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
   useDocumentTitle("Vote | CPC Vote");
@@ -44,19 +43,6 @@ export function VoterBallotScreen() {
     saveVoterDraft(Object.entries(selections).flatMap(([positionId, candidates]) => candidates.map((id) => ({ position_id: Number(positionId), candidate_student_id: id }))));
   }, [selections]);
 
-  useEffect(() => {
-    if (!token) return;
-
-    let active = true;
-    getVoterBallot(token)
-      .then((response) => { if (active) setBallot(response); })
-      .catch((error: unknown) => {
-        if (active) setMessage(error instanceof Error ? error.message : "Unable to load your ballot.");
-      })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [token]);
-
   if (loading) {
     return <PageSkeleton kind="ballot" label="Loading your ballot" />;
   }
@@ -64,14 +50,14 @@ export function VoterBallotScreen() {
   if (!ballot) {
     return (
       <section className="student-empty" role="alert">
-        {message || "Unable to load your ballot."}
+        {ballotError || message || "Unable to load your ballot."}
       </section>
     );
   }
 
   const loadedBallot = ballot;
   const completedPositions = loadedBallot.positions.filter((position) => (selections[position.id]?.length ?? 0) > 0).length;
-  const canReview = loadedBallot.can_submit_vote && loadedBallot.positions.length > 0;
+  const canReview = loadedBallot.can_submit_vote && !ballotError && loadedBallot.positions.length > 0;
   function toggleCandidate(position: BallotPosition, candidate: BallotCandidate) {
     setMessage("");
     setSelections((current) => {
@@ -91,7 +77,7 @@ export function VoterBallotScreen() {
   }
 
   function handleReview() {
-    if (!loadedBallot.can_submit_vote) return;
+    if (!canReview) return;
     const draft: VoterSelection[] = Object.entries(selections).flatMap(([positionId, candidates]) =>
       candidates.map((candidateId) => ({
         position_id: Number(positionId),
@@ -118,7 +104,7 @@ export function VoterBallotScreen() {
           })}</ul>
           <button className="student-button" disabled={!canReview} onClick={handleReview} type="button">Review Vote<ArrowRight aria-hidden="true" /></button>
           <p className="ballot-summary__help">{!loadedBallot.can_submit_vote ? "You can explore while the election is being prepared." : "Selections are optional. Submitting a blank or partial ballot still records your attendance."}</p>
-          <p aria-live="polite" className="student-error" role="status">{message}</p>
+          <p aria-live="polite" className="student-error" role="status">{message || ballotError}</p>
         </aside>
       </div>
     </StudentLayout>

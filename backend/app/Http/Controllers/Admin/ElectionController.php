@@ -116,7 +116,10 @@ class ElectionController extends Controller
     public function activate(Election $election): JsonResponse
     {
         return DB::transaction(function () use ($election): JsonResponse {
-            $election = Election::whereKey($election->id)->lockForUpdate()->firstOrFail();
+            // Serialize activation decisions across elections, including scheduled ones.
+            $elections = Election::orderBy('id')->lockForUpdate()->get();
+            $election = $elections->firstWhere('id', $election->id);
+            abort_unless($election, 404);
             if ($election->status !== 'draft') {
                 return response()->json([
                     'message' => 'Only a draft election can be activated.',
@@ -138,13 +141,23 @@ class ElectionController extends Controller
                 ], 422);
             }
 
-            $anotherActiveElection = Election::currentlyActive()
-                ->where('id', '!=', $election->id)
-                ->exists();
+            $opensAt = $election->starts_at ?? now();
+            if ($election->ends_at && ($election->ends_at->lessThanOrEqualTo(now()) || $election->ends_at->lessThanOrEqualTo($opensAt))) {
+                throw ValidationException::withMessages(['ends_at' => 'Set a closing time after the opening time and the current time before activating this election.']);
+            }
+            $effectiveStart = $opensAt->greaterThan(now()) ? $opensAt : now();
+            $anotherActiveElection = $elections->contains(function (Election $other) use ($election, $effectiveStart): bool {
+                if ($other->id === $election->id || $other->status !== 'active') {
+                    return false;
+                }
+
+                return (! $other->ends_at || $other->ends_at->greaterThanOrEqualTo($effectiveStart))
+                    && (! $election->ends_at || ! $other->starts_at || $other->starts_at->lessThanOrEqualTo($election->ends_at));
+            });
 
             if ($anotherActiveElection) {
                 return response()->json([
-                    'message' => 'Another election is already active.',
+                    'message' => 'Another active or scheduled election overlaps this voting period.',
                 ], 409);
             }
 

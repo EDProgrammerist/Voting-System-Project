@@ -28,10 +28,12 @@ class DashboardController extends Controller
 
         $election = Election::findOrFail($validated['election_id']);
 
-        $eligibleStudents = Student::query()
+        // A status change after submission must not remove a recorded voter from turnout.
+        $eligibleStudentsQuery = Student::query()
             ->forElection($election)
-            ->where('academic_status', 'enrolled')
-            ->count();
+            ->where(fn ($query) => $query->where('academic_status', 'enrolled')
+                ->orWhereHas('participations', fn ($query) => $query->where('election_id', $election->id)));
+        $eligibleStudents = (clone $eligibleStudentsQuery)->count();
 
         $alreadyVoted = VoterParticipation::query()
             ->where('election_id', $election->id)
@@ -46,11 +48,9 @@ class DashboardController extends Controller
             ? round(($alreadyVoted / $eligibleStudents) * 100, 2)
             : 0;
 
-        $eligibleByCourse = Student::query()
-            ->forElection($election)
+        $eligibleByCourse = (clone $eligibleStudentsQuery)
             ->selectRaw("COALESCE(NULLIF(course, ''), 'Unspecified') AS course")
             ->selectRaw('COUNT(*) AS total')
-            ->where('academic_status', 'enrolled')
             ->groupByRaw("COALESCE(NULLIF(course, ''), 'Unspecified')")
             ->pluck('total', 'course');
 

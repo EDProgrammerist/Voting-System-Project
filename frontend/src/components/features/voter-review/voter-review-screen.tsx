@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -7,8 +7,9 @@ import {
   getVoterDraft,
   getVoterToken,
 } from "@/lib/voter-session";
-import { getVoterBallot, submitVoterVote } from "@/services/voter-auth-service";
-import type { BallotPosition, VoterBallotResponse, VoterSelection, SignaturePoint } from "@/types/voter";
+import { submitVoterVote } from "@/services/voter-auth-service";
+import { useVoterBallot } from "@/hooks/use-voter-ballot";
+import type { BallotPosition, VoterSelection, SignaturePoint } from "@/types/voter";
 import { CandidateProfile } from "@/components/features/voter-shared/candidate-profile";
 import { VoteVerification } from "@/components/features/voter-shared/vote-verification";
 import { BallotReference } from "@/components/features/voter-shared/ballot-reference";
@@ -26,35 +27,14 @@ export function VoterReviewScreen() {
   const navigate = useNavigate();
   const token = getVoterToken();
   const storedDraft = getVoterDraft();
-  const [ballot, setBallot] = useState<VoterBallotResponse | null>(null);
   const [selections] = useState<VoterSelection[]>(storedDraft);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const { ballot, loading, error: ballotError } = useVoterBallot(token, submitting);
   const [signature, setSignature] = useState<SignaturePoint[][]>([]);
   const [thumbmark, setThumbmark] = useState(false);
   const [message, setMessage] = useState("");
 
   useDocumentTitle("Review Vote | CPC Vote");
-
-  useEffect(() => {
-    if (!token) return;
-
-    let active = true;
-    getVoterBallot(token)
-      .then((response) => {
-        if (active) setBallot(response);
-      })
-      .catch((error: unknown) => {
-        if (active) setMessage(error instanceof Error ? error.message : "Unable to load your ballot.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [token]);
 
   const reviewedPositions = useMemo(
     () => (ballot?.positions ?? []).map((position) => ({
@@ -71,6 +51,7 @@ export function VoterReviewScreen() {
   );
 
   const canSubmit = ballot !== null
+    && !ballotError
     && ballot.can_submit_vote
     && reviewedPositions.length > 0;
 
@@ -120,7 +101,7 @@ export function VoterReviewScreen() {
   if (!ballot) {
     return (
       <section className="student-empty" role="alert">
-        {message || "Unable to load your ballot review."}
+        {ballotError || message || "Unable to load your ballot review."}
       </section>
     );
   }
@@ -141,7 +122,7 @@ export function VoterReviewScreen() {
         </ul><p className="review-checklist__note">Your ballot is submitted only when you press Confirm Vote.</p></aside>
       </div>
       <div className="voter-review__actions"><button className="student-button student-button--secondary" disabled={submitting} onClick={() => navigate("/voter/ballot")} type="button"><ArrowLeft aria-hidden="true" />Go Back</button><button className="student-button" disabled={submitting || !canSubmit || !signature.length || !thumbmark} onClick={handleConfirm} type="button">{submitting ? "Confirming..." : "Confirm Vote"}<ArrowRight aria-hidden="true" /></button></div>
-      <p aria-live="polite" className="student-error" role="status">{message}</p>
+      <p aria-live="polite" className="student-error" role="status">{message || ballotError}</p>
     </StudentLayout>
   );
 }
