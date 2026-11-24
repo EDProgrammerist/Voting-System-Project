@@ -49,7 +49,7 @@ export function useVoterBallot(token: string | null, paused = false) {
       }
     }
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 2_000);
+    const timer = window.setInterval(() => void refresh(), 5_000);
     const onVisible = () => void refresh();
     window.addEventListener("focus", onVisible);
     document.addEventListener("visibilitychange", onVisible);

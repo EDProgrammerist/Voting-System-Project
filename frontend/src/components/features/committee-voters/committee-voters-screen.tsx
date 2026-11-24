@@ -18,7 +18,7 @@ import "./committee-voters-screen.css";
 import { ClassListImport } from "./class-list-import";
 import { PageSkeleton } from "@/components/common/page-skeleton";
 
-const LIVE_REFRESH_INTERVAL_MS = 2_000;
+const LIVE_REFRESH_INTERVAL_MS = 5_000;
 
 function normalizeSearch(value: string): string {
   return value

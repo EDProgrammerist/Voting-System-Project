@@ -16,6 +16,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-interaction --no-progress --prefer-dist --optimize-autoloader
 COPY . .
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-voting.ini
+COPY docker/render/php.ini /usr/local/etc/php/conf.d/zz-render.ini
 COPY docker/render/apache.conf /etc/apache2/sites-available/000-default.conf
 RUN mkdir -p storage/app/private storage/app/public storage/framework/cache/data \
         storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \

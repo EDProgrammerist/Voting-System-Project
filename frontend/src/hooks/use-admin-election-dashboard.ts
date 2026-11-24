@@ -27,7 +27,7 @@ const EMPTY_DASHBOARD: DashboardData = {
   results_by_position: {},
 };
 
-const LIVE_REFRESH_INTERVAL_MS = 2_000;
+const LIVE_REFRESH_INTERVAL_MS = 5_000;
 
 export function useAdminElectionDashboard() {
   const selection = useAdminElection();

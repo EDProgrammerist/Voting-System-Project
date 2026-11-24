@@ -25,7 +25,7 @@ export function getVoterSession(
   signal?: AbortSignal,
 ): Promise<VoterSessionResponse> {
   return apiRequest("/voter/session", {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }, 
     signal,
     cache: "no-store",
   });

@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "election": "SSG Election 2026",
+  "partylists": {
+    "TEAM_A": {
+      "name": "Blue Alliance (Demo)",
+      "platform": "Sample platform: strengthen student feedback, peer learning, and clear election updates."
+    },
+    "TEAM_B": {
+      "name": "Red Alliance (Demo)",
+      "platform": "Sample platform: support student wellbeing, inclusive activities, and transparent student projects."
+    }
+  },
+  "candidates": [
+    {
+      "id": "IM2-DEMO-A-PRES",
+      "position": "President",
+      "team": "TEAM_A",
+      "full_name": "Alex Reyes (Demo)",
+      "achievements": "Demonstration profile: Coordinated a student feedback activity and presented a sample campus improvement proposal."
+    },
+    {
+      "id": "IM2-DEMO-A-VP",
+      "position": "Vice President",
+      "team": "TEAM_A",
+      "full_name": "Mika Santos (Demo)",
+      "achievements": "Demonstration profile: Organized a sample volunteer team and supported an inter-class leadership activity."
+    },
+    {
+      "id": "IM2-DEMO-A-SEC",
+      "position": "Secretary",
+      "team": "TEAM_A",
+      "full_name": "Sam Navarro (Demo)",
+      "achievements": "Demonstration profile: Prepared sample meeting minutes and organized a classroom records project."
+    },
+    {
+      "id": "IM2-DEMO-A-TREAS",
+      "position": "Treasurer",
+      "team": "TEAM_A",
+      "full_name": "Noel Cruz (Demo)",
+      "achievements": "Demonstration profile: Prepared a sample activity budget and presented a student fund transparency report."
+    },
+    {
+      "id": "IM2-DEMO-A-AUD",
+      "position": "Auditor",
+      "team": "TEAM_A",
+      "full_name": "Dani Flores (Demo)",
+      "achievements": "Demonstration profile: Reviewed a sample budget, checked receipts, and prepared an accountability checklist."
+    },
+    {
+      "id": "IM2-DEMO-A-PIO",
+      "position": "PIO",
+      "team": "TEAM_A",
+      "full_name": "Jamie Ramos (Demo)",
+      "achievements": "Demonstration profile: Created a sample student information campaign and coordinated event announcements."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-01",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Andrea Bautista (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: student welfare."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-02",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Nico Valdez (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: peer mentoring."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-03",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Lea Mercado (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: accessible activities."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-04",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Paolo Aquino (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: environmental projects."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-05",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Mira Salazar (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: academic support."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-06",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Luis Cabrera (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: student feedback."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-07",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Bea Romero (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: sports participation."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-08",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Carlo Estrella (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: arts and culture."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-09",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Ella Torres (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: digital information."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-10",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Marco Diaz (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: volunteer service."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-11",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Nina Delos Reyes (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: inclusive events."
+    },
+    {
+      "id": "IM2-DEMO-A-SEN-12",
+      "position": "Senator",
+      "team": "TEAM_A",
+      "full_name": "Rafa Soriano (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: classroom representation."
+    },
+    {
+      "id": "IM2-DEMO-B-PRES",
+      "position": "President",
+      "team": "TEAM_B",
+      "full_name": "Casey Mendoza (Demo)",
+      "achievements": "Demonstration profile: Coordinated a student feedback activity and presented a sample campus improvement proposal."
+    },
+    {
+      "id": "IM2-DEMO-B-VP",
+      "position": "Vice President",
+      "team": "TEAM_B",
+      "full_name": "Ari Villanueva (Demo)",
+      "achievements": "Demonstration profile: Organized a sample volunteer team and supported an inter-class leadership activity."
+    },
+    {
+      "id": "IM2-DEMO-B-SEC",
+      "position": "Secretary",
+      "team": "TEAM_B",
+      "full_name": "Toni Garcia (Demo)",
+      "achievements": "Demonstration profile: Prepared sample meeting minutes and organized a classroom records project."
+    },
+    {
+      "id": "IM2-DEMO-B-TREAS",
+      "position": "Treasurer",
+      "team": "TEAM_B",
+      "full_name": "Robin Lim (Demo)",
+      "achievements": "Demonstration profile: Prepared a sample activity budget and presented a student fund transparency report."
+    },
+    {
+      "id": "IM2-DEMO-B-AUD",
+      "position": "Auditor",
+      "team": "TEAM_B",
+      "full_name": "Jules Castillo (Demo)",
+      "achievements": "Demonstration profile: Reviewed a sample budget, checked receipts, and prepared an accountability checklist."
+    },
+    {
+      "id": "IM2-DEMO-B-PIO",
+      "position": "PIO",
+      "team": "TEAM_B",
+      "full_name": "Chris Dela Pena (Demo)",
+      "achievements": "Demonstration profile: Created a sample student information campaign and coordinated event announcements."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-01",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Dana Santiago (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: student welfare."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-02",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Enzo Castillo (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: peer mentoring."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-03",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Lia Fernandez (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: accessible activities."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-04",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Miguel Lopez (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: environmental projects."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-05",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Ria Gonzales (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: academic support."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-06",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Adrian Perez (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: student feedback."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-07",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Celine Navarro (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: sports participation."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-08",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Tomas Rivera (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: arts and culture."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-09",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Sofia Velasco (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: digital information."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-10",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Ivan Domingo (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: volunteer service."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-11",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Kaye Ramos (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: inclusive events."
+    },
+    {
+      "id": "IM2-DEMO-B-SEN-12",
+      "position": "Senator",
+      "team": "TEAM_B",
+      "full_name": "Theo Marquez (Demo)",
+      "achievements": "Demonstration profile: Supported a sample classroom outreach project and peer leadership activity. Focus: classroom representation."
+    }
+  ]
+}

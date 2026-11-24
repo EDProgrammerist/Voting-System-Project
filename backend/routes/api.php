@@ -24,7 +24,7 @@ Route::prefix('voter')->group(function (): void {
     )->middleware('throttle:20,1');
 
     Route::middleware([
-        'auth:sanctum',
+        'auth:sanctum', 
         'voter.only',
     ])->group(function (): void {
         Route::get('/session', [VoterAuthController::class, 'session']);
