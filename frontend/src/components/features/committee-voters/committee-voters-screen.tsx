@@ -19,6 +19,15 @@ import { ClassListImport } from "./class-list-import";
 import { PageSkeleton } from "@/components/common/page-skeleton";
 
 const LIVE_REFRESH_INTERVAL_MS = 5_000;
+const YEAR_LEVELS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+const SECTIONS = ["1D", "2D", "3D", "4D"];
+const UNSPECIFIED = "__unspecified__";
+
+function formatYearLevel(value: string | null): string {
+  const year = value?.trim() ?? "";
+  const match = year.match(/^(?:year\s*)?([1-4])(?:st|nd|rd|th)?(?:\s*year)?$/i);
+  return match ? YEAR_LEVELS[Number(match[1]) - 1] : year;
+}
 
 function normalizeSearch(value: string): string {
   return value
@@ -50,6 +59,9 @@ export function CommitteeVotersScreen() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("All Status");
+  const [course, setCourse] = useState("");
+  const [yearLevel, setYearLevel] = useState("");
+  const [section, setSection] = useState("");
   const [notice, setNotice] = useState("");
   const [elections, setElections] = useState<ElectionSummary[]>([]);
   const [electionId, setElectionId] = useState<number | null>(null);
@@ -144,11 +156,47 @@ export function CommitteeVotersScreen() {
     () => [...new Set(voters.map((voter) => voter.academic_status))],
     [voters],
   );
+  const normalizedVoters = useMemo(
+    () =>
+      voters.map((voter) => ({
+        ...voter,
+        course: voter.course?.trim().toUpperCase() ?? "",
+        year_level: formatYearLevel(voter.year_level),
+        section: voter.section?.trim().toUpperCase() ?? "",
+      })),
+    [voters],
+  );
+  const filterOptions = useMemo(() => {
+    const sorted = (values: string[]) =>
+      [...new Set(values.filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true }),
+      );
+    return {
+      courses: sorted(normalizedVoters.map((voter) => voter.course)),
+      years: sorted([
+        ...YEAR_LEVELS,
+        ...normalizedVoters.map((voter) => voter.year_level),
+      ]),
+      sections: sorted([
+        ...SECTIONS,
+        ...normalizedVoters.map((voter) => voter.section),
+      ]),
+    };
+  }, [normalizedVoters]);
+
+  function clearFilters() {
+    setQuery("");
+    setStatus("All Status");
+    setCourse("");
+    setYearLevel("");
+    setSection("");
+  }
+
   const filteredVoters = useMemo(() => {
     const search = normalizeSearch(query);
     const nameParts = search.split(/\s+/);
     const idSearch = search.replaceAll(" ", "");
-    return voters.filter((voter) => {
+    return normalizedVoters.filter((voter) => {
       const name = normalizeSearch(voter.full_name);
       const studentId = normalizeSearch(voter.student_id).replaceAll(" ", "");
       const matchesSearch =
@@ -157,9 +205,16 @@ export function CommitteeVotersScreen() {
         nameParts.every((part) => name.includes(part));
       const matchesStatus =
         status === "All Status" || voter.academic_status === status;
-      return matchesSearch && matchesStatus;
+      const matchesField = (selected: string, value: string) =>
+        !selected || (selected === UNSPECIFIED ? !value : selected === value);
+      return (
+        matchesSearch && matchesStatus &&
+        matchesField(course, voter.course) &&
+        matchesField(yearLevel, voter.year_level) &&
+        matchesField(section, voter.section)
+      );
     });
-  }, [status, query, voters]);
+  }, [status, query, normalizedVoters, course, yearLevel, section]);
 
   if (loading)
     return (
@@ -199,6 +254,7 @@ export function CommitteeVotersScreen() {
                 aria-label="Election for attendance"
                 value={electionId ?? ""}
                 onChange={(event) => {
+                  clearFilters();
                   setLoading(true);
                   setVoters([]);
                   setNotice("");
@@ -227,6 +283,38 @@ export function CommitteeVotersScreen() {
             </button>
           </div>
 
+          {[
+            {
+              label: "course", value: course, onChange: setCourse,
+              options: filterOptions.courses, all: "All courses", format: formatCourse,
+            },
+            {
+              label: "year level", value: yearLevel, onChange: setYearLevel,
+              options: filterOptions.years, all: "All year levels", format: (value: string) => value,
+            },
+            {
+              label: "section", value: section, onChange: setSection,
+              options: filterOptions.sections, all: "All sections", format: (value: string) => value,
+            },
+          ].map((filter) => (
+            <label className="voter-filters__select" key={filter.label}>
+              <span>Filter by {filter.label}</span>
+              <select
+                aria-label={`Filter by ${filter.label}`}
+                value={filter.value}
+                onChange={(event) => filter.onChange(event.target.value)}
+              >
+                <option value="">{filter.all}</option>
+                {filter.options.map((item) => (
+                  <option key={item} value={item}>
+                    {filter.format(item)}
+                  </option>
+                ))}
+                <option value={UNSPECIFIED}>Not specified</option>
+              </select>
+              <CaretDown aria-hidden="true" weight="bold" />
+            </label>
+          ))}
           <label className="voter-filters__select">
             <span>Filter by academic status</span>
             <select
@@ -243,6 +331,14 @@ export function CommitteeVotersScreen() {
             </select>
             <CaretDown aria-hidden="true" weight="bold" />
           </label>
+          <button
+            className="voter-filters__clear"
+            type="button"
+            onClick={clearFilters}
+            disabled={!query && status === "All Status" && !course && !yearLevel && !section}
+          >
+            Clear filters
+          </button>
         </form>
 
         <section className="voters-table-card" aria-label="Registered voters">

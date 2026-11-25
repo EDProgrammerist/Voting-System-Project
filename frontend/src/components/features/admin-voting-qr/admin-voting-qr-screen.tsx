@@ -5,37 +5,37 @@ import { useAdminElection } from "@/hooks/use-admin-election";
 import { AdminElectionQr } from "./admin-election-qr";
 import "../admin-dashboard/admin-dashboard-screen.css";
 import "../admin-dashboard/admin-overview.css";
-import "./admin-settings-screen.css";
+import "./admin-voting-qr-screen.css";
 import { PageSkeleton } from "@/components/common/page-skeleton";
 
-export function AdminSettingsScreen() {
+export function AdminVotingQrScreen() {
   const [attempt, setAttempt] = useState(0);
   const { election, state, error } = useAdminElection(attempt);
   const loading = state === "loading";
-  useDocumentTitle("Settings | CPC Vote Admin");
+  useDocumentTitle("Voting QR | CPC Vote Admin");
 
   if (loading)
     return (
       <section className="admin-dashboard__content">
-        <PageSkeleton kind="settings" label="Loading election settings" />
+        <PageSkeleton kind="settings" label="Loading voting QR" />
       </section>
     );
   return (
     <>
       <section className="admin-dashboard__content">
-        <header className="admin-settings__heading">
-          <h1>Settings</h1>
-          <p>Manage the voting tools for your school election.</p>
+        <header className="admin-voting-qr__heading">
+          <h1>Voting QR</h1>
+          <p>Display the voting code for the selected school election.</p>
         </header>
         <section
-          className="admin-settings__card"
-          aria-labelledby="settings-voting-qr-title"
+          className="admin-voting-qr__card"
+          aria-labelledby="voting-qr-title"
           aria-busy={loading}
         >
           <header>
             <QrCode aria-hidden="true" />
             <div>
-              <h2 id="settings-voting-qr-title">Voting QR code</h2>
+              <h2 id="voting-qr-title">Voting QR code</h2>
               <p>
                 Students can scan this code directly from the screen to open
                 student login.
@@ -47,7 +47,7 @@ export function AdminSettingsScreen() {
               <p>{error}</p>
               <button
                 type="button"
-                className="admin-settings__retry"
+                className="admin-voting-qr__retry"
                 onClick={() => {
                   setAttempt((value) => value + 1);
                 }}
@@ -57,8 +57,8 @@ export function AdminSettingsScreen() {
             </div>
           ) : election ? (
             <>
-              <p className="admin-settings__election">{election.name}</p>
-              <p className="admin-settings__status">
+              <p className="admin-voting-qr__election">{election.name}</p>
+              <p className="admin-voting-qr__status">
                 {election.status === "closed"
                   ? "This election is closed. Its QR code no longer accepts new voters."
                   : election.status === "draft"

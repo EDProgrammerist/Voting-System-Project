@@ -1,63 +1,63 @@
-.admin-settings__heading {
+.admin-voting-qr__heading {
   margin-bottom: 28px;
 }
-.admin-settings__heading h1 {
+.admin-voting-qr__heading h1 {
   margin: 0;
   color: #202e43;
   font-size: 26px;
   font-weight: 750;
   letter-spacing: -0.8px;
 }
-.admin-settings__heading p {
+.admin-voting-qr__heading p {
   margin: 8px 0 0;
   color: #58677c;
   font-size: 13px;
   line-height: 1.7;
 }
-.admin-settings__card {
+.admin-voting-qr__card {
   max-width: 850px;
   padding: 28px;
   border: 1px solid #e0e6ef;
   border-radius: 12px;
   background: #fff;
 }
-.admin-settings__card > header {
+.admin-voting-qr__card > header {
   display: flex;
   align-items: flex-start;
   gap: 14px;
   margin-bottom: 26px;
 }
-.admin-settings__card > header > svg {
+.admin-voting-qr__card > header > svg {
   flex: none;
   width: 28px;
   height: 28px;
   color: #2459b8;
 }
-.admin-settings__card h2 {
+.admin-voting-qr__card h2 {
   margin: 0;
   color: #202e43;
   font-size: 18px;
   font-weight: 750;
 }
-.admin-settings__card p {
+.admin-voting-qr__card p {
   color: #58677c;
   font-size: 13px;
   line-height: 1.8;
 }
-.admin-settings__card header p {
+.admin-voting-qr__card header p {
   margin: 8px 0 0;
 }
-.admin-settings__election {
+.admin-voting-qr__election {
   max-width: 520px;
   color: #394d68;
   font-size: 12px;
   font-weight: 650;
 }
-.admin-settings__status {
+.admin-voting-qr__status {
   max-width: 64ch;
   margin: 14px 0 0;
 }
-.admin-settings__retry {
+.admin-voting-qr__retry {
   min-height: 44px;
   padding: 8px 16px;
   margin-top: 10px;
@@ -67,12 +67,12 @@
   background: #fff;
   cursor: pointer;
 }
-.admin-settings button:focus-visible {
+.admin-voting-qr button:focus-visible {
   outline: 3px solid #2459b8;
   outline-offset: 3px;
 }
 @media (max-width: 640px) {
-  .admin-settings__card {
+  .admin-voting-qr__card {
     padding: 22px 18px;
   }
 }

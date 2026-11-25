@@ -24,7 +24,7 @@ const AdminLoginPage = lazy(() => import("@/pages/admin/login"));
 const CommitteeVotersPage = lazy(() => import("@/pages/committee/voters"));
 const CommitteeLoginPage = lazy(() => import("@/pages/committee/login"));
 const AdminVotesPage = lazy(() => import("@/pages/admin/votes"));
-const AdminSettingsPage = lazy(() => import("@/pages/admin/settings"));
+const AdminVotingQrPage = lazy(() => import("@/pages/admin/voting-qr"));
 const HomePage = lazy(() => import("@/pages/guest/home"));
 const GuestLayout = lazy(() => import("@/pages/guest/layout"));
 const NotFoundPage = lazy(() => import("@/pages/guest/not-found"));
@@ -131,7 +131,8 @@ export default function AppRouter() {
         />
         <Route element={<RequireAdmin />}>
           <Route element={<StaffPortalLayout portal="admin" />}>
-            <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            <Route path="/admin/voting-qr" element={<AdminVotingQrPage />} />
+            <Route path="/admin/settings" element={<Navigate to="/admin/voting-qr" replace />} />
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/admin/votes" element={<AdminVotesPage />} />
             <Route

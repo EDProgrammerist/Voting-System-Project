@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   CheckSquareOffset,
   Gauge,
-  GearSix,
+  QrCode,
   List,
   SignOut,
   UserList,
@@ -27,7 +27,7 @@ import {
 import { logoutCommittee } from "@/services/committee-service";
 
 type AdminSection =
-  "dashboard" | "votes" | "voters" | "candidates" | "partylists" | "settings";
+  "dashboard" | "votes" | "voters" | "candidates" | "partylists" | "voting-qr";
 
 interface AdminSidebarProps {
   active: AdminSection;
@@ -74,10 +74,10 @@ const adminNavigationGroups = [
     label: "Administration",
     items: [
       {
-        id: "settings",
-        label: "Settings",
-        icon: GearSix,
-        path: "/admin/settings",
+        id: "voting-qr",
+        label: "Voting QR",
+        icon: QrCode,
+        path: "/admin/voting-qr",
       },
     ],
   },

@@ -1,6 +1,6 @@
 .voter-filters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 240px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
   border: 1px solid #e4e9f0;
   border-radius: 10px;
@@ -10,7 +10,32 @@
 }
 .voter-filters__search {
   display: grid;
+  grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr) 44px;
+}
+.voter-filters__clear {
+  grid-column: 1 / -1;
+  justify-self: end;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #fff;
+  color: #2459b8;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.voter-filters__clear:hover:not(:disabled) {
+  background: #edf2fc;
+}
+.voter-filters__clear:disabled {
+  color: #66758a;
+  cursor: default;
+}
+.voter-filters :is(input, select, button):focus-visible {
+  outline: 2px solid #2459b8;
+  outline-offset: 3px;
 }
 .voter-filters__election {
   display: grid;
@@ -206,6 +231,11 @@
   .voters-table th,
   .voters-table td {
     padding-inline: 12px;
+  }
+}
+@media (max-width: 1000px) {
+  .voter-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 640px) {
