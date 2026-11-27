@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\ClassSection;
 use App\Models\Student;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +31,7 @@ class ClassListReader
         'fullname' => 'full_name', 'name' => 'full_name', 'studentname' => 'full_name',
         'course' => 'course', 'program' => 'course', 'yearlevel' => 'year_level', 'year' => 'year_level',
         'section' => 'section', 'classsection' => 'section', 'academicstatus' => 'academic_status', 'enrollmentstatus' => 'academic_status', 'status' => 'academic_status',
+        'votingstatus' => '_voting_status', 'attendance' => '_attendance', 'attendancetime' => '_attendance_time',
     ];
 
     public function inspect(UploadedFile $file): array
@@ -85,7 +87,7 @@ class ClassListReader
         return $matches[0];
     }
 
-    public function preview(UploadedFile $file, string $worksheet, int $headerRow): array
+    public function preview(UploadedFile $file, string $worksheet, int $headerRow, ?ClassSection $section = null): array
     {
         $sheets = $this->inspect($file);
         $info = collect($sheets)->firstWhere('name', $worksheet);
@@ -134,7 +136,7 @@ class ClassListReader
         if (in_array('full_name', $mapping, true) && (in_array('first_name', $mapping, true) || in_array('last_name', $mapping, true))) {
             $this->fail('Use either Full Name or separate Lastname and Firstname columns, so names are unambiguous.');
         }
-        $mapping = array_filter($mapping, fn ($field) => $field !== '_sequence');
+        $mapping = array_filter($mapping, fn ($field) => ! str_starts_with($field, '_'));
         $book->disconnectWorksheets();
         $reader->setReadFilter($this->filter($headerRow + 1, $headerRow + self::MAX_ROWS, array_keys($mapping)));
         try {
@@ -195,6 +197,16 @@ class ClassListReader
             $record['full_name'] = Str::squish($record['full_name']);
             $record['course'] = $record['course'] ? Str::upper($record['course']) : null;
             $record['academic_status'] = Str::lower($record['academic_status']);
+            if ($section) {
+                if ($section->conflictsWith($record)) {
+                    $rowIssues[] = ['row' => $number, 'field' => 'section', 'message' => 'The course, year level, or section conflicts with the selected section. Correct the class details before importing.'];
+                }
+                foreach ($section->classFields() as $field => $value) {
+                    if (trim((string) $record[$field]) === '') {
+                        $record[$field] = $value;
+                    }
+                }
+            }
             $validator = Validator::make($record, [
                 'student_id' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9][A-Za-z0-9._-]*$/'],
                 'full_name' => ['required', 'string', 'max:255', 'regex:/\pL/u'],
@@ -224,10 +236,14 @@ class ClassListReader
         if (! $rows) {
             $this->fail('The selected worksheet has no student rows below the header.');
         }
-        $existing = Student::whereIn('student_id', array_column($rows, 'student_id'))->pluck('student_id')->map(fn ($id) => strtolower($id))->flip();
+        $existing = Student::whereIn('student_id', array_column($rows, 'student_id'))->get()->keyBy(fn ($student) => strtolower($student->student_id));
         foreach ($rows as &$row) {
             if ($row['status'] === 'new' && $existing->has(strtolower($row['student_id']))) {
                 $row['status'] = 'existing';
+                if ($section?->conflictsWith($existing->get(strtolower($row['student_id']))->getAttributes())) {
+                    $row['status'] = 'invalid';
+                    $issues[] = ['row' => $row['row_number'], 'field' => 'section', 'message' => 'This student already belongs to a different class. Existing class assignments are preserved.'];
+                }
             }
         }
         unset($row);

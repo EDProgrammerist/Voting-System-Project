@@ -20,7 +20,7 @@ export function StaffPortalLayout({
   const { pathname } = useLocation();
   const section =
     portal === "committee"
-      ? "voters"
+      ? pathname.endsWith("/sections") ? "sections" : "overview"
       : pathname.endsWith("/votes")
         ? "votes"
         : pathname.endsWith("/partylists")
@@ -31,8 +31,10 @@ export function StaffPortalLayout({
               ? "voting-qr"
               : "dashboard";
   const kind =
-    section === "voters" || section === "votes"
+    section === "votes" || section === "sections"
       ? "table"
+      : section === "overview"
+        ? "dashboard"
       : section === "partylists"
         ? "candidates"
         : section === "voting-qr"
@@ -40,7 +42,7 @@ export function StaffPortalLayout({
           : section;
   return (
     <main
-      className={`admin-dashboard admin-overview ${section === "dashboard" ? "" : section === "voting-qr" ? "admin-voting-qr" : `admin-management admin-${section}`}`}
+      className={`admin-dashboard admin-overview ${section === "dashboard" ? "" : section === "voting-qr" ? "admin-voting-qr" : `admin-management admin-${section === "overview" ? "committee-overview" : section}`}`}
       data-ui
     >
       <a className="overview-skip" href="#portal-main">

@@ -1,0 +1,47 @@
+.committee-sections { min-width: 0; }
+.sections-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.sections-header h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.8px; color: #202e43; }
+.sections-header p, .sections-help { color: #58677c; font-size: 13px; line-height: 1.8; margin: 8px 0 0; }
+.sections-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #2459b8; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.committee-sections svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sections-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 14px; border: 1px solid #cbd6e5; border-radius: 7px; background: #fff; color: #2459b8; font-size: 12px; font-weight: 600; cursor: pointer; }
+.sections-button:hover:not(:disabled) { background: #edf2fa; }
+.sections-button:disabled { color: #65748a; background: #edf0f4; cursor: default; }
+.committee-sections :is(button, input, select, a, summary):focus-visible { outline: 2px solid #2459b8; outline-offset: 3px; }
+.sections-toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sections-toolbar { margin-bottom: 24px; align-items: end; }
+.sections-toolbar > button { justify-self: start; }
+.committee-sections label { display: grid; min-width: 0; gap: 8px; color: #394d68; font-size: 12px; font-weight: 600; }
+.committee-sections label :is(input, select) { min-width: 0; width: 100%; min-height: 44px; border: 1px solid #cbd6e5; border-radius: 7px; background: #fff; padding: 10px 12px; color: #202e43; font-size: 13px; }
+.section-course > h2 { margin: 0; color: #202e43; font-size: 18px; font-weight: 750; }
+.section-directory { display: grid; gap: 24px; }
+.section-course { border: 1px solid #dce5f1; background: #fff; border-radius: 12px; overflow: hidden; }
+.section-course > h2 { padding: 20px 24px; border-bottom: 1px solid #e4e9f0; }
+.section-year { padding: 0 24px; }
+.section-year h3 { font-size: 13px; font-weight: 700; color: #58677c; margin: 20px 0 6px; }
+.section-year ul { margin: 0; padding: 0; list-style: none; }
+.section-year li { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 14px 0; border-bottom: 1px solid #e4e9f0; }
+.section-year:last-child li:last-child { border: 0; }
+.section-open { display: flex; align-items: center; text-align: left; gap: 14px; min-height: 44px; min-width: 0; background: none; border: 0; color: #2459b8; cursor: pointer; padding: 0 4px; }
+.section-open > svg { width: 26px; height: 26px; }
+.section-open span, .sections-unassigned > span:first-child { display: grid; gap: 5px; min-width: 0; }
+.section-open strong, .sections-unassigned strong { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.section-open small, .sections-unassigned small { font-size: 12px; color: #58677c; line-height: 1.6; }
+.section-open:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.sections-unassigned { display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; background: #fff; border: 1px solid #dce5f1; border-radius: 12px; padding: 20px 24px; min-height: 72px; color: #2459b8; cursor: pointer; }
+.sections-unassigned > span:last-child { font-size: 12px; white-space: nowrap; }
+.sections-error { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff0ef; color: #a13530; padding: 14px 18px; border-radius: 7px; font-size: 13px; margin: 0 0 20px; }
+.sections-empty { padding: 28px 20px; border: 1px solid #dce5f1; border-radius: 12px; background: #fff; color: #58677c; font-size: 13px; text-align: center; }
+.sections-empty h2 { font-size: 16px; color: #202e43; margin: 0 0 8px; }
+.sections-empty p { margin: 0; }
+@media (max-width: 760px) {
+  .sections-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sections-toolbar > label:first-child { grid-column: 1 / -1; }
+  .section-year li { flex-wrap: wrap; gap: 12px; }
+  .section-year, .section-course > h2 { padding-inline: 18px; }
+  .sections-unassigned { padding: 18px; }
+}
+@media (max-width: 360px) {
+  .sections-toolbar { grid-template-columns: 1fr; }
+  .sections-unassigned { align-items: flex-start; flex-direction: column; }
+}

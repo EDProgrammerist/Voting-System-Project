@@ -16,14 +16,14 @@ export interface ClassListRow {
   year_level: string | null;
   section: string | null;
   academic_status: string;
-  status: "new" | "existing" | "invalid";
+  status: "new" | "existing" | "invalid" | "organize";
 }
 export interface ClassListPreview {
   layout: { worksheet: string; header_row: number };
   rows: ClassListRow[];
   issues: { row: number; field: string; message: string }[];
   warnings: { row: number; message: string }[];
-  summary: { total: number; new: number; existing: number; invalid: number };
+  summary: { total: number; new: number; existing: number; invalid: number; organize?: number };
   import_id: string | null;
   expires_at: string | null;
 }
@@ -37,4 +37,18 @@ export interface ClassListResult {
   inserted: number;
   skipped: number;
   already_committed: boolean;
+  organized?: number;
+}
+
+export interface ClassSection {
+  id: number;
+  course: string;
+  year_level: number;
+  name: string;
+  student_count: number;
+}
+
+export interface SectionsResponse {
+  data: ClassSection[];
+  unassigned_count: number;
 }

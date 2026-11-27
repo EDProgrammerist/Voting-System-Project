@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
 
 import { useDocumentTitle } from "@/hooks/use-document-title";
-import { getCommitteeToken } from "@/lib/committee-session";
+import { getCommitteeToken, getCommitteeElectionId, setCommitteeElectionId } from "@/lib/committee-session";
 import {
   listAllCommitteeStudents,
   listCommitteeElections,
@@ -64,7 +64,7 @@ export function CommitteeVotersScreen() {
   const [section, setSection] = useState("");
   const [notice, setNotice] = useState("");
   const [elections, setElections] = useState<ElectionSummary[]>([]);
-  const [electionId, setElectionId] = useState<number | null>(null);
+  const [electionId, setElectionId] = useState<number | null>(getCommitteeElectionId);
 
   useDocumentTitle("Voters | CPC Vote Committee");
 
@@ -77,10 +77,12 @@ export function CommitteeVotersScreen() {
         if (!active) return;
         setElections(data);
         const election =
+          data.find((item) => item.id === getCommitteeElectionId()) ??
           data.find((item) => item.status === "active") ??
           data.find((item) => item.status === "draft") ??
           data[0];
         setElectionId(election?.id ?? null);
+        setCommitteeElectionId(election?.id ?? null);
       })
       .catch(() => {
         /* Student list still reports its current election if the picker is unavailable. */
@@ -259,6 +261,7 @@ export function CommitteeVotersScreen() {
                   setVoters([]);
                   setNotice("");
                   setElectionId(Number(event.target.value));
+                  setCommitteeElectionId(Number(event.target.value));
                 }}
               >
                 {elections.map((election) => (

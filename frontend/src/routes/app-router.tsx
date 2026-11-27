@@ -22,6 +22,8 @@ const AdminPartylistsPage = lazy(() => import("@/pages/admin/partylists"));
 const AdminDashboardPage = lazy(() => import("@/pages/admin/dashboard"));
 const AdminLoginPage = lazy(() => import("@/pages/admin/login"));
 const CommitteeVotersPage = lazy(() => import("@/pages/committee/voters"));
+const CommitteeSectionsPage = lazy(() => import("@/pages/committee/sections"));
+const CommitteeOverviewPage = lazy(() => import("@/pages/committee/dashboard"));
 const CommitteeLoginPage = lazy(() => import("@/pages/committee/login"));
 const AdminVotesPage = lazy(() => import("@/pages/admin/votes"));
 const AdminVotingQrPage = lazy(() => import("@/pages/admin/voting-qr"));
@@ -52,7 +54,7 @@ export default function AppRouter() {
   const defaultRoute = hasAdminToken
     ? "/admin/dashboard"
     : hasCommitteeToken
-      ? "/committee/voters"
+      ? "/committee/dashboard"
       : hasVoterToken
         ? isVoterPasswordRequired()
           ? "/voter/password"
@@ -68,7 +70,7 @@ export default function AppRouter() {
           path="/committee/login"
           element={
             hasCommitteeToken ? (
-              <Navigate to="/committee/voters" replace />
+              <Navigate to="/committee/dashboard" replace />
             ) : (
               <CommitteeLoginPage />
             )
@@ -76,7 +78,9 @@ export default function AppRouter() {
         />
         <Route element={<RequireCommittee />}>
           <Route element={<StaffPortalLayout portal="committee" />}>
+            <Route path="/committee/dashboard" element={<CommitteeOverviewPage />} />
             <Route path="/committee/voters" element={<CommitteeVotersPage />} />
+            <Route path="/committee/sections" element={<CommitteeSectionsPage />} />
           </Route>
         </Route>
         <Route

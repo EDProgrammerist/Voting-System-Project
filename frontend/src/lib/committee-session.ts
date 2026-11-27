@@ -16,6 +16,17 @@ export function saveCommitteeSession(token: string, user: CommitteeUser): void {
   sessionStorage.setItem("committee_user", JSON.stringify(user));
 }
 export function clearCommitteeSession(): void {
+  sessionStorage.removeItem("committee_election_id");
   sessionStorage.removeItem("committee_access_token");
   sessionStorage.removeItem("committee_user");
+}
+
+export function getCommitteeElectionId(): number | null {
+  const value = Number(sessionStorage.getItem("committee_election_id"));
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
+}
+
+export function setCommitteeElectionId(value: number | null): void {
+  if (value === null) sessionStorage.removeItem("committee_election_id");
+  else sessionStorage.setItem("committee_election_id", String(value));
 }

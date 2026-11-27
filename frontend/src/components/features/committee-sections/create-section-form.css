@@ -1,0 +1,18 @@
+.section-create { border: 1px solid #dce5f1; background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+.section-create h2 { margin: 0; color: #202e43; font-size: 18px; font-weight: 750; }
+.section-create p { color: #58677c; font-size: 13px; line-height: 1.8; margin: 8px 0 0; }
+.section-create__fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.section-create label { display: grid; gap: 8px; min-width: 0; color: #394d68; font-size: 12px; font-weight: 600; }
+.section-create label :is(input, select) { width: 100%; min-width: 0; min-height: 44px; border: 1px solid #cbd6e5; border-radius: 7px; background: #fff; padding: 10px 12px; color: #202e43; font: inherit; font-size: 13px; }
+.section-create__actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+.section-create .section-create__button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid #cbd6e5; border-radius: 7px; background: #fff; padding: 10px 14px; color: #2459b8; font-size: 12px; font-weight: 600; cursor: pointer; }
+.section-create .section-create__button--primary { background: #2459b8; border-color: #2459b8; color: #fff; }
+.section-create .section-create__button:hover:not(:disabled) { background: #edf2fa; }
+.section-create .section-create__button--primary:hover:not(:disabled) { background: #1b4896; }
+.section-create .section-create__button:disabled { cursor: default; background: #edf0f4; border-color: #dce3ec; color: #65748a; }
+.section-create :is(input, select, button):focus-visible { outline: 2px solid #2459b8; outline-offset: 3px; }
+.section-create .section-create__error { margin-top: 16px; padding: 12px 16px; border-radius: 7px; background: #fff0ef; color: #a13530; }
+@media (max-width: 760px) {
+  .section-create { padding: 20px; }
+  .section-create__fields { grid-template-columns: 1fr; }
+}

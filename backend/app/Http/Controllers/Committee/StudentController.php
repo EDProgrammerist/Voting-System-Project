@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Committee;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassSection;
 use App\Models\Election;
 use App\Models\Student;
 use App\Support\VoterElection;
@@ -16,6 +17,7 @@ class StudentController extends Controller
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'section_id' => ['nullable', 'integer', 'exists:class_sections,id'],
             'election_id' => [
                 'nullable',
                 'integer',
@@ -55,6 +57,9 @@ class StudentController extends Controller
 
         $students = Student::query()
             ->forElection($election)
+            ->when(isset($validated['section_id']), function ($query) use ($validated, $election): void {
+                $query->whereIn('student_id', ClassSection::findOrFail($validated['section_id'])->students($election)->select('student_id'));
+            })
             ->when(
                 $electionId,
                 function ($query, int $electionId): void {

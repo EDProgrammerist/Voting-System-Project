@@ -49,7 +49,7 @@ export function AdminLoginScreen({
         const response = await loginCommittee({ email, password });
         saveCommitteeSession(response.token, response.committee);
         setStatus("success");
-        navigate("/committee/voters", { replace: true });
+        navigate("/committee/dashboard", { replace: true });
         return;
       }
       const response = await loginAdmin({ email, password });

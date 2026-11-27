@@ -1,0 +1,55 @@
+.committee-overview { min-width: 0; }
+.committee-overview__header { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.committee-overview__header > div:first-child { flex: 1 1 320px; }
+.committee-overview__header h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.8px; color: #202e43; }
+.committee-overview__header p { margin: 8px 0 0; color: #58677c; font-size: 13px; line-height: 1.8; }
+.committee-overview__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.committee-overview :is(a, button) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; color: #2459b8; font-size: 12px; font-weight: 600; text-underline-offset: 3px; }
+.committee-overview__actions a, .committee-overview button { padding: 10px 14px; border: 1px solid #cbd6e5; background: #fff; border-radius: 7px; cursor: pointer; text-decoration: none; }
+.committee-overview__actions a:hover, .committee-overview button:hover { background: #edf2fa; }
+.committee-overview .committee-overview__add-section { background: #2459b8; border-color: #2459b8; color: #fff; }
+.committee-overview .committee-overview__add-section:hover { background: #1b4896; }
+.committee-overview svg { width: 18px; height: 18px; flex-shrink: 0; }
+.committee-overview :is(a, button, select):focus-visible { outline: 2px solid #2459b8; outline-offset: 3px; }
+.committee-overview__election { display: flex; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.committee-overview__election label { display: grid; gap: 8px; max-width: 400px; min-width: 0; flex: 1 1 240px; color: #394d68; font-size: 12px; font-weight: 600; }
+.committee-overview__election select { width: 100%; min-height: 44px; padding: 10px 12px; background: #fff; border: 1px solid #cbd6e5; border-radius: 7px; font: inherit; color: #202e43; }
+.committee-overview__election p { margin: 0 0 12px; font-size: 12px; color: #58677c; }
+.committee-overview__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #dce5f1; background: #fff; border-radius: 12px; overflow: hidden; margin: 0; }
+.committee-overview__metrics > div { padding: 24px; min-width: 0; }
+.committee-overview__metrics > div + div { border-left: 1px solid #e4e9f0; }
+.committee-overview__metrics dt { color: #394d68; font-size: 13px; font-weight: 650; }
+.committee-overview__metrics dd { margin: 12px 0 8px; font-size: 32px; font-weight: 750; line-height: 1.2; color: #202e43; font-variant-numeric: tabular-nums; }
+.committee-overview__metrics p { margin: 0; color: #58677c; font-size: 12px; line-height: 1.6; }
+.committee-overview__context { margin: 14px 0 24px; color: #58677c; font-size: 12px; line-height: 1.8; }
+.committee-overview__attention { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #dce5f1; border-radius: 12px; margin-bottom: 24px; }
+.committee-overview__attention h2 { margin: 0 0 6px; color: #202e43; font-size: 15px; font-weight: 700; }
+.committee-overview__attention p { margin: 0; font-size: 12px; color: #58677c; line-height: 1.7; }
+.committee-overview__attention a { flex-shrink: 0; }
+.committee-overview__courses { border: 1px solid #dce5f1; border-radius: 12px; overflow: hidden; background: #fff; }
+.committee-overview__table-heading { padding: 22px 24px; }
+.committee-overview__table-heading h2 { margin: 0; color: #202e43; font-size: 17px; font-weight: 750; }
+.committee-overview__table-heading p { margin: 6px 0 0; color: #58677c; font-size: 12px; line-height: 1.7; }
+.committee-overview table { width: 100%; border-collapse: collapse; text-align: left; }
+.committee-overview th { color: #58677c; background: #f8fafc; font-size: 11px; font-weight: 600; padding: 12px 24px; }
+.committee-overview td { color: #58677c; border-top: 1px solid #e4e9f0; font-size: 12px; padding: 12px 24px; font-variant-numeric: tabular-nums; }
+.committee-overview td strong { color: #202e43; }
+.committee-overview__empty { padding: 12px 24px 24px; color: #58677c; font-size: 13px; line-height: 1.8; }
+.committee-overview__notice { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-radius: 7px; padding: 14px 18px; background: #fff0ef; color: #a13530; margin-bottom: 20px; font-size: 13px; }
+.committee-overview__notice p { margin: 0; }
+.committee-overview__sr-only { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+@media (max-width: 1000px) { .committee-overview :is(th, td) { padding-inline: 16px; } }
+@media (max-width: 640px) {
+  .committee-overview__metrics { grid-template-columns: 1fr; }
+  .committee-overview__metrics > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 20px; padding: 18px 20px; }
+  .committee-overview__metrics > div + div { border-left: 0; border-top: 1px solid #e4e9f0; }
+  .committee-overview__metrics dd { grid-column: 2; grid-row: 1 / 3; font-size: 28px; margin: 0; }
+  .committee-overview__metrics p { grid-column: 1; }
+  .committee-overview__attention, .committee-overview__table-heading { padding: 20px; }
+  .committee-overview table, .committee-overview tbody { display: block; }
+  .committee-overview thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .committee-overview tr { display: grid; padding: 14px 20px; border-top: 1px solid #e4e9f0; }
+  .committee-overview td { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding: 7px 0; border: 0; overflow-wrap: anywhere; }
+  .committee-overview td::before { content: attr(data-label); color: #58677c; font-size: 11px; }
+  .committee-overview td a { justify-content: flex-start; }
+}

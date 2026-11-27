@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PartylistController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Committee\ClassListImportController;
 use App\Http\Controllers\Committee\CommitteeAuthController;
+use App\Http\Controllers\Committee\SectionController;
 use App\Http\Controllers\Committee\StudentController;
 use App\Http\Controllers\Voter\BallotController;
 use App\Http\Controllers\Voter\QrEntryController;
@@ -24,7 +25,7 @@ Route::prefix('voter')->group(function (): void {
     )->middleware('throttle:20,1');
 
     Route::middleware([
-        'auth:sanctum', 
+        'auth:sanctum',
         'voter.only',
     ])->group(function (): void {
         Route::get('/session', [VoterAuthController::class, 'session']);
@@ -135,6 +136,10 @@ Route::prefix('committee')->group(function (): void {
         Route::post('/logout', [CommitteeAuthController::class, 'logout']);
         Route::get('/elections', [ElectionController::class, 'index']);
         Route::get('/students', [StudentController::class, 'index']);
+        Route::get('/sections', [SectionController::class, 'index']);
+        Route::get('/courses', [SectionController::class, 'courses']);
+        Route::post('/sections', [SectionController::class, 'store']);
+        Route::get('/sections/{section}/export', [SectionController::class, 'export']);
         Route::post('/students', [StudentController::class, 'store']);
         Route::put('/students/{studentId}', [StudentController::class, 'update']);
         Route::post('/class-list/inspect', [ClassListImportController::class, 'inspect'])->middleware('throttle:10,1');

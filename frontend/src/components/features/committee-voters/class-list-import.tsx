@@ -25,10 +25,14 @@ export function ClassListImport({
   onImported,
   electionId,
   electionName,
+  section,
+  initiallyOpen = false,
 }: {
   onImported: () => void;
   electionId?: number;
   electionName?: string;
+  section?: { id: number; course: string; year_level: number; name: string };
+  initiallyOpen?: boolean;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [inspection, setInspection] = useState<ClassListInspection | null>(
@@ -80,11 +84,12 @@ export function ClassListImport({
         sheet,
         controller.signal,
         electionId,
+        section?.id,
       );
       if (controller.signal.aborted) return;
       setWorksheet(data.layout.worksheet);
       setPreview(data);
-      if (data.import_id && !data.issues.length && !data.warnings.length) {
+      if (!section && data.import_id && !data.issues.length && !data.warnings.length) {
         setBusy("commit");
         const imported = await commitClassList(token, data.import_id);
         if (controller.signal.aborted) return;
@@ -176,19 +181,20 @@ export function ClassListImport({
 
   const pageCount = preview ? Math.ceil(preview.rows.length / 20) : 0;
   return (
-    <details className="class-import">
+    <details className="class-import" open={initiallyOpen || undefined}>
       <summary>
         <UploadSimple aria-hidden="true" />
-        <span>Import class list from Excel</span>
+        <span>{section ? "Import Excel" : "Import class list from Excel"}</span>
       </summary>
       <div className="class-import__body" aria-busy={Boolean(busy)}>
         {electionName && (
           <p className="class-import__hint">Import into {electionName}.</p>
         )}
+        {section && <p className="class-import__hint">Selected class: {section.course}, year {section.year_level}, {section.name}. Missing class details use this section. Conflicting assignments must be corrected before importing. Exported voting and attendance columns are ignored.</p>}
         <p className="class-import__hint">
           Choose your class list to import and organize records automatically.
           Headers and names are detected, including Lastname, Firstname, and
-          M.I. Students already in this election are skipped. Existing accounts
+          M.I. {section ? "Existing records can receive missing class details; their names, passwords, and voting history are preserved." : "Students already in this election are skipped."} Existing accounts
           are preserved when added to another year's roster. New records receive
           no password or login access. Maximum 5 MB and 5,000 rows. Keep Student
           IDs as text to preserve leading zeros.
@@ -270,6 +276,7 @@ export function ClassListImport({
             <p>
               {result.inserted} students added to this election.{" "}
               {result.skipped} already registered students skipped.
+              {Boolean(result.organized) && <> {result.organized} existing records organized into this section.</>}
             </p>
           </div>
         )}
@@ -283,6 +290,7 @@ export function ClassListImport({
               {preview.summary.total} rows · {preview.summary.new} to add ·{" "}
               {preview.summary.existing} already registered ·{" "}
               {preview.summary.invalid} invalid rows
+              {Boolean(preview.summary.organize) && <> · {preview.summary.organize} to organize</>}
             </p>
             {preview.issues.length > 0 && (
               <div className="class-import__error" role="alert">
@@ -398,8 +406,7 @@ export function ClassListImport({
               </div>
             )}
             <p className="class-import__hint">
-              Review every ID and name. Confirming adds new records only.
-              Existing records are never overwritten.
+              Review every ID and name. {section ? "Confirming adds new records and fills missing class details. Existing names, accounts, and voting history are preserved." : "Confirming adds new records only. Existing records are never overwritten."}
             </p>
             {preview.import_id ? (
               <button
@@ -413,7 +420,7 @@ export function ClassListImport({
               >
                 {busy === "commit"
                   ? "Importing..."
-                  : `Confirm import (${preview.summary.new} students)`}
+                  : `Confirm import (${preview.summary.new + (preview.summary.organize ?? 0)} students)`}
               </button>
             ) : (
               preview.issues.length === 0 && (

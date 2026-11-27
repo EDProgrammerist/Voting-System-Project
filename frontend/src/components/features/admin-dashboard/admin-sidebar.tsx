@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   CheckSquareOffset,
   Gauge,
+  Folders,
   QrCode,
   List,
   SignOut,
@@ -9,7 +10,7 @@ import {
   Users,
   X,
 } from "@phosphor-icons/react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import committeeProfile from "@/assets/committee-profile.png";
 import adminProfile from "@/assets/admin-profile.png";
 
@@ -24,10 +25,19 @@ import {
   getCommitteeToken,
   getCommitteeUser,
 } from "@/lib/committee-session";
-import { logoutCommittee } from "@/services/committee-service";
+import { COMMITTEE_COURSES_CHANGED, listCommitteeCourses, logoutCommittee } from "@/services/committee-service";
 
 type AdminSection =
-  "dashboard" | "votes" | "voters" | "candidates" | "partylists" | "voting-qr";
+  "dashboard" | "overview" | "votes" | "voters" | "sections" | "candidates" | "partylists" | "voting-qr";
+
+interface NavigationItem {
+  id: string;
+  label: string;
+  icon: typeof Gauge;
+  path: string;
+  course?: string;
+}
+interface NavigationGroup {label: string; items: NavigationItem[]}
 
 interface AdminSidebarProps {
   active: AdminSection;
@@ -35,7 +45,7 @@ interface AdminSidebarProps {
   portal?: "admin" | "committee";
 }
 
-const adminNavigationGroups = [
+const adminNavigationGroups: NavigationGroup[] = [
   {
     label: "Reports",
     items: [
@@ -83,23 +93,22 @@ const adminNavigationGroups = [
   },
 ];
 
-const committeeNavigationGroups = [
-  {
-    label: "Committee",
-    items: [
-      { id: "voters", label: "Voters", icon: Users, path: "/committee/voters" },
-    ],
-  },
-];
-
 export function AdminSidebar({
   active,
   overview = false,
   portal = "admin",
 }: AdminSidebarProps) {
   const committee = portal === "committee";
+  const {pathname} = useLocation();
+  const [params] = useSearchParams();
+  const [courses, setCourses] = useState<string[]>([]);
+  const [courseError, setCourseError] = useState("");
+  const [coursesLoading, setCoursesLoading] = useState(true);
   const navigationGroups = committee
-    ? committeeNavigationGroups
+    ? [
+      {label: "Committee", items: [{id: "overview", label: "Overview", icon: Gauge, path: "/committee/dashboard"}]},
+      {label: "Courses", items: courses.map((course) => ({id: `course:${course}`, label: course, icon: Folders, path: `/committee/sections?course=${encodeURIComponent(course)}`, course}))},
+    ] satisfies NavigationGroup[]
     : adminNavigationGroups;
   const navigationLabel = committee
     ? "Committee navigation"
@@ -109,6 +118,40 @@ export function AdminSidebar({
   const sidebarRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const admin = committee ? getCommitteeUser() : getAdminUser();
+
+  useEffect(() => {
+    const token = getCommitteeToken();
+    if (!committee || !token) return;
+    const controller = new AbortController();
+    let inFlight = false;
+    let refreshQueued = false;
+    async function refreshCourses() {
+      if (inFlight) return;
+      inFlight = true;
+      try {
+        const response = await listCommitteeCourses(token!, controller.signal);
+        if (!controller.signal.aborted) {setCourses(response.data); setCourseError("");}
+      } catch {
+        if (!controller.signal.aborted) setCourseError("Courses are temporarily unavailable.");
+      } finally {
+        inFlight = false;
+        if (!controller.signal.aborted) setCoursesLoading(false);
+        if (refreshQueued && !controller.signal.aborted) {
+          refreshQueued = false;
+          void refreshCourses();
+        }
+      }
+    }
+    const refresh = () => {if (!document.hidden) void refreshCourses();};
+    const coursesChanged = () => {
+      if (inFlight) refreshQueued = true;
+      else void refreshCourses();
+    };
+    void refreshCourses();
+    window.addEventListener(COMMITTEE_COURSES_CHANGED, coursesChanged);
+    window.addEventListener("focus", refresh);
+    return () => {controller.abort(); window.removeEventListener(COMMITTEE_COURSES_CHANGED, coursesChanged); window.removeEventListener("focus", refresh);};
+  }, [committee, pathname]);
 
   useEffect(() => {
     if (!overview || !menuOpen) return;
@@ -170,7 +213,7 @@ export function AdminSidebar({
   }
 
   function handleNavigation(
-    item: (typeof navigationGroups)[number]["items"][number],
+    item: NavigationItem,
   ) {
     setMenuOpen(false);
     navigate(item.path);
@@ -222,7 +265,9 @@ export function AdminSidebar({
               <p>{group.label}</p>
               {group.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = item.id === active;
+                const isActive = "course" in item && item.course
+                  ? active === "sections" && params.get("course") === item.course
+                  : item.id === active;
                 return (
                   <button
                     aria-current={isActive ? "page" : undefined}
@@ -242,6 +287,9 @@ export function AdminSidebar({
               })}
             </div>
           ))}
+          {committee && coursesLoading && <p className="committee-course-status" role="status">Loading courses…</p>}
+          {committee && courseError && <div className="committee-course-status" role="status"><p>{courseError}</p><button type="button" onClick={() => window.dispatchEvent(new Event(COMMITTEE_COURSES_CHANGED))}>Try again</button></div>}
+          {committee && !coursesLoading && !courseError && courses.length === 0 && <p className="committee-course-status">No courses yet. Add a section from Overview.</p>}
         </nav>
         <div className="admin-dashboard__account">
           <div>

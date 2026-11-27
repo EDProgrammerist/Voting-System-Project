@@ -75,3 +75,7 @@ export async function apiRequest<T>(
   const response = await request(endpoint, init);
   return (await response.json().catch(() => null)) as T;
 }
+
+export async function apiDownload(endpoint: string, init?: RequestInit): Promise<Blob> {
+  return (await request(endpoint, init)).blob();
+}

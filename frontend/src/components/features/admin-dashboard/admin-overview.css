@@ -912,3 +912,6 @@
     scroll-behavior: auto !important;
   }
 }
+.admin-overview .committee-course-status { padding: 8px 12px; color: #58677c; font-size: 12px; line-height: 1.7; }
+.admin-overview .committee-course-status p { margin: 0 0 6px; }
+.admin-overview .committee-course-status button { border: 1px solid #cbd6e5; background: #fff; color: #2459b8; border-radius: 7px; padding: 8px 12px; min-height: 44px; cursor: pointer; }
